@@ -1,0 +1,15 @@
+[core]
+reloadable = false
+order = -110
+
+[package]
+title = "Fusion Twin workflow schema"
+version = "1.0.0"
+description = "Typed operating point and visualization controls for the fusion RTWT workflow."
+
+[dependencies]
+"omni.usd.libs" = {}
+"omni.cae.viz" = {}
+
+[[python.module]]
+name = "fusion.twin.schema"

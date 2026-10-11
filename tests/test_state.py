@@ -26,6 +26,14 @@ class StateValidationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_patch({"exec": "arbitrary"}, set())
 
+    def test_design_equilibrium_and_scientific_modes_are_explicit(self):
+        self.assertEqual(validate_patch({"design": "longleg", "equilibrium": "rampup", "mode": "delta_temperature"}, set()),
+                         {"design": "longleg", "equilibrium": "rampup", "mode": "delta_temperature"})
+        self.assertEqual(validate_patch({"mode": "volume"}, set()), {"mode": "volume"})
+        for patch_value in ({"design": "unknown"}, {"equilibrium": "unknown"}, {"mode": "unknown"}):
+            with self.assertRaises(ValueError):
+                validate_patch(patch_value, set())
+
     def test_export_contains_complete_provenance_and_manifest_sources(self):
         root = Path(__file__).resolve().parents[1]
         manifest = json.loads((root / "assets/manifest.json").read_text(encoding="utf-8"))

@@ -67,14 +67,14 @@ class ComputeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.output = tempfile.TemporaryDirectory(prefix="fusion_compute_test_")
-        cls.engine = FieldEngine(ROOT)
-        cls.engine.runtime = Path(cls.output.name)
+        cls.engine = FieldEngine(ROOT, runtime=Path(cls.output.name))
 
     @classmethod
     def tearDownClass(cls):
         cls.output.cleanup()
 
     def solve(self, parameters, phase=1.0):
+        self.engine._select_context("conventional", "reference")
         temperature, heatflux, _ = self.engine._solve(parameters, phase)
         return temperature.copy(), heatflux.copy()
 
@@ -120,8 +120,8 @@ class ComputeTests(unittest.TestCase):
         self.assertEqual(len(result["history"]), 31)
         previous_peak = -np.inf
         for sample in result["history"]:
-            # Phase is serialized to four decimals; use time to recover exact sample position.
-            phase = sample["time_s"] / 600.0
+            self.assertNotIn("time_s", sample)
+            phase = sample["phase"]
             temperature, heatflux = self.solve(state, phase)
             self.assertAlmostEqual(sample["peak_temperature_C"], float(temperature.max()), delta=0.02)
             self.assertAlmostEqual(sample["heatflux"], float(heatflux.max()), delta=0.002)
@@ -141,8 +141,8 @@ class ComputeTests(unittest.TestCase):
     def test_published_fields_have_consistent_shapes_units_and_legends(self):
         state = {**SCENARIOS["lowflow"], "phase": 0.73, "scenario": "lowflow"}
         result = self.engine.compute(state, 102)
-        fields = np.load(self.engine.runtime / "fields.npz", allow_pickle=False)
-        metadata = json.loads((self.engine.runtime / "fields.json").read_text(encoding="utf-8"))
+        fields = np.load(self.engine.runtime / result["field_ref"]["path"], allow_pickle=False)
+        metadata = json.loads(str(fields["metadata_json"]))
         n, m = len(fields["surface_points"]), len(fields["surface_triangles"])
         self.assertEqual(fields["surface_points"].shape, (n, 3))
         self.assertEqual(fields["surface_triangles"].shape, (m, 3))
@@ -155,8 +155,9 @@ class ComputeTests(unittest.TestCase):
         self.assertEqual(metadata["units"]["heatflux"], "MW/m2")
         self.assertEqual(metadata["units"]["slice"], "keV")
         for array in fields.values():
-            self.assertTrue(np.isfinite(array).all())
-        for name in ("temperature_rgb", "heatflux_rgb", "slice_rgb"):
+            if array.dtype.kind in "fi":
+                self.assertTrue(np.isfinite(array).all())
+        for name in ("temperature_rgb", "heatflux_rgb", "slice_rgb", "delta_temperature_rgb", "delta_heatflux_rgb"):
             self.assertEqual(fields[name].shape[1], 3)
             self.assertTrue(np.all((fields[name] >= 0) & (fields[name] <= 1)))
         for bounds in metadata["ranges"].values():
@@ -166,6 +167,10 @@ class ComputeTests(unittest.TestCase):
         self.assertIn("synthetic", result["source_label"].lower())
         self.assertIn("synthetic", result["assumptions"]["plasma_slice"].lower())
         self.assertIn("demonstration", result["assumptions"]["limit"].lower())
+        self.assertEqual(str(fields["field_key"]), result["field_ref"]["key"])
+        self.assertEqual(int(fields["field_revision"]), result["field_ref"]["revision"])
+        self.assertEqual(str(fields["topology_key"]), result["field_ref"]["topology_key"])
+        fields.close()
 
     def test_magnetic_lines_stay_in_equilibrium_domain_and_follow_flux(self):
         eq, lines = self.engine.eq, self.engine.lines
@@ -215,11 +220,16 @@ class DeviceConsistencyTests(unittest.TestCase):
         cls.gpu = FieldEngine(ROOT, device="cuda:0")
 
     def test_cpu_and_cuda_thermal_results_agree(self):
-        for parameters in (SCENARIOS["nominal"], SCENARIOS["highload"]):
-            cpu_t, cpu_q, _ = self.cpu._solve(parameters, 0.41)
-            gpu_t, gpu_q, _ = self.gpu._solve(parameters, 0.41)
-            np.testing.assert_allclose(cpu_t, gpu_t, atol=1e-3, rtol=1e-5)
-            np.testing.assert_allclose(cpu_q, gpu_q, atol=1e-5, rtol=1e-5)
+        for design in ("conventional", "longleg"):
+            for equilibrium in ("reference", "rampup", "sof", "eof", "rampdown"):
+                self.cpu._select_context(design, equilibrium)
+                self.gpu._select_context(design, equilibrium)
+                for parameters in (SCENARIOS["nominal"], SCENARIOS["highload"]):
+                    with self.subTest(design=design, equilibrium=equilibrium, parameters=parameters):
+                        cpu_t, cpu_q, _ = self.cpu._solve(parameters, 0.41)
+                        gpu_t, gpu_q, _ = self.gpu._solve(parameters, 0.41)
+                        np.testing.assert_allclose(cpu_t, gpu_t, atol=1e-3, rtol=1e-5)
+                        np.testing.assert_allclose(cpu_q, gpu_q, atol=1e-5, rtol=1e-5)
 
     def test_returned_cpu_fields_survive_a_following_solve(self):
         temperatures, heatflux, _ = self.cpu._solve(SCENARIOS["highload"], 0.8)
@@ -227,6 +237,22 @@ class DeviceConsistencyTests(unittest.TestCase):
         self.cpu._solve(SCENARIOS["nominal"], 0.8)
         np.testing.assert_array_equal(temperatures, expected_t)
         np.testing.assert_array_equal(heatflux, expected_q)
+
+    def test_all_equilibrium_traces_stay_in_domain_and_agree_between_devices(self):
+        for design in ("conventional", "longleg"):
+            for equilibrium in ("reference", "rampup", "sof", "eof", "rampdown"):
+                with self.subTest(design=design, equilibrium=equilibrium):
+                    self.cpu._select_context(design, equilibrium)
+                    self.gpu._select_context(design, equilibrium)
+                    lines, eq = self.gpu.lines, self.gpu.equilibrium
+                    rz = np.stack((np.linalg.norm(lines[:, :, :2], axis=2), lines[:, :, 2]), axis=-1)
+                    self.assertTrue(np.isfinite(lines).all())
+                    self.assertGreaterEqual(float(rz[:, :, 0].min()), float(eq.r.min()))
+                    self.assertLessEqual(float(rz[:, :, 0].max()), float(eq.r.max()))
+                    self.assertGreaterEqual(float(rz[:, :, 1].min()), float(eq.z.min()))
+                    self.assertLessEqual(float(rz[:, :, 1].max()), float(eq.z.max()))
+                    self.assertLess(float(np.ptp(eq.psin(rz), axis=1).max()), 0.005)
+                    self.assertLess(float(np.linalg.norm(self.cpu.lines - lines, axis=2).max()), 0.002)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,47 @@
-# 首版验收记录
+# 验收记录
+
+## 当前工程演示版本（2026-10-12，本机验收完成）
+
+本节覆盖 `75e51cf` 之后的工程优化。机器可读摘要及代码、证据文件SHA-256保存在 [validation-results.json](validation-results.json)。后面的首版记录保留为历史证据，不代表当前版本仍有相同缺陷，也不能代替当前版本的回归。热场是 `synthetic_demo`，数值自洽检查不等于真实装置物理验证。
+
+| 范围 | 已获得的证据 | 尚需关闭的内容 |
+| --- | --- | --- |
+| 命令与字段协议 | `runtime/qa/reliability.json` **18 项通过**：100个并发动作、重试去重、10组设计/平衡、差值场、导出一致性、持续滑动，以及慢响应/临时失败/恢复/参数拒绝 | 本项通过；旧503失败记录保留在 `reliability-final.log` |
+| 真实重启恢复 | `runtime/qa/restart-reliability.json` 三阶段通过：确认丢失恢复、Kit 重启取消旧动作、服务重启保留已完成结果与截图哈希 | 不宣称任意崩溃窗口下严格 exactly-once |
+| Python 回归 | `runtime/unit-tests.log` **108 项通过**，耗时17.968秒，包含启动身份、同目录异端口拒绝、预制数据、全模式RT2、连续字段重置及状态文件读取竞争检查 | 本项通过 |
+| 预制数据交付 | `tests/test_baked_scenarios.py` 已纳入上述整套测试；逐一读取 40 个交付字段包，核对版本、独立三角面积分、功率账本和冷却 KPI | 本项通过；保留合成模型适用边界 |
+| RTWT / Kit-CAE / IndeX | `runtime/qa/nvidia.json` **7项通过**：真实WebRTC控制清单、UI写入、原生NanoVDB、缓存命中及剖切失效、双设计切换、装配运动与停稳均RT2、消息请求全部确认。`runtime/depth-probe/analysis.json` 与迁移原生截图确认RT2＋深度模式3的CAD遮挡 | 本项通过；报告附代码哈希 |
+| 集成性能 | `performance-release-assembly.json`：环绕 29.97 FPS、拖动 29.96 FPS；`performance-release-volume.json`：环绕 30.13 FPS、拖动 29.95 FPS。两者均为真实可见 Edge 浏览器，运动/拖动均 0 掉帧 | ≥24 FPS、掉帧率≤5%通过；记录每阶段实际引擎和代码哈希 |
+| 完整功能流程 | `acceptance-release-complete.json` **36项通过**：全流程30.00 FPS、0掉帧，稳态30.09 FPS，JS/资源错误为空；CAD/USD完整下载字节与交付文件相同 | 本项通过；保留截图版35项独立证据 |
+| 路径与启动 | `runtime/qa/portability-kit.json` **9 项通过**：英文带空格目录、8766 端口、双设计计算、跨项目端口/PID 防误操作、真实 Kit/RTWT/IndeX 与原生 QHD 截图；运行时目录链接数为零，测试进程退出耗时 3.578 秒 | 同机目录迁移通过；新机器仍需配置 Python、Kit 和驱动 |
+| 热参数端到端响应 | `runtime/qa/latency-release-rt2.json`：20次真实 DOM→RTWT→视频采样，响应中位数254.8 ms、P95 280.5 ms、最大280.8 ms；读回P95 13.9 ms，HTTP观察P95 6.0 ms | 300 ms目标通过；不以服务确认或Kit字段版本替代像素变化 |
+| 测量与来源导出 | `runtime/qa/measurement.json`：实际CAD表面两次点选，距离8.5024 m，与三维点坐标独立计算一致；JSON来源及字段身份一致 | 本项通过 |
+
+默认CPU几何重建只传 `--output-assets`，1.781秒完成；两设计各11系统、1458逻辑部件、2682网格、1,418,328三角形与交付manifest一致，USD没有未解析引用。212个源资产及来源文件SHA-256全部保持不变。新默认不读取旧项目路径，不发布临时候选目录。前端语法检查、串流构建及Git差异空白检查也通过。
+
+性能数值使用浏览器 `requestVideoFrameCallback` 的实际呈现计数。输出视频和静止截图为 2560×1440；运动时内部渲染为 1920×1080。静止约 30 FPS、收到 30 FPS 或 Kit 心跳约 30 FPS 均不能替代持续运动呈现验收。
+
+所有模式、运动、停稳和原生PNG统一采用 `RealTimePathTracing`（RTX Real-Time 2.0），DLSS Quality；体场另使用 `rtx.index.compositeDepthMode=3`。本机 Kit 110.1.3 的路径追踪体场对照出现中央螺线管穿透，不能仅开启深度选项就宣称修复。RT2 深度模式 3 在相机偏移 0 与 2.8 的对照中遮挡正确；迁移副本的 `relocated-volume.png` 和 `relocated-assembly-restored.png` 已目视核对，并验证当前体场字段身份、NanoVDB 精确往返、15 个 RTWT 控制项和实际渲染模式。截图路径及 SHA-256 保存在 `portability-kit.json`。
+
+停稳后恢复离线路径追踪的中间方案虽然通过环绕/拖动检查，却在完整功能流程中仅有10.26 FPS（自动截图）和11.85 FPS（关闭自动截图）。隐藏、爆炸和磁力线切换之后的800 ms窗口仅约1–4 FPS。当前统一RT2后，`acceptance-rt2-workflow.json` **36项通过**，全流程30.04 FPS、0掉帧；统计包含所有操作和原生PNG导出，未排除重建区间。`acceptance-release-visual.json`截图版 **35项通过**，全流程29.99 FPS，浏览器错误为空。自动页面截图本身可能影响呈现，故性能硬门槛使用不自动截页面、仍保留原生PNG导出的流程。
+
+`acceptance-release-rt2.json`保留一次失败：全部功能及帧率已通过，但浏览器出现 `ERR_NO_BUFFER_SPACE`。Windows System / Tcpip事件4231（RecordId 139798，2026-10-12 07:42:55.598）确认同一时刻全局临时TCP端口分配失败。后续8765无挂起连接，未发现本项目连接泄漏证据；增加失败URL诊断后的上述截图回归通过。未修改生产HTTP策略或忽略浏览器错误来通过检查。
+
+首轮 `latency-current.json` 仅完成17次，GPU→CPU读回阻塞到秒级；该失败记录保留，不作为当前通过证据。随后确认原生RTX也存在热场旧颜色残留，CPU字段和USD颜色正确。科学模式改为RT2/DLSS Quality后，在字段应用下一帧设置一次 `/rtx-transient/post/dlss/forceParamReset`，由渲染器消费并自动清零。`field-dlss-oneframe` 原生低→高→低截图的左右受热面回归误差分别为0.37和0.45/255。
+
+最终像素校准使用固定左右包层各1100像素，以及只按初始低温图锁定的完整可见热场；不再剔除响应失败或未回归区域。三个区域各自检查信号、噪声、至少90%响应覆盖和95%回归覆盖；试验要求三个区域共同达到响应阈值。20次输入均完整确认服务、字段及像素；两次预热单列，不计入统计。阈值定义及完整逐帧数据保存在 `tools/qa/latency.mjs` 和上述JSON，测试表示此机器、此工况下的浏览器视频响应，不等同物理显示器光电测量。
+
+DLSS重置语义参考 [NVIDIA官方说明](https://docs.isaacsim.omniverse.nvidia.com/latest/replicator_tutorials/tutorial_replicator_sdg_workflows.html#dlss-temporal-reset)。实际复位消费、原生截图与浏览器像素结果均在本机验证，不能仅凭设置存在判断生效。
+
+### 对旧版评审数值的复核
+
+独立复现旧版公式与源 CAD 三角形得到总实体表面积 13,021.2763 m²；名义 2000 MW 时，扫描两端表面热流积分分别为 2,628.2217 MW 和 11,937.9651 MW，出口温度保持 409.8901°C。该面积包含背面/内部面，不能作为有效等离子体受热面积。当前实现使用独立 PFC 表面和统一功率账本，见 `physics-model.md`。
+
+两设计的辐射屏蔽源主体都为 20° 扇区。直接对旋转轴附近 R≈3×10⁻¹⁶ m 的四个点计算 atan2 会产生 90°；排除这些点后角域严格为 0–20°，源文件 SHA-256 与基线相同。因此没有把辐射屏蔽改为单份。源等离子体的 502 个径向端盖三角形、PF/CS 集合的 396 个径向端盖三角形则确实存在；当前回转表面与外露端盖分开管理，并有整环、剖切和爆炸检查。
+
+---
+
+## 历史：首版验收
 
 日期：2026-10-11。设备：Windows、RTX 5070 Ti 16 GB。
 

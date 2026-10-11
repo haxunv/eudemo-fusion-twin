@@ -1,0 +1,112 @@
+[workflow]
+id = "fusion-engineering"
+label = "EU DEMO engineering twin"
+title = "EU DEMO · NVIDIA RTWT / Kit-CAE"
+app_state_prim = "/World/AppState"
+inference_prim = "/World/FusionResults"
+
+[controls.design]
+schema_attr = "fusion:state:design"
+role = "inference"
+widget = "select"
+label = "CAD design"
+values = ["conventional", "longleg"]
+bindings = [{kind = "Variant", knobs = ["design"], targets = ["/World/Machine"], variant_set = "design"}]
+
+[controls.equilibrium]
+schema_attr = "fusion:state:equilibrium"
+role = "inference"
+widget = "select"
+label = "Source magnetic equilibrium"
+values = ["reference", "rampup", "sof", "eof", "rampdown"]
+
+[controls.scenario]
+schema_attr = "fusion:state:scenario"
+role = "inference"
+widget = "select"
+values = ["nominal", "ramp", "lowflow", "highload"]
+
+[controls.power]
+schema_attr = "fusion:state:power"
+role = "inference"
+widget = "slider"
+label = "Effective thermal power"
+unit = "MW"
+bounds = {min = 500, max = 2600, step = 50}
+bindings = [{kind = "Attribute", knobs = ["power"], targets = ["/World/FusionResults"], attribute = "fusion:effectiveThermalPowerMW"}]
+
+[controls.flow]
+schema_attr = "fusion:state:flow"
+role = "inference"
+widget = "slider"
+unit = "ratio"
+bounds = {min = 0.4, max = 1.4, step = 0.05}
+
+[controls.inlet]
+schema_attr = "fusion:state:inlet"
+role = "inference"
+widget = "slider"
+unit = "degC"
+bounds = {min = 200, max = 400, step = 5}
+
+[controls.phase]
+schema_attr = "fusion:state:phase"
+role = "inference"
+widget = "slider"
+label = "Prescribed load fraction"
+bounds = {min = 0, max = 1, step = 0.01}
+
+[controls.mode]
+schema_attr = "fusion:state:mode"
+role = "visualization"
+widget = "select"
+values = ["assembly", "temperature", "heatflux", "delta_temperature", "delta_heatflux", "magnetic", "slice", "volume"]
+bindings = [{kind = "Callback", knobs = ["mode"], callback = "fusion.engineering.volume_visibility"}]
+
+[controls.view]
+schema_attr = "fusion:state:view"
+role = "view"
+widget = "select"
+values = ["overview", "front", "top", "section", "divertor"]
+
+[controls.cutaway]
+schema_attr = "fusion:state:cutaway"
+role = "visualization"
+widget = "slider"
+unit = "deg"
+bounds = {min = 0, max = 180, step = 20}
+
+[controls.explode]
+schema_attr = "fusion:state:explode"
+role = "visualization"
+widget = "slider"
+bounds = {min = 0, max = 1, step = 0.05}
+
+[controls.opacity]
+schema_attr = "fusion:state:opacity"
+role = "visualization"
+widget = "slider"
+bounds = {min = 0.1, max = 1, step = 0.05}
+
+[controls.fieldLines]
+schema_attr = "fusion:state:fieldLines"
+role = "visualization"
+widget = "toggle"
+
+[controls.orbit]
+schema_attr = "fusion:state:orbit"
+role = "visualization"
+widget = "toggle"
+
+[controls.playing]
+schema_attr = "fusion:state:playing"
+role = "visualization"
+widget = "toggle"
+
+[outputs.plasma_temperature]
+target = "/World/FusionResults"
+field_name = "Temperature"
+label = "Synthetic plasma temperature"
+units = "keV"
+data_format = "nanovdb"
+visualizations = ["volume"]

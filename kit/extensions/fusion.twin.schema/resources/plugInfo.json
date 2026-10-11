@@ -1,0 +1,14 @@
+{
+  "Plugins": [{
+    "Name": "fusionTwinWorkflow",
+    "Type": "resource",
+    "Root": ".",
+    "ResourcePath": ".",
+    "Info": {"Types": {"FusionTwinWorkflowAppStateAPI": {
+      "alias": {"UsdSchemaBase": "FusionTwinAppStateAPI"},
+      "bases": ["UsdAPISchemaBase"],
+      "schemaIdentifier": "FusionTwinAppStateAPI",
+      "schemaKind": "singleApplyAPI"
+    }}}
+  }]
+}

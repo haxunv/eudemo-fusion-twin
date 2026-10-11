@@ -1,0 +1,39 @@
+[package]
+title = "Fusion NVIDIA pipeline verification"
+version = "1.0.0"
+
+[dependencies]
+"omni.kit.uiapp" = {}
+"omni.hydra.rtx" = {}
+"omni.kit.viewport.window" = {}
+"omni.kit.renderer.capture" = {}
+"fusion.twin.schema" = {}
+"omni.rtwt.controller" = {}
+"omni.rtwt.inference" = {}
+"omni.cae.index" = {}
+
+[settings]
+exts."omni.rtwt.controller".workflow_manifest = "${app}/../workflow/workflow.toml"
+exts."omni.rtwt.controller".app_state_api_schemas = ["FusionTwinAppStateAPI"]
+exts."omni.rtwt.controller".disable_viewport_selection = false
+app.window.width = 1280
+app.window.height = 720
+app.renderer.resolution.width = 1280
+app.renderer.resolution.height = 720
+app.settings.persistent = false
+app.file.ignoreUnsavedOnExit = true
+app.fastShutdown = true
+app.vsync = false
+app.runLoops.main.rateLimitEnabled = true
+app.runLoops.main.rateLimitFrequency = 20
+rtx.rendermode = "PathTracing"
+rtx.index.compositeEnabled = true
+rtx.index.overrideSubdivisionMode = "kd_tree"
+rtx.index.overrideSubdivisionPartCount = 1
+rtx.pathtracing.spp = 1
+rtx.pathtracing.totalSpp = 32
+rtx.pathtracing.optixDenoiser.enabled = true
+rtx-transient.dlssg.enabled = false
+
+[settings.app.exts]
+folders.'++' = ["${app}/../extensions"]

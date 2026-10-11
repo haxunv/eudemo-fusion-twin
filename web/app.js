@@ -3,38 +3,46 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
 const translations = {
   zh: {
+    stateRetrying: '正在重试工况更新', stateUnsaved: '工况尚未保存，点击重试', stateRejected: '工况参数被拒绝，请检查输入',
+    volume: '等离子体体积场', volumeError: '体积场生成失败，请切换模式后重试', volumePreparing: '体积渲染正在准备', plasmaHidden: '科学场模式下隐藏等离子体边界实体',
+    design: '反应堆方案', conventional: '常规偏滤器', longleg: '长腿偏滤器', equilibrium: '磁平衡状态', eqRampup: '电流爬升', eqSof: '平顶开始', eqEof: '平顶结束', eqRampdown: '电流下降',
+    differenceField: '三维差值场', deltaTemperature: '温度差', deltaHeatflux: '热流差', differenceNote: '当前工况减参考工况，使用相同几何与磁平衡。', powerBalance: '功率收支', powerInput: '当前输入热功率', surfacePower: '表面沉积', volumePower: '体积沉积', unresolvedPower: '未解析功率', balanceError: '收支误差', strikeUnresolved: '当前平衡未解析出有效靶板打击点', actionCancelled: '场景已变化，请重新操作', actionPending: '操作仍在处理中', fieldUpdating: '正在同步三维场', fieldSynchronized: '三维场已同步',
     digitalTwin: '聚变数字孪生', connecting: '正在连接', connected: 'RTX 实时串流', preview: 'RTX 预览', offline: '渲染器未连接', serverOffline: '服务未连接', fullscreen: '全屏',
     views: '视角', orbit: '环绕', assembly: '装配', assemblyTree: '模型装配树', measure: '测量', measureTitle: '部件尺寸与双点测量', reset: '重置', resetView: '恢复默认视角',
     searchComponents: '搜索部件', isolate: '隔离所选', showAll: '全部显示', selectComponent: '选择部件查看工程属性', explore: '探索', compare: '对比', settings: '工况设置', scenario: '运行工况',
-    nominal: '额定运行', ramp: '热负荷爬升', lowflow: '低冷却流量', highload: '高热负荷', fusionPower: '假定热负荷', coolantFlow: '冷却流量', inletTemperature: '冷却剂入口温度',
+    nominal: '额定运行', ramp: '热负荷爬升', lowflow: '低冷却流量', highload: '高热负荷', fusionPower: '名义热功率预算', coolantFlow: '冷却流量', inletTemperature: '冷却剂入口温度',
     visualization: '可视化方式', assemblyMode: '工程装配', temperature: '温度', heatflux: '热流密度', magnetic: '磁力线', slice: '截面场', adjustment: '可视化调整', cutaway: '剖开角度', explode: '装配爆炸', opacity: '不透明度', fieldLines: '叠加磁力线',
-    compareTitle: '工况对比', compareDescription: '比较参考工况与当前工况的热管理响应。', baseline: '参考工况', candidate: '当前工况', compareNote: '同一几何模型 · 同一数据生成方法', trendTitle: '时间历程', surfaceTemperature: '峰值表面温度',
+    compareTitle: '工况对比', compareDescription: '比较参考工况与当前工况的热管理响应。', baseline: '参考工况', candidate: '当前工况', compareNote: '同一几何模型 · 同一数据生成方法', trendTitle: '准稳态负荷扫描', surfaceTemperature: '峰值表面温度',
     readouts: '计算结果', peakTemperature: '峰值温度', peakHeatflux: '峰值热流', outletTemperature: '出口温度', coolingMargin: '温度裕量', fieldCompute: '场计算', export: '导出工况', screenshot: '截图',
-    play: '播放 / 暂停', discharge: '热响应过程', rampUp: '起始', flatTop: '升温', rampDown: '稳态', dataProvenance: '数据来源与模型说明', initializing: '正在准备工程场景', initializingDetail: '加载 EU-DEMO 装配与 RTX 渲染器',
+    play: '播放 / 暂停', discharge: '负荷扫描', rampUp: '低负荷', flatTop: '中间负荷', rampDown: '名义负荷', dataProvenance: '数据来源与模型说明', initializing: '正在准备工程场景', initializingDetail: '加载 EU-DEMO 装配与 RTX 渲染器',
     dimensions: '工程尺寸', cadProvenance: '公开概念设计生成的反应堆装配。保留部件层级、材料和源模型信息。', engineeringDemo: '工程演示数据', fieldProvenance: '预制或简化模型生成的场数据用于交互展示；工况、单位和计算参数随导出文件提供。', renderProvenance: 'OpenUSD 场景通过本机 Kit 渲染，WebRTC 传输交互画面。',
     overview: '全堆总览', front: '正视图', top: '俯视图', section: '剖面视图', divertor: '偏滤器', overviewTitle: 'EU-DEMO 反应堆装配', frontTitle: '环向装配 · 正视', topTitle: '磁体与包层 · 俯视', sectionTitle: '堆内结构 · 剖面', divertorTitle: '偏滤器 · 热管理',
     overviewDescription: '公开 CAD 装配 · 交互工况与多物理场', frontDescription: 'TF / PF 线圈、真空室与等离子体边界', topDescription: '环向扇区、径向层级与维护通道', sectionDescription: '包层、屏蔽结构与真空边界', divertorDescription: '等离子体面对部件与热流分布',
-    material: '材料', parts: '零部件', triangles: '三角面', source: '来源', dimensionsXYZ: '包围盒 X × Y × Z', downloadStep: '下载 STEP 源模型', downloadUsd: '下载 USD 场景', sourceCad: '源 CAD 文件', noResult: '等待计算结果', noHistory: '计算后显示时间历程',
+    material: '材料', parts: '零部件', triangles: '三角面', source: '来源', dimensionsXYZ: '包围盒 X × Y × Z', downloadStep: '下载 STEP 源模型', downloadUsd: '下载 USD 场景', sourceCad: '源 CAD 文件', noResult: '等待计算结果', noHistory: '计算后显示负荷扫描曲线',
     selectFirst: '请先在装配树中选择部件', dimensionsHint: '所选部件的轴对齐包围盒尺寸，单位为米。', measureHint: '在三维视口中依次点击两个表面点。', startMeasure: '双点测量', clearMeasure: '清除测量', measurementStarted: '测量已开启，请在模型表面选择两个点', measuredDistance: '两点距离', noBounds: '当前部件尚无尺寸数据',
     exportDone: '已导出当前工况、计算结果与来源说明', screenshotDone: '已保存 RTX 渲染截图', screenshotUnavailable: '等待 RTX 画面后可保存截图', requestFailed: '操作未完成，请检查本地服务', updated: '工况已更新', noComponents: '没有匹配的部件', dataPending: '等待数据源信息', reference: '参考', gpuCompute: 'GPU 场计算', cpuCompute: 'CPU 场计算', liveRender: '实时渲染', connectHint: '点击重新连接串流', sourceEquilibrium: '公开平衡数据', heatfluxLimit: '色标上限 12 MW/m²', temperatureLimit: '色标上限 1,100 °C',
-    compareAssembly: '查看当前工况', renderPending: 'RTX 正在加载场景', rendererError: '渲染器启动失败，检查运行日志', dimensionX: '宽度 X', dimensionY: '深度 Y', dimensionZ: '高度 Z', demoTimeline: '600 s · 演示时间',
+    compareAssembly: '查看当前工况', renderPending: 'RTX 正在加载场景', rendererError: '渲染器启动失败，检查运行日志', dimensionX: '宽度 X', dimensionY: '深度 Y', dimensionZ: '高度 Z', demoTimeline: '准稳态 · 合成工况',
   },
   en: {
+    stateRetrying: 'Retrying scenario update', stateUnsaved: 'Scenario not saved. Click to retry.', stateRejected: 'Scenario parameters were rejected. Check the input.',
+    volume: 'Plasma volume', volumeError: 'Volume generation failed. Switch modes to retry.', volumePreparing: 'Volume rendering is preparing', plasmaHidden: 'The plasma boundary solid is hidden in field modes',
+    design: 'Reactor design', conventional: 'Conventional divertor', longleg: 'Long-leg divertor', equilibrium: 'Magnetic equilibrium', eqRampup: 'Current ramp-up', eqSof: 'Start of flat-top', eqEof: 'End of flat-top', eqRampdown: 'Current ramp-down',
+    differenceField: '3D DIFFERENCE FIELD', deltaTemperature: 'Temperature difference', deltaHeatflux: 'Heat-flux difference', differenceNote: 'Current minus reference, with identical geometry and magnetic equilibrium.', powerBalance: 'POWER BALANCE', powerInput: 'Current thermal input', surfacePower: 'Surface deposition', volumePower: 'Volume deposition', unresolvedPower: 'Unresolved power', balanceError: 'Balance error', strikeUnresolved: 'No valid target strike point resolved for this equilibrium', actionCancelled: 'The scene changed. Please retry the action.', actionPending: 'The action is still in progress.', fieldUpdating: 'Synchronizing 3D fields', fieldSynchronized: '3D fields synchronized',
     digitalTwin: 'Fusion Digital Twin', connecting: 'Connecting', connected: 'RTX LIVE STREAM', preview: 'RTX PREVIEW', offline: 'Renderer offline', serverOffline: 'Service offline', fullscreen: 'Fullscreen',
     views: 'VIEWS', orbit: 'ORBIT', assembly: 'Assembly', assemblyTree: 'ASSEMBLY TREE', measure: 'Measure', measureTitle: 'Component dimensions and point measurement', reset: 'Reset', resetView: 'Reset view',
     searchComponents: 'Search components', isolate: 'Isolate', showAll: 'Show all', selectComponent: 'Select a component to inspect its properties', explore: 'Explore', compare: 'Compare', settings: 'SETTINGS', scenario: 'Scenario',
-    nominal: 'Nominal operation', ramp: 'Thermal load ramp', lowflow: 'Reduced coolant flow', highload: 'High heat load', fusionPower: 'Assumed thermal load', coolantFlow: 'Coolant flow', inletTemperature: 'Coolant inlet temperature',
+    nominal: 'Nominal operation', ramp: 'Thermal load ramp', lowflow: 'Reduced coolant flow', highload: 'High heat load', fusionPower: 'Nominal thermal budget', coolantFlow: 'Coolant flow', inletTemperature: 'Coolant inlet temperature',
     visualization: 'VISUALIZATION TECHNIQUES', assemblyMode: 'Assembly', temperature: 'Temperature', heatflux: 'Heat flux', magnetic: 'Field lines', slice: 'Field section', adjustment: 'VISUALIZATION ADJUSTMENT', cutaway: 'Cutaway angle', explode: 'Explode', opacity: 'Opacity', fieldLines: 'Show magnetic field lines',
-    compareTitle: 'SCENARIO COMPARISON', compareDescription: 'Thermal response of the reference and active operating scenarios.', baseline: 'BASELINE', candidate: 'CURRENT', compareNote: 'Same geometry · Same field-generation method', trendTitle: 'TIME HISTORY', surfaceTemperature: 'Peak surface temperature',
+    compareTitle: 'SCENARIO COMPARISON', compareDescription: 'Thermal response of the reference and active operating scenarios.', baseline: 'BASELINE', candidate: 'CURRENT', compareNote: 'Same geometry · Same field-generation method', trendTitle: 'QUASI-STEADY LOAD SCAN', surfaceTemperature: 'Peak surface temperature',
     readouts: 'SIMULATION READOUTS', peakTemperature: 'Peak temperature', peakHeatflux: 'Peak heat flux', outletTemperature: 'Outlet temperature', coolingMargin: 'Thermal margin', fieldCompute: 'Field calculation', export: 'Export scenario', screenshot: 'Capture',
-    play: 'Play / pause', discharge: 'THERMAL RESPONSE', rampUp: 'Start', flatTop: 'Warm-up', rampDown: 'Steady', dataProvenance: 'DATA & MODEL PROVENANCE', initializing: 'Preparing the engineering scene', initializingDetail: 'Loading EU-DEMO assembly and RTX renderer',
+    play: 'Play / pause', discharge: 'LOAD SCAN', rampUp: 'Low load', flatTop: 'Intermediate', rampDown: 'Nominal load', dataProvenance: 'DATA & MODEL PROVENANCE', initializing: 'Preparing the engineering scene', initializingDetail: 'Loading EU-DEMO assembly and RTX renderer',
     dimensions: 'ENGINEERING DIMENSIONS', cadProvenance: 'Reactor assembly generated from an open concept design. Component hierarchy, materials and source references are retained.', engineeringDemo: 'Engineering demonstration data', fieldProvenance: 'Precomputed or reduced-model fields support the interactive demonstration. Scenarios, units and calculation inputs are included in exports.', renderProvenance: 'The OpenUSD scene is rendered locally by Kit and streamed interactively through WebRTC.',
     overview: 'Overview', front: 'Front', top: 'Top', section: 'Section', divertor: 'Divertor', overviewTitle: 'EU-DEMO reactor assembly', frontTitle: 'Toroidal assembly · Front', topTitle: 'Magnets & blanket · Top', sectionTitle: 'Internal structure · Section', divertorTitle: 'Divertor · Thermal response',
     overviewDescription: 'Public CAD assembly · Interactive scenarios & multiphysics fields', frontDescription: 'TF / PF coils, vacuum vessel and plasma boundary', topDescription: 'Toroidal sectors, radial layers and maintenance access', sectionDescription: 'Blanket, shielding and vacuum boundary', divertorDescription: 'Plasma-facing components and heat-flux distribution',
     material: 'Material', parts: 'Parts', triangles: 'Triangles', source: 'Source', dimensionsXYZ: 'Bounding box X × Y × Z', downloadStep: 'Download source STEP', downloadUsd: 'Download USD scene', sourceCad: 'Source CAD files', noResult: 'Waiting for calculation', noHistory: 'History appears after calculation',
     selectFirst: 'Select a component in the assembly tree first', dimensionsHint: 'Axis-aligned bounding-box dimensions of the selected component, in metres.', measureHint: 'Select two surface points in the 3D viewport.', startMeasure: 'Point-to-point', clearMeasure: 'Clear measurement', measurementStarted: 'Measurement enabled. Select two points on the model.', measuredDistance: 'Point-to-point distance', noBounds: 'Dimensions are not available for this component',
     exportDone: 'Scenario, results and provenance exported', screenshotDone: 'RTX render saved', screenshotUnavailable: 'Capture is available after the RTX image arrives', requestFailed: 'Action failed. Check the local service.', updated: 'Scenario updated', noComponents: 'No matching components', dataPending: 'Waiting for source metadata', reference: 'Reference', gpuCompute: 'GPU field calculation', cpuCompute: 'CPU field calculation', liveRender: 'Live rendering', connectHint: 'Click to reconnect the stream', sourceEquilibrium: 'Public equilibrium data', heatfluxLimit: 'Color scale capped at 12 MW/m²', temperatureLimit: 'Color scale capped at 1,100 °C',
-    compareAssembly: 'View current scenario', renderPending: 'RTX is loading the scene', rendererError: 'Renderer failed to start. Check runtime logs.', dimensionX: 'Width X', dimensionY: 'Depth Y', dimensionZ: 'Height Z', demoTimeline: '600 s · DEMO TIME',
+    compareAssembly: 'View current scenario', renderPending: 'RTX is loading the scene', rendererError: 'Renderer failed to start. Check runtime logs.', dimensionX: 'Width X', dimensionY: 'Depth Y', dimensionZ: 'Height Z', demoTimeline: 'QUASI-STEADY · SYNTHETIC',
   },
 };
 
@@ -48,8 +56,14 @@ let streamLive = false;
 let previewReady = false;
 let serviceReady = false;
 let pendingPatch = {};
+let inflightPatch = {};
 let patchTimer;
 let sendingPatch = false;
+let lastPatchSent = -Infinity;
+let patchRetries = 0;
+let patchRetryAt = 0;
+let patchPaused = false;
+let patchRecoveryObserved = false;
 let previewLoading = false;
 let lastPreview = 0;
 let streamerStarted = false;
@@ -57,7 +71,12 @@ let toastTimer;
 let measureMode = false;
 let pointerStart = null;
 let lastMeasuredDistance = null;
-let measureCommandSeq = 0;
+let actionTail = Promise.resolve();
+let activeActions = 0;
+let serverEpoch = null;
+
+state.design = 'conventional';
+state.equilibrium = 'reference';
 
 const t = (key) => translations[language][key] || key;
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -107,7 +126,7 @@ function renderComponents() {
   const visible = components.filter((component) => [component.name_en, component.name_zh, component.id].some((value) => String(value || '').toLowerCase().includes(query)));
   const partCount = components.reduce((sum, component) => sum + (component.part_count || 0), 0);
   $('#assembly-count').textContent = `${number(components.length)} ${language === 'zh' ? '系统' : 'systems'} / ${number(partCount)} ${t('parts')}`;
-  $('#component-tree').innerHTML = visible.length ? visible.map((component) => `<div class="component-row ${state.selected === component.id ? 'selected' : ''}" data-component="${esc(component.id)}" role="button" tabindex="0" aria-pressed="${state.selected === component.id}"><input type="checkbox" data-visible="${esc(component.id)}" ${state.visible?.[component.id] !== false ? 'checked' : ''} aria-label="${t('showAll')} ${esc(componentName(component))}"><svg viewBox="0 0 20 20"><path d="m10 2 7 4v8l-7 4-7-4V6zm-7 4 7 4 7-4m-7 4v8"/></svg><span>${esc(componentName(component))}</span><small>${number(component.part_count)}</small></div>`).join('') : `<p class="empty-chart">${t('noComponents')}</p>`;
+  $('#component-tree').innerHTML = visible.length ? visible.map((component) => `<div class="component-row ${state.selected === component.id ? 'selected' : ''}" data-component="${esc(component.id)}" role="button" tabindex="0" aria-pressed="${state.selected === component.id}"><input type="checkbox" data-visible="${esc(component.id)}" ${state.visible?.[component.id] !== false && (component.id !== 'plasma' || state.mode === 'assembly') ? 'checked' : ''} ${component.id === 'plasma' && state.mode !== 'assembly' ? `disabled title="${t('plasmaHidden')}"` : ''} aria-label="${t('showAll')} ${esc(componentName(component))}"><svg viewBox="0 0 20 20"><path d="m10 2 7 4v8l-7 4-7-4V6zm-7 4 7 4 7-4m-7 4v8"/></svg><span>${esc(componentName(component))}</span><small>${number(component.part_count)}</small></div>`).join('') : `<p class="empty-chart">${t('noComponents')}</p>`;
   renderProperties();
 }
 
@@ -143,11 +162,11 @@ function sliderValue(key) {
 
 function renderConnection() {
   const connection = $('#connection');
-  const label = streamLive ? 'connected' : previewReady ? 'preview' : serviceReady ? 'connecting' : 'serverOffline';
+  const label = patchPaused ? 'stateUnsaved' : streamLive ? 'connected' : previewReady ? 'preview' : serviceReady ? 'connecting' : 'serverOffline';
   connection.classList.toggle('online', streamLive);
-  connection.classList.toggle('error', !serviceReady);
+  connection.classList.toggle('error', !serviceReady || patchPaused);
   $('span', connection).textContent = t(label);
-  connection.title = t('connectHint');
+  connection.title = t(patchPaused ? 'stateUnsaved' : 'connectHint');
   $('#viewport').classList.toggle('live', streamLive);
   $('#loading-state').hidden = streamLive || previewReady;
   const rendererStatus = String(renderer.status || '').toLowerCase();
@@ -157,16 +176,32 @@ function renderConnection() {
 }
 
 function renderLegend() {
-  const modes = { temperature: ['temperature', '°C', 300, 1100], heatflux: ['heatflux', 'MW/m²', 0, 12], slice: ['temperature', 'keV', 0, 30], magnetic: ['magnetic', t('sourceEquilibrium'), null, null] };
+  const modes = { temperature: ['temperature', '°C', 300, 1100], heatflux: ['heatflux', 'MW/m²', 0, 12], delta_temperature: ['deltaTemperature', '°C', -1, 1], delta_heatflux: ['deltaHeatflux', 'MW/m²', -1, 1], slice: ['temperature', 'keV', 0, 30], volume: ['volume', 'keV', 0, 30], magnetic: ['magnetic', t('sourceEquilibrium'), null, null] };
   const legend = modes[state.mode];
   $('#field-legend').hidden = !legend;
   if (!legend) return;
   $('#legend-title').textContent = t(legend[0]);
   $('#legend-unit').textContent = legend[1];
   $('.colormap').hidden = state.mode === 'magnetic';
-  $('#legend-min').textContent = legend[2] === null ? '' : number(legend[2]);
-  const overflow = state.mode === 'heatflux' ? result.peak_heatflux_MW_m2 > 12 : state.mode === 'slice' ? false : result.peak_temperature_C > 1100;
-  $('#legend-max').textContent = legend[3] === null ? '' : number(legend[3]) + (overflow ? '+' : '');
+  $('.colormap').classList.toggle('diverging', state.mode.startsWith('delta_'));
+  $('.colormap').classList.toggle('volume-colormap', state.mode === 'volume');
+  const volumeColors = renderer.volume_colormap;
+  $('.colormap').style.background = state.mode === 'volume' && volumeColors ? `linear-gradient(90deg,${volumeColors.rgba.map((rgba, i) => `rgb(${rgba.slice(0, 3).map(value => Math.round(value * 255)).join(' ')}) ${volumeColors.positions[i] * 100}%`).join(',')})` : '';
+  const range = state.mode === 'volume' ? (renderer.volume_range_keV || [0, 30]) : (result.color_ranges?.[state.mode] || legend.slice(2));
+  $('#legend-min').textContent = range[0] === null ? '' : number(range[0], state.mode.includes('heatflux') ? 2 : 0);
+  const overflow = state.mode === 'heatflux' ? result.peak_heatflux_MW_m2 > range[1] : state.mode === 'temperature' ? result.peak_temperature_C > range[1] : false;
+  $('#legend-max').textContent = range[1] === null ? '' : number(range[1], state.mode.includes('heatflux') ? 2 : 0) + (overflow && !state.mode.startsWith('delta_') ? '+' : '');
+}
+
+function renderPowerBudget() {
+  const budget = result.power_budget;
+  if (!budget) { $('#power-budget').textContent = t('noResult'); return; }
+  const rows = [['powerInput', 'requested_thermal_MW'], ['surfacePower', 'surface_absorbed_MW'], ['volumePower', 'volume_absorbed_MW'], ['unresolvedPower', 'unresolved_MW'], ['balanceError', 'closure_residual_MW']];
+  const volume = state.mode === 'volume';
+  const synchronized = renderer.ready && result.field_ref?.key && renderer.applied_field_key === result.field_ref.key &&
+    (!volume || (!renderer.volume_pending && !renderer.volume_error && renderer.applied_volume_field_key === result.field_ref.key && renderer.volume_mask_angle === state.cutaway));
+  $('#power-budget').innerHTML = rows.map(([label, key]) => `<div class="property-row"><span>${t(label)}</span><span>${number(budget[key], 2)} MW</span></div>`).join('') +
+    `${budget.unresolved_MW > 0.01 ? `<p class="budget-warning">${t('strikeUnresolved')}</p>` : ''}<p class="field-sync ${synchronized ? 'synchronized' : ''}">${t(volume && renderer.volume_error ? 'volumeError' : synchronized ? 'fieldSynchronized' : 'fieldUpdating')}</p>`;
 }
 
 function renderResults() {
@@ -176,10 +211,18 @@ function renderResults() {
   const backend = result.compute_backend || result.backend || result.engine || '';
   $('#compute-badge').textContent = backend || (result.gpu_ms != null ? 'CUDA / Warp' : '—');
   $('#gpu-time').textContent = result.gpu_ms != null ? `${number(result.gpu_ms, 2)} ms` : result.cpu_ms != null ? `${number(result.cpu_ms, 2)} ms · CPU` : '—';
-  const sourceLabel = result.source_label === 'synthetic_thermal_bluemira_equilibrium' ? (language === 'zh' ? '合成热边界条件与简化传热模型 / Bluemira 公开磁平衡数据' : 'Synthetic thermal boundaries and reduced heat-transfer model / Bluemira magnetic equilibrium') : result.source_label || manifest.source_label || t('dataPending');
+  const sourceLabel = ['synthetic_thermal_bluemira_equilibrium', 'synthetic_demo_source_geometry_equilibrium'].includes(result.source_label) ? (language === 'zh' ? '合成热预算与简化传热模型 / Bluemira 概念几何与磁平衡' : 'Synthetic thermal budget and reduced heat-transfer model / Bluemira concept geometry and equilibrium') : result.source_label || manifest.source_label || t('dataPending');
   const assumptions = result.assumptions || {};
-  const assumptionLabels = { thermal: ['传热模型', 'Thermal model'], coolant: ['冷却剂', 'Coolant'], limit: ['演示阈值', 'Demonstration threshold'], magnetics: ['磁平衡', 'Magnetic equilibrium'], plasma_slice: ['等离子体截面', 'Plasma section'] };
+  const assumptionLabels = { thermal: ['传热模型', 'Thermal model'], coolant: ['冷却回路', 'Coolant'], budget: ['功率预算', 'Power budget'], radiation: ['辐射沉积', 'Radiation deposition'], target: ['靶板热流', 'Target heat flux'], history: ['扫描坐标', 'Scan coordinate'], limit: ['演示阈值', 'Demonstration threshold'], magnetics: ['磁平衡', 'Magnetic equilibrium'], plasma_slice: ['等离子体截面', 'Plasma section'] };
   const assumptionChinese = {
+    'Synthetic quasi-steady wall resistance; prescribed load scan, no time-dependent heat transport or qualified material model': '采用合成壁面热阻的准稳态负荷扫描，未求解瞬态热输运，材料模型未经工程评定。',
+    'Absorbed surface plus assumed blanket volume heat only; helium cp=5200 J/(kg K), 3500 kg/s times flow, 85/15% circuit split; unresolved power excluded': '回路吸热包含表面沉积与假定包层体积热源，不包含未解析功率。氦比热 5,200 J/(kg·K)，总质量流量为 3,500 kg/s 乘流量系数，两回路按 85/15% 分配。',
+    'Input is effective thermal power, not fusion power. Synthetic split: 80% blanket volume, 20% plasma-surface channel; 65% core radiation, then 70% SOL radiation, 3% wall particles and 27% targets; target inner/outer 30/70%': '输入代表有效热功率。合成预算分配：80% 包层体积热源，20% 等离子体表面通道；后者 65% 分配给核心辐射，余量再按 70% SOL 辐射、3% 主壁粒子、27% 靶板分配；内外靶板按 30/70% 分配。',
+    'Uniform area deposition split 90/10% wall/divertor; no photon transport or neutron transport calculation': '辐射按面积均匀沉积，主壁／偏滤器按 90/10% 分配；未求解光子或中子输运。',
+    'Eich upstream profile with synthetic lambda_q=6 mm, S=2 mm divided by hotspot, flux mapping and incidence; local +/-0.75 m neighborhood at a source psi=1 intersection; no 3D shadowing or detached SOL solution': '使用 Eich 上游轮廓，合成宽度 λq=6 mm、S=2 mm 随热点系数调整；通过磁通映射及入射角，在源 ψ=1 交点附近 ±0.75 m 建立局部热斑；未求解三维遮挡和脱靶 SOL。',
+    'Selected Bluemira axisymmetric equilibrium, Bphi=fvac/R approximation; cached per equilibrium; no discrete TF ripple': '使用所选 Bluemira 轴对称平衡，Bφ=fvac/R，按平衡缓存；未包含离散 TF 纹波。',
+    'Synthetic 25 keV core profile shaped by selected source normalized poloidal flux': '依据所选平衡的归一化极向磁通，构造 25 keV 核心温度的合成剖面。',
+    'Dimensionless quasi-steady load scan, phase in [0,1]; no elapsed-time coordinate; equilibria are independently selected snapshots': '无量纲准稳态负荷扫描，扫描进度为 0–1；磁平衡为独立选择的状态快照。',
     'Synthetic surface heat-flux distribution and wall thermal resistance; not normalized as a conservative full-reactor heat solution': '合成表面热流分布与壁面热阻模型；未按全堆功率守恒进行归一化。',
     'Separate assumed helium circuit energy balance: cp=5200 J/(kg K), nominal flow=3500 kg/s': '采用独立假定的氦冷却回路能量平衡：比热 5,200 J/(kg·K)，额定质量流量 3,500 kg/s。',
     '900 degC demonstration threshold; not a material qualification limit': '900 °C 为演示温度阈值，未用于材料合格评定。',
@@ -218,10 +261,18 @@ function renderHistory() {
 }
 
 function render() {
+  if (manifest.active_design !== state.design && manifest.design_components?.[state.design]) {
+    manifest.components = manifest.design_components[state.design];
+    manifest.active_design = state.design;
+    renderComponents();
+    renderDownloads();
+  }
   $$('[data-tab]').forEach((button) => { button.classList.toggle('active', button.dataset.tab === state.tab); button.setAttribute('aria-selected', button.dataset.tab === state.tab); });
   $('#explore-panel').hidden = state.tab === 'compare';
   $('#compare-panel').hidden = state.tab !== 'compare';
   $$('[data-mode]').forEach((button) => { button.classList.toggle('active', button.dataset.mode === state.mode); button.setAttribute('aria-pressed', button.dataset.mode === state.mode); });
+  $('[data-mode="volume"]').disabled = !renderer.rtwt_ready;
+  $('[data-mode="volume"]').title = renderer.rtwt_ready ? '' : t('volumePreparing');
   $$('[data-view]').forEach((button) => button.classList.toggle('active', button.dataset.view === state.view));
   $$('[data-state]').forEach((input) => {
     const key = input.dataset.state;
@@ -231,6 +282,8 @@ function render() {
     if (output) output.innerHTML = sliderValue(key);
   });
   $('#scenario-select').value = state.scenario;
+  $('#design-select').value = state.design;
+  $('#equilibrium-select').value = state.equilibrium;
   $('#fieldlines-toggle').checked = state.fieldLines;
   $('#orbit-button').classList.toggle('active', state.orbit);
   $('#play-button').classList.toggle('playing', state.playing);
@@ -240,59 +293,155 @@ function render() {
   renderLegend();
   renderConnection();
   renderResults();
+  renderPowerBudget();
   renderComparison();
   if ($('#measure-dialog').open) renderMeasurement();
 }
 
 async function api(path, options) {
   const response = await fetch(path, options);
-  if (!response.ok) throw new Error(`${response.status} ${path}`);
+  if (!response.ok) { const error = new Error(`${response.status} ${path}`); error.status = response.status; throw error; }
   return response.json();
 }
 
 function applySnapshot(snapshot) {
+  if (snapshot.server_epoch && snapshot.server_epoch !== serverEpoch) { serverEpoch = snapshot.server_epoch; revision = -1; }
   if (snapshot.revision != null && snapshot.revision < revision) return;
   revision = snapshot.revision ?? revision;
   const previousSelected = state.selected;
   const previousVisibility = JSON.stringify(state.visible);
-  state = { ...state, ...(snapshot.state || {}), ...pendingPatch };
+  const previousDesign = state.design;
+  const previousMode = state.mode;
+  const previousRendererEpoch = renderer.renderer_epoch;
+  state = { ...state, ...(snapshot.state || {}), ...inflightPatch, ...pendingPatch };
   result = snapshot.result || result;
   renderer = snapshot.renderer || renderer;
-  if (renderer.selected && renderer.applied_revision >= revision && state.selected !== renderer.selected) {
+  if (previousDesign !== state.design && manifest.design_components?.[state.design]) {
+    manifest.components = manifest.design_components[state.design];
+    renderer.measurement = null;
+    renderDownloads();
+  }
+  if (previousDesign !== state.design || (previousRendererEpoch && previousRendererEpoch !== renderer.renderer_epoch)) {
+    measureMode = false;
+    lastMeasuredDistance = null;
+    $('#measure-button').classList.remove('active');
+  }
+  if (!('selected' in inflightPatch) && !('selected' in pendingPatch) && renderer.selected && renderer.applied_revision >= revision && state.selected !== renderer.selected) {
     state.selected = renderer.selected;
     pendingPatch.selected = renderer.selected;
     clearTimeout(patchTimer);
     patchTimer = setTimeout(flushPatch, 0);
   }
   serviceReady = true;
-  if (previousSelected !== state.selected || previousVisibility !== JSON.stringify(state.visible)) renderComponents();
+  if (previousMode !== state.mode || previousDesign !== state.design || previousSelected !== state.selected || previousVisibility !== JSON.stringify(state.visible)) renderComponents();
   render();
-  const distance = renderer.measurement?.type === 'distance' ? renderer.measurement.distance_m : null;
-  if (measureMode && renderer.command_seq >= measureCommandSeq && distance != null && distance !== lastMeasuredDistance) { lastMeasuredDistance = distance; measureMode = false; $('#measure-button').classList.remove('active'); openMeasurement(); }
 }
 
 function setState(patch, delay = 0) {
+  if (patchPaused) resumePatch();
   pendingPatch = { ...pendingPatch, ...patch };
   state = { ...state, ...patch };
   render();
-  if ('selected' in patch || 'visible' in patch) renderComponents();
+  if ('selected' in patch || 'visible' in patch || 'mode' in patch) renderComponents();
+  schedulePatch(delay);
+}
+
+function schedulePatch(interval = 0) {
   clearTimeout(patchTimer);
-  patchTimer = setTimeout(flushPatch, delay);
+  if (patchPaused) { patchTimer = null; return; }
+  const now = performance.now();
+  patchTimer = setTimeout(flushPatch, Math.max(0, interval - (now - lastPatchSent), patchRetryAt - now));
+}
+
+function resumePatch() {
+  patchRetries = 0;
+  patchRetryAt = 0;
+  patchPaused = false;
+  patchRecoveryObserved = false;
+  if (Object.keys(pendingPatch).length) schedulePatch();
+}
+
+function retryableStateError(error) {
+  const status = error.status || Number(String(error.message).match(/HTTP Error (\d{3})/)?.[1]);
+  if (status) return status >= 500 || status === 408 || status === 429;
+  if (error.rejected) return /URLError|TimeoutError|ConnectionError|unavailable/i.test(error.message);
+  return !/^(ValueError|TypeError):/.test(error.message);
 }
 
 async function flushPatch() {
-  if (sendingPatch || !Object.keys(pendingPatch).length) return;
+  clearTimeout(patchTimer);
+  patchTimer = null;
+  if (sendingPatch || patchPaused || !Object.keys(pendingPatch).length) return;
+  if (performance.now() < patchRetryAt) { schedulePatch(); return; }
   const patch = pendingPatch;
   pendingPatch = {};
+  inflightPatch = patch;
   sendingPatch = true;
-  try { applySnapshot(await api('/api/state', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(patch) })); }
-  catch { serviceReady = false; toast(t('requestFailed')); renderConnection(); }
-  finally { sendingPatch = false; if (Object.keys(pendingPatch).length) flushPatch(); }
+  lastPatchSent = performance.now();
+  try {
+    let snapshot;
+    if (streamLive && renderer.rtwt_ready && window.FusionStreamer?.connected) {
+      const response = await window.FusionStreamer.request('fusion_set_state', { state: patch }, 45000);
+      if (!response?.accepted) {
+        const error = new Error(response?.error || 'RTX state request was rejected');
+        error.rejected = true;
+        throw error;
+      }
+      snapshot = await api('/api/state');
+    } else {
+      snapshot = await api('/api/state', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(patch) });
+    }
+    inflightPatch = {};
+    patchRetries = 0;
+    patchRetryAt = 0;
+    patchRecoveryObserved = false;
+    applySnapshot(snapshot);
+  }
+  catch (error) {
+    if (retryableStateError(error)) {
+      pendingPatch = { ...patch, ...pendingPatch };
+      patchRetries += 1;
+      patchPaused = patchRetries > 2;
+      patchRetryAt = performance.now() + (patchRetries === 1 ? 250 : 1000);
+      serviceReady = false;
+      toast(t(patchPaused ? 'stateUnsaved' : 'stateRetrying'));
+    } else {
+      patchRetries = 0;
+      patchRetryAt = 0;
+      toast(t('stateRejected'));
+    }
+    renderConnection();
+  }
+  finally {
+    inflightPatch = {};
+    sendingPatch = false;
+    if (Object.keys(pendingPatch).length && !patchPaused) schedulePatch(50);
+  }
 }
 
 async function action(type, extra = {}) {
-  try { return await api('/api/action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, ...extra }) }); }
-  catch { toast(t('requestFailed')); return null; }
+  const requestId = crypto.randomUUID();
+  const payload = { type, ...extra, request_id: requestId, server_epoch: serverEpoch, renderer_epoch: renderer.renderer_epoch };
+  if ('x' in extra || 'y' in extra) {
+    payload.topology_key = renderer.topology_key;
+    payload.interaction_key = renderer.interaction_key;
+  }
+  const accepted = actionTail.then(() => api('/api/action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }));
+  actionTail = accepted.catch(() => {});
+  activeActions += 1;
+  try {
+    let record = await accepted;
+    const deadline = Date.now() + 30000;
+    while (record.status === 'pending' || record.status === 'running') {
+      if (Date.now() > deadline) { toast(t('actionPending')); return null; }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      record = await api(`/api/actions/${encodeURIComponent(requestId)}`);
+    }
+    if (record.status !== 'completed') { toast(t(record.status === 'cancelled' ? 'actionCancelled' : 'requestFailed')); return null; }
+    applySnapshot(await api('/api/state'));
+    return record;
+  } catch (error) { toast(t(error.status === 409 ? 'actionCancelled' : 'requestFailed')); return null; }
+  finally { activeActions -= 1; }
 }
 
 function toast(message) {
@@ -335,7 +484,7 @@ function startStream() {
   if (!window.FusionStreamer || streamerStarted) return;
   streamerStarted = true;
   window.FusionStreamer.connect({
-    onConnected: () => { streamLive = true; renderConnection(); },
+    onConnected: () => { streamLive = true; if (patchPaused) resumePatch(); renderConnection(); },
     onDisconnected: () => { streamLive = false; streamerStarted = false; renderConnection(); },
     onError: () => { streamLive = false; streamerStarted = false; renderConnection(); },
   });
@@ -360,11 +509,14 @@ function updatePreview() {
 
 async function poll() {
   try {
-    if (!sendingPatch && !Object.keys(pendingPatch).length) applySnapshot(await api('/api/state'));
+    if (!sendingPatch && (!Object.keys(pendingPatch).length || patchPaused)) {
+      applySnapshot(await api('/api/state'));
+      if (patchPaused && patchRecoveryObserved) resumePatch();
+    }
     updatePreview();
     if (!streamerStarted && serviceReady && renderer.ready) startStream();
-  } catch { serviceReady = false; renderConnection(); }
-  setTimeout(poll, document.hidden ? 2500 : 1000);
+  } catch { patchRecoveryObserved = true; serviceReady = false; renderConnection(); }
+  setTimeout(poll, document.hidden ? 2500 : activeActions || state.playing ? 250 : 1000);
 }
 
 document.addEventListener('click', async (event) => {
@@ -376,8 +528,7 @@ document.addEventListener('click', async (event) => {
   if (button.dataset.view) setState({ view: button.dataset.view, orbit: false });
   if (button.dataset.mode) {
     const mode = button.dataset.mode;
-    const plasma = manifest.components.find((component) => component.id === 'plasma');
-    setState({ mode, selected: '', visible: { ...state.visible, plasma: mode === 'assembly' ? plasma?.default_visible !== false : false } });
+    setState({ mode, selected: '' });
   }
   if (button.dataset.tab) setState({ tab: button.dataset.tab });
   if (button.dataset.close === 'assembly-drawer') toggleAssembly(false);
@@ -386,7 +537,7 @@ document.addEventListener('click', async (event) => {
     case 'assembly-button': toggleAssembly(); break;
     case 'orbit-button': setState({ orbit: !state.orbit }); break;
     case 'play-button': setState({ playing: !state.playing }); break;
-    case 'reset-view-button': setState({ view: 'overview', selected: '', cutaway: 80, explode: 0, opacity: 1, orbit: false, visible: Object.fromEntries((manifest.components || []).map((component) => [component.id, component.id === 'plasma' && state.mode !== 'assembly' ? false : component.default_visible !== false])) }); await action('reset_camera', { view: 'overview' }); break;
+    case 'reset-view-button': setState({ view: 'overview', selected: '', cutaway: 80, explode: 0, opacity: 1, orbit: false, visible: Object.fromEntries((manifest.components || []).map((component) => [component.id, component.default_visible !== false])) }); await action('reset_camera', { view: 'overview' }); break;
     case 'isolate-button':
       if (!state.selected) { toast(t('selectFirst')); break; }
       setState({ visible: Object.fromEntries(manifest.components.map((component) => [component.id, component.id === state.selected])) }); break;
@@ -394,7 +545,7 @@ document.addEventListener('click', async (event) => {
     case 'measure-button': case 'component-measure': openMeasurement(); break;
     case 'start-measure-button': {
       const response = await action('measure_start');
-      if (response) { measureMode = true; measureCommandSeq = response.command_seq; lastMeasuredDistance = null; $('#measure-dialog').close(); $('#measure-button').classList.add('active'); toast(t('measurementStarted')); } break;
+      if (response) { measureMode = true; lastMeasuredDistance = null; $('#measure-dialog').close(); $('#measure-button').classList.add('active'); toast(t('measurementStarted')); } break;
     }
     case 'clear-measure-button':
       if (await action('measure_clear')) { measureMode = false; lastMeasuredDistance = null; renderer.measurement = null; $('#measure-button').classList.remove('active'); renderMeasurement(); } break;
@@ -407,26 +558,23 @@ document.addEventListener('click', async (event) => {
         toast(t('exportDone'));
       } catch { toast(t('requestFailed')); } break;
     case 'screenshot-button':
+      button.disabled = true;
       try {
-        if (streamLive && $('#remote-video').videoWidth) {
-          const canvas = document.createElement('canvas');
-          canvas.width = $('#remote-video').videoWidth;
-          canvas.height = $('#remote-video').videoHeight;
-          canvas.getContext('2d').drawImage($('#remote-video'), 0, 0);
-          canvas.toBlob((blob) => { if (blob) { download(blob, `eudemo-${state.view}.png`); toast(t('screenshotDone')); } });
-        } else {
-          const response = await fetch(`/api/preview.png?t=${Date.now()}`);
-          if (!response.ok) throw new Error('preview unavailable');
-          download(await response.blob(), `eudemo-${state.view}.png`);
-          toast(t('screenshotDone'));
-        }
-      } catch { toast(t('screenshotUnavailable')); } break;
+        const completed = await action('capture');
+        if (!completed?.result?.capture_url) break;
+        const response = await fetch(completed.result.capture_url);
+        if (!response.ok) throw new Error('capture unavailable');
+        download(await response.blob(), `eudemo-${state.design}-${state.view}.png`);
+        toast(t('screenshotDone'));
+      } catch { toast(t('screenshotUnavailable')); }
+      finally { button.disabled = false; }
+      break;
   }
 });
 
 document.addEventListener('input', (event) => {
   const element = event.target;
-  if (element.dataset.state) setState({ [element.dataset.state]: Number(element.value) }, 150);
+  if (element.dataset.state) setState({ [element.dataset.state]: Number(element.value) }, 50);
   if (element.id === 'component-search') renderComponents();
 });
 
@@ -434,6 +582,8 @@ document.addEventListener('change', (event) => {
   const element = event.target;
   if (element.dataset.visible) setState({ visible: { ...state.visible, [element.dataset.visible]: element.checked } });
   if (element.id === 'scenario-select') setState({ scenario: element.value });
+  if (element.id === 'design-select') setState({ design: element.value, selected: '', playing: false });
+  if (element.id === 'equilibrium-select') setState({ equilibrium: element.value });
   if (element.id === 'fieldlines-toggle') setState({ fieldLines: element.checked });
   if (element.dataset.state) flushPatch();
 });
@@ -444,12 +594,15 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') toggleAssembly(false);
 });
 
-$('#connection').addEventListener('click', () => { if (!streamLive) { streamerStarted = false; startStream(); } });
+$('#connection').addEventListener('click', () => {
+  if (patchPaused) { resumePatch(); renderConnection(); }
+  if (!streamLive) { streamerStarted = false; startStream(); }
+});
 $('#remote-video').addEventListener('playing', () => { streamLive = true; renderConnection(); });
 $('#remote-video').addEventListener('emptied', () => { streamLive = false; renderConnection(); });
 for (const surface of [$('#remote-video'), $('#render-preview')]) {
   surface.addEventListener('pointerdown', (event) => { pointerStart = { x: event.clientX, y: event.clientY }; });
-  surface.addEventListener('pointerup', (event) => {
+  surface.addEventListener('pointerup', async (event) => {
     if (!pointerStart || event.button !== 0 || Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 5) { pointerStart = null; return; }
     pointerStart = null;
     const rect = surface.getBoundingClientRect();
@@ -459,7 +612,18 @@ for (const surface of [$('#remote-video'), $('#render-preview')]) {
     const width = Math.min(rect.width, rect.height * aspect), height = width / aspect;
     const x = (event.clientX - rect.left - (rect.width - width) / 2) / width;
     const y = (event.clientY - rect.top - (rect.height - height) / 2) / height;
-    if (x >= 0 && x <= 1 && y >= 0 && y <= 1) action(measureMode ? 'measure' : 'pick', { x, y });
+    if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
+      const measuring = measureMode;
+      const completed = await action(measuring ? 'measure' : 'pick', { x, y });
+      const measurement = completed?.result?.measurement;
+      if (measuring && measurement?.type === 'distance') {
+        renderer.measurement = measurement;
+        measureMode = false;
+        lastMeasuredDistance = measurement.distance_m;
+        $('#measure-button').classList.remove('active');
+        openMeasurement();
+      }
+    }
   });
 }
 $$('dialog').forEach((dialog) => dialog.addEventListener('click', (event) => { if (event.target === dialog) { const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close(); } }));

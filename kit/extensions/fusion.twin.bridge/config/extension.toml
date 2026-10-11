@@ -1,11 +1,18 @@
+[core]
+reloadable = false
+
 [package]
-title = "Fusion Twin File Bridge"
+title = "Fusion Twin Engineering Controller"
 version = "0.1.0"
 description = "CAD state, selection, measurements and RTX capture."
 
 [dependencies]
 "omni.usd" = {}
 "omni.kit.viewport.utility" = {}
+"fusion.twin.schema" = {}
+"omni.rtwt.controller" = {}
+"omni.rtwt.inference" = {}
+"omni.cae.index" = {}
 
 [[python.module]]
 name = "fusion.twin.bridge"

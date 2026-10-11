@@ -1,8 +1,8 @@
 """Build an inspectable OpenUSD assembly from harvested Bluemira EU-DEMO CAD.
 
 The source CAD is retained unchanged. Render geometry is assembled in metres,
-Z-up; PF/CS and plasma wedges are normalized from 22 to 20 degrees so their
-18 repetitions meet exactly. This is a conceptual engineering visualization.
+Z-up; continuous PF/CS and plasma surfaces are revolved from their source RZ
+sections. Original CAD assets remain unchanged.
 """
 
 from __future__ import annotations
@@ -12,16 +12,18 @@ import hashlib
 import json
 import math
 import shutil
+import sys
 from pathlib import Path
 
 import numpy as np
 from pxr import Gf, Kind, Sdf, Usd, UsdGeom, UsdLux, UsdShade, Vt
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "app"))
+from fusion_twin.geometry import CONTINUOUS_COMPONENTS, merge_meshes, revolve_from_endcap
 ASSETS = ROOT / "assets"
 SOURCE = ASSETS / "source" / "eudemo"
 SCENE = ASSETS / "scene"
-LEGACY = Path(r"D:\nvcode\fusion-twin")
 VARIANTS = ("conventional", "longleg")
 N_SECTORS = 18
 CUT_SECTORS = (14, 15, 16, 17)
@@ -66,7 +68,7 @@ def write_json(path: Path, data: object) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def copy_sources(legacy: Path) -> None:
+def copy_sources(legacy: Path, provenance_root: Path | None = None) -> None:
     origin = legacy / "source/specializations/fusion/data/eudemo"
     for variant in VARIANTS:
         shutil.copytree(origin / variant, SOURCE / variant, dirs_exist_ok=True)
@@ -76,19 +78,19 @@ def copy_sources(legacy: Path) -> None:
         src = legacy / relative
         if src.is_file():
             shutil.copy2(src, provenance / ("legacy_" + src.name))
-    wsl = Path(r"\\wsl.localhost\Ubuntu-24.04\home\research\fusion")
-    for repo in ("bluemira", "eudemo"):
-        for name in ("LICENSE", "README.md"):
-            src = wsl / repo / name
+    if provenance_root is not None:
+        for repo in ("bluemira", "eudemo"):
+            for name in ("LICENSE", "README.md"):
+                src = provenance_root / repo / name
+                if src.is_file():
+                    shutil.copy2(src, provenance / f"{repo}_{name}")
+        config = provenance_root / "eudemo/studies/first/config"
+        for name in ("params.json", "build_config.json", "fixed_boundary_eqdsk.json", "process/mockPROCESS.json"):
+            src = config / name
             if src.is_file():
-                shutil.copy2(src, provenance / f"{repo}_{name}")
-    config = wsl / "eudemo/studies/first/config"
-    for name in ("params.json", "build_config.json", "fixed_boundary_eqdsk.json", "process/mockPROCESS.json"):
-        src = config / name
-        if src.is_file():
-            dest = provenance / "generation_config" / name
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dest)
+                dest = provenance / "generation_config" / name
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dest)
     files = []
     for path in sorted(SOURCE.rglob("*")):
         if path.is_file():
@@ -216,17 +218,11 @@ def part_material(component, name):
     return COMPONENTS[component][2]
 
 
-def sector_geometry(points, component):
-    points = points.copy()
-    if component in ("pf_coils", "cs_coils", "plasma"):
-        r = np.linalg.norm(points[:, :2], axis=1)
-        angle = np.arctan2(points[:, 1], points[:, 0]) * (20.0 / 22.0)
-        points[:, 0], points[:, 1] = r * np.cos(angle), r * np.sin(angle)
-    return points
-
-
 def component_parts(variant):
     manifest = json.loads((SOURCE / variant / "cad/manifest.json").read_text())
+    with np.load(SOURCE / variant / "equilibria/eof.npz", allow_pickle=False) as data:
+        coil_centres = np.column_stack((data["coil_x"], data["coil_z"]))
+        coil_names, coil_types = data["coil_names"].copy(), data["coil_ctype"].copy()
     result = {key: [] for key in COMPONENTS}
     for source_component, parts in manifest.items():
         for part_id, info in parts.items():
@@ -234,27 +230,50 @@ def component_parts(variant):
             with np.load(path, allow_pickle=False) as data:
                 points, triangles = data["points"].copy(), data["tris"].copy()
             component = source_component
-            if source_component == "pf_coils" and np.max(np.linalg.norm(points[:, :2], axis=1)) < 3.8:
-                component = "cs_coils"
-            points = sector_geometry(points, component)
+            if source_component == "pf_coils":
+                radii = np.linalg.norm(points[:, :2], axis=1)
+                centre = np.array(((radii.min()+radii.max())/2, (points[:,2].min()+points[:,2].max())/2))
+                distances = np.linalg.norm(coil_centres-centre, axis=1)
+                coil = int(distances.argmin())
+                if distances[coil] > 0.001:
+                    raise ValueError(f"CAD part {variant}/{part_id} does not match a source coil")
+                component = "cs_coils" if str(coil_types[coil]).endswith("CS") else "pf_coils"
+                info = {**info, "coil_name": str(coil_names[coil]), "coil_type": str(coil_types[coil])}
+            if component in CONTINUOUS_COMPONENTS:
+                points, triangles = merge_meshes(revolve_from_endcap(points, triangles).values())
             result[component].append((part_id, info, points, triangles, path))
     return result
 
 
-def build_prototypes(variant, parts):
+def build_prototypes(variant, parts, scene_dir=SCENE):
     for component, items in parts.items():
-        path = SCENE / "geometry" / variant / f"{component}.usdc"
+        path = scene_dir / "geometry" / variant / f"{component}.usdc"
         stage = new_stage(path, "Component")
         material_library(stage, "/Component/Looks")
         Usd.ModelAPI(stage.GetDefaultPrim()).SetKind(Kind.Tokens.component)
         for part_id, info, points, triangles, source_path in items:
-            obj = mesh(stage, f"/Component/{part_id}", points, triangles,
-                       part_material(component, info["name"]), "/Component/Looks")
-            prim = obj.GetPrim()
+            part_path = f"/Component/{part_id}"
+            if component in CONTINUOUS_COMPONENTS:
+                prim = UsdGeom.Xform.Define(stage, part_path).GetPrim()
+                for role, (p, t) in revolve_from_endcap(points, triangles).items():
+                    obj = mesh(stage, f"{part_path}/{role}", p, t,
+                               part_material(component, info["name"]), "/Component/Looks")
+                    obj.GetPrim().SetCustomDataByKey("geometryRole", role)
+                    if role != "body":
+                        obj.CreateVisibilityAttr(UsdGeom.Tokens.invisible)
+                prim.SetCustomDataByKey("continuousRevolution", True)
+            else:
+                prim = mesh(stage, part_path, points, triangles,
+                            part_material(component, info["name"]), "/Component/Looks").GetPrim()
             prim.SetDisplayName(info["name"])
-            prim.SetCustomData({"sourcePartPath": info["path"], "sourceMaterial": info.get("material") or "unspecified",
+            metadata = {"sourcePartPath": info["path"], "sourceMaterial": info.get("material") or "unspecified",
                                 "sourceFile": source_path.relative_to(ASSETS).as_posix(),
-                                "triangleCount": int(len(triangles))})
+                                "triangleCount": int(len(triangles)), "sourcePartId": part_id}
+            if "coil_name" in info:
+                metadata.update(sourceCoilName=info["coil_name"], sourceCoilType=info["coil_type"],
+                                resolvedPartPath=f"Poloidal Coils/{info['coil_name']}/{info['name']}")
+            for key, value in metadata.items():
+                prim.SetCustomDataByKey(key, value)
         stage.GetRootLayer().Save()
 
 
@@ -294,6 +313,12 @@ def machine(stage, all_parts):
                     part.SetCustomDataByKey("sectorIndex", sector)
                     if is_cut:
                         UsdGeom.Imageable(part).CreateVisibilityAttr(UsdGeom.Tokens.invisible)
+                    if component in CONTINUOUS_COMPONENTS:
+                        for part_id, *_ in all_parts[variant][component]:
+                            for role, shown in (("cap_start", sector == 0),
+                                                ("cap_end", sector == min(CUT_SECTORS)-1)):
+                                cap = stage.OverridePrim(f"{part.GetPath()}/{part_id}/{role}")
+                                UsdGeom.Imageable(cap).CreateVisibilityAttr("inherited" if shown else "invisible")
     variants.SetVariantSelection("conventional")
 
 
@@ -394,13 +419,16 @@ def cameras(stage):
     return result
 
 
-def build(legacy: Path, copy=True):
-    if copy:
-        copy_sources(legacy)
+def build(legacy: Path | None = None, copy=True, output_assets: Path | None = None,
+          provenance_root: Path | None = None):
+    output_assets = Path(output_assets) if output_assets is not None else ASSETS
+    scene_dir = output_assets / "scene"
+    if copy and legacy is not None:
+        copy_sources(legacy, provenance_root=provenance_root)
     all_parts = {variant: component_parts(variant) for variant in VARIANTS}
     for variant, parts in all_parts.items():
-        build_prototypes(variant, parts)
-    stage = new_stage(SCENE / "fusion.usda")
+        build_prototypes(variant, parts, scene_dir)
+    stage = new_stage(scene_dir / "fusion.usda")
     stage.GetRootLayer().documentation = "EU-DEMO-like conceptual CAD assembly. Original B-rep retained in assets/source. Render units: metres."
     stage.GetRootLayer().customLayerData = {"defaultCamera": "/World/Cameras/overview", "dataStatus": "conceptual_design_and_simulation", "copyright": "See source/provenance.json"}
     material_library(stage)
@@ -409,12 +437,14 @@ def build(legacy: Path, copy=True):
     lighting(stage)
     camera_data = cameras(stage)
     stage.GetRootLayer().Save()
-    components = []
-    for component, (en, zh, material, visible) in COMPONENTS.items():
-        items = all_parts["conventional"][component]
-        repeats = N_SECTORS
-        source_component = "pf_coils" if component == "cs_coils" else component
-        components.append({
+    design_components = {}
+    for variant, parts in all_parts.items():
+        components = []
+        for component, (en, zh, material, visible) in COMPONENTS.items():
+            items = parts[component]
+            repeats = N_SECTORS
+            source_component = "pf_coils" if component == "cs_coils" else component
+            components.append({
             "id": component, "name_en": en, "name_zh": zh,
             "usd_path": f"/World/Machine/{component}", "material": material,
             "source": "Bluemira EU-DEMO-like CAD generated locally",
@@ -423,15 +453,21 @@ def build(legacy: Path, copy=True):
             "triangle_count": sum(len(item[3]) for item in items) * repeats,
             "unique_part_count": len(items), "sector_count": repeats,
             "sector_angle_deg": 360 / repeats, "default_visible": visible,
-            "source_step": f"source/eudemo/conventional/cad/{source_component}.stp",
-        })
+            "source_step": f"source/eudemo/{variant}/cad/{source_component}.stp",
+            "mesh_count": len(items) * repeats * (3 if component in CONTINUOUS_COMPONENTS else 1),
+            "continuous_revolution": component in CONTINUOUS_COMPONENTS,
+            })
+        design_components[variant] = components
+    components = design_components["conventional"]
     provenance = json.loads((ASSETS / "source/provenance.json").read_text(encoding="utf-8"))
     manifest = {
-        "schema_version": 1, "title": "EU-DEMO Fusion Digital Twin",
+        "schema_version": 2, "title": "EU-DEMO Fusion Digital Twin",
         "stage": "scene/fusion.usda", "unit": "m", "up_axis": "Z",
         "components": components,
+        "design_components": design_components,
         "total_part_count": sum(c["part_count"] for c in components),
         "total_triangle_count": sum(c["triangle_count"] for c in components),
+        "total_mesh_count": sum(c["mesh_count"] for c in components),
         "unique_part_count": sum(c["unique_part_count"] for c in components),
         "source": provenance["repositories"],
         "cameras": camera_data,
@@ -440,18 +476,27 @@ def build(legacy: Path, copy=True):
         "cutaway": {"start_deg": 280, "end_deg": 360, "sector_indices": list(CUT_SECTORS),
                     "description": "80 degree opening follows four exact 20 degree CAD sectors."},
         "geometry_notes": ["Full named component hierarchy from source CAD; no reactor components replaced by display primitives.",
-                           "PF/CS and plasma source 22 degree wedges are resampled to 20 degrees before repetition.",
+                           "PF/CS and plasma are revolved from source RZ end-cap sections; artificial radial caps are separately controlled.",
+                           "PF/CS classification uses source equilibrium coil names/types, verified against CAD section centres.",
                            "Studio plinth, floor and supports are visualization-only environment geometry.",
                            "Manufacturing tolerances, watertight B-rep quality and collision clearance have not been certified."],
     }
-    write_json(ASSETS / "manifest.json", manifest)
-    print(json.dumps({"stage": str(SCENE / "fusion.usda"), "parts": manifest["total_part_count"],
+    write_json(output_assets / "manifest.json", manifest)
+    print(json.dumps({"stage": str(scene_dir / "fusion.usda"), "parts": manifest["total_part_count"],
                       "triangles": manifest["total_triangle_count"], "source_files": len(provenance["files"])}, ensure_ascii=False))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source-project", type=Path, default=LEGACY)
-    parser.add_argument("--skip-copy", action="store_true")
+    parser.add_argument("--source-project", type=Path,
+                        help="Explicitly import source CAD from another project; otherwise use shipped assets/source")
+    parser.add_argument("--skip-copy", action="store_true",
+                        help="Use shipped source assets even when --source-project is supplied (compatibility option)")
+    parser.add_argument("--provenance-root", type=Path,
+                        help="Optional directory containing bluemira/ and eudemo/ repositories for imported provenance")
+    parser.add_argument("--output-assets", type=Path, help="Build into an isolated assets directory")
     args = parser.parse_args()
-    build(args.source_project, copy=not args.skip_copy)
+    if args.provenance_root is not None and (args.source_project is None or args.skip_copy):
+        parser.error("--provenance-root requires --source-project without --skip-copy")
+    build(args.source_project, copy=not args.skip_copy, output_assets=args.output_assets,
+          provenance_root=args.provenance_root)

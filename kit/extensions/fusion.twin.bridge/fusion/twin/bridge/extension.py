@@ -1,14 +1,15 @@
 """Native USD/RTX controller; all edits live in the session layer."""
 
 import asyncio
+import hashlib
 import json
 import math
 import os
 import shutil
+import sys
 import tempfile
 import time
 import traceback
-from io import BytesIO
 from pathlib import Path
 
 import carb
@@ -17,14 +18,23 @@ import omni.kit.app
 import omni.usd
 from omni.kit.viewport.utility import capture_viewport_to_file, get_active_viewport, get_active_viewport_window
 from pxr import Gf, Sdf, Usd, UsdGeom, UsdShade, Vt
+from .geometry import GeometryController
 
 
 class FusionTwinExtension(omni.ext.IExt):
     def on_startup(self, ext_id):
-        self.root = Path(os.environ.get("FUSION_TWIN_ROOT", "D:/nv聚变"))
+        self.root = Path(os.environ.get("FUSION_TWIN_ROOT", str(Path(__file__).resolve().parents[6])))
+        if str(self.root / "app") not in sys.path:
+            sys.path.insert(0, str(self.root / "app"))
+        from fusion_twin.protocol import CommandConsumer, interaction_key, load_field_packet
+        self.command_consumer = CommandConsumer()
+        self.interaction_key = interaction_key
+        self.load_field_packet = load_field_packet
         settings = carb.settings.get_settings()
         settings.set("/rtx/background/source/type", 2)
         settings.set("/rtx/background/source/color", [0.012, 0.018, 0.026])
+        settings.set("/rtx/rtpt/cached/enabled", True)
+        settings.set("/rtx/post/dlss/execMode", 2)
         self.render_resolution = (
             settings.get("/app/renderer/resolution/width"),
             settings.get("/app/renderer/resolution/height"),
@@ -40,10 +50,22 @@ class FusionTwinExtension(omni.ext.IExt):
         self.runtime = self.root / "runtime"
         self.runtime.mkdir(parents=True, exist_ok=True)
         self.stage = None
+        self.scene_ready = False
         self.state = {}
         self.revision = -1
         self.command_seq = 0
+        self.command_task = None
+        self.applied_field_key = None
+        self.field_reference = None
+        self.field_data = None
+        self.nvidia_workflow = None
+        self.gpu_name = None
+        self.topology_key = None
+        self.equilibrium_key = None
+        self.color_key = None
         self.last_poll = 0
+        self.apply_timing = None
+        self.render_reset = None
         self.last_report = 0
         self.last_frame = time.perf_counter()
         self.fps = 0.0
@@ -61,7 +83,6 @@ class FusionTwinExtension(omni.ext.IExt):
         self.capture_pending = False
         self.capture_task = None
         self.reset_task = None
-        self.field_mtime = 0
         self.orbit_angle = 0.0
         self.alive = True
         self.task = asyncio.ensure_future(self._load())
@@ -85,16 +106,10 @@ class FusionTwinExtension(omni.ext.IExt):
             machine = self.stage.GetPrimAtPath("/World/Machine")
             if not machine:
                 raise RuntimeError("Scene has no /World/Machine assembly")
-            for component in machine.GetChildren():
-                self.components[component.GetName()] = component
-                for sector in component.GetChildren():
-                    if sector.GetName().startswith("sector_"):
-                        number = int(sector.GetName().rsplit("_", 1)[1])
-                        self.sectors.append((component.GetName(), number, sector))
-                for prim in Usd.PrimRange(component):
-                    if prim.IsA(UsdGeom.Mesh):
-                        material, _ = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial()
-                        self.original_bindings[str(prim.GetPath())] = material.GetPath() if material else None
+            self._collect_components()
+            self.geometry_controller = GeometryController(self.stage)
+            from .nvidia_workflow import NvidiaWorkflow
+            self.nvidia_workflow = NvidiaWorkflow(self.stage, self.root)
             cameras = self.stage.GetPrimAtPath("/World/Cameras")
             if cameras:
                 for camera in cameras.GetChildren():
@@ -131,6 +146,7 @@ class FusionTwinExtension(omni.ext.IExt):
                 self.viewport.fill_frame = False
                 self.viewport.resolution = self.render_resolution
                 self._set_camera("overview")
+            self.scene_ready = True
             self.error = None
             self._poll(force=True)
             for _ in range(120):
@@ -147,7 +163,7 @@ class FusionTwinExtension(omni.ext.IExt):
         self.last_frame = now
         if dt > 0:
             self.fps = self.fps * 0.92 + min(1.0 / dt, 200.0) * 0.08
-        if self.stage and now - self.last_poll >= 0.1:
+        if self.scene_ready and now - self.last_poll >= 1 / 60:
             self.last_poll = now
             try:
                 self._poll()
@@ -181,6 +197,9 @@ class FusionTwinExtension(omni.ext.IExt):
         resolution = self.interactive_resolution if self.quality == "interaction" else self.render_resolution
         if tuple(viewport.resolution) != resolution:
             viewport.resolution = resolution
+        settings = carb.settings.get_settings()
+        if settings.get("/rtx/rendermode") != "RealTimePathTracing":
+            settings.set("/rtx/rendermode", "RealTimePathTracing")
 
     def _poll(self, force=False):
         request_path = self.runtime / "state.json"
@@ -190,77 +209,145 @@ class FusionTwinExtension(omni.ext.IExt):
             request = json.loads(request_path.read_text(encoding="utf-8-sig"))
         except (json.JSONDecodeError, PermissionError):
             return
+        epoch_changed = self.command_consumer.synchronize(request)
+        if epoch_changed:
+            if self.command_task:
+                self.command_task.cancel()
+                self.command_task = None
+            self.measure_points = []
+            self.measurement = None
         revision = int(request.get("revision", 0))
-        if force or revision != self.revision:
-            previous = self.state
-            self.state = request.get("state", {})
+        if force or epoch_changed or revision != self.revision:
+            reference = request.get("field_ref")
+            if not reference:
+                return
+            started = time.perf_counter()
+            data = self.field_data if reference["key"] == self.applied_field_key else self.load_field_packet(self.runtime, reference)
+            loaded = time.perf_counter()
+            self._apply_snapshot(request, reference, data)
+            finished = time.perf_counter()
+            self.apply_timing = {"revision": revision, "field_key": reference["key"],
+                                 "packet_load_ms": round((loaded - started) * 1000, 2),
+                                 "snapshot_apply_ms": round((finished - loaded) * 1000, 2),
+                                 "finished_at": time.time()}
+        if self.command_task is None or self.command_task.done():
+            command = self.command_consumer.next(request)
+            if command:
+                self.command_task = asyncio.ensure_future(self._execute_command(command))
+                self._report()
+
+    def _apply_snapshot(self, request, reference, data):
+        previous = self.state
+        self.state = request.get("state", {})
+        try:
+            if "metadata_json" in data:
+                metadata = json.loads(str(data["metadata_json"]))
+                if any(metadata[key] != self.state.get(key) for key in ("design", "equilibrium")):
+                    raise ValueError("Snapshot geometry/equilibrium does not match the field packet")
+            design_changed = self.state.get("design", "conventional") != previous.get("design")
+            if design_changed:
+                self._switch_design(self.state.get("design", "conventional"))
+            if design_changed or self.state.get("equilibrium") != previous.get("equilibrium"):
+                if self.command_task:
+                    self.command_task.cancel()
+                    self.command_task = None
+                if self.command_consumer.current:
+                    self.command_consumer.finish(self.command_consumer.current, "cancelled", error="scene_changed")
+                self.measure_points = []
+                self.measurement = None
+                self.selected = None
             self._apply_state(previous)
-            self.revision = revision
-        seq = int(request.get("command_seq", 0))
-        if seq != self.command_seq:
-            self.command_seq = seq
-            command = request.get("command") or {}
-            if isinstance(command, str):
-                command = {"type": command}
-            self._command(command)
-        fields_path = self.runtime / "fields.json"
-        if fields_path.exists():
-            mtime = fields_path.stat().st_mtime_ns
-            if mtime != self.field_mtime:
-                self.field_mtime = mtime
-                self._apply_fields()
+            if reference["key"] != self.applied_field_key or self.state.get("mode") != previous.get("mode"):
+                self._apply_fields(reference, data)
+                if self.state.get("mode") in ("temperature", "heatflux", "delta_temperature", "delta_heatflux", "slice"):
+                    # Let the pending reset consume the latest colours during continuous input.
+                    if self.reset_task is None or self.reset_task.done():
+                        self.reset_task = asyncio.ensure_future(self._reset_renderer(settle_frames=1))
+            self.field_reference = reference
+            self.field_data = data
+            self.applied_field_key = reference["key"]
+            if design_changed or any(self.state.get(key) != previous.get(key) for key in ("mode", "visible", "cutaway", "explode", "fieldLines", "selected")):
+                self._field_visibility()
+            if self.nvidia_workflow:
+                self.nvidia_workflow.submit(self.state, data, reference)
+            self.gpu_name = request.get("result", {}).get("gpu_name", self.gpu_name)
+            self.revision = int(request["revision"])
+            self.error = None
+        except Exception:
+            self.state = previous
+            raise
+
+    def _collect_components(self):
+        self.components, self.sectors, self.original_bindings = {}, [], {}
+        for component in self.stage.GetPrimAtPath("/World/Machine").GetChildren():
+            self.components[component.GetName()] = component
+            for sector in component.GetChildren():
+                if sector.GetName().startswith("sector_"):
+                    self.sectors.append((component.GetName(), int(sector.GetName().rsplit("_", 1)[1]), sector))
+            for prim in Usd.PrimRange(component):
+                if prim.IsA(UsdGeom.Mesh):
+                    material, _ = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial()
+                    self.original_bindings[str(prim.GetPath())] = material.GetPath() if material else None
+
+    def _switch_design(self, design):
+        layer = self.stage.GetSessionLayer()
+        if layer.GetPrimAtPath("/World/Machine"):
+            edits = Sdf.BatchNamespaceEdit()
+            edits.Add(Sdf.Path("/World/Machine"), Sdf.Path.emptyPath)
+            if not layer.Apply(edits):
+                raise RuntimeError("Cannot clear previous design session edits")
+        variants = self.stage.GetPrimAtPath("/World/Machine").GetVariantSet("design")
+        if design not in variants.GetVariantNames():
+            raise ValueError(f"Unknown scene design: {design}")
+        variants.SetVariantSelection(design)
+        self._collect_components()
+        self.geometry_controller.reset(self.stage)
+        for path in ("/World/Fields/Surface", "/World/Fields/Slice", "/World/Fields/FieldLines"):
+            self.stage.RemovePrim(path)
+        UsdGeom.Xform.Define(self.stage, "/World/Fields")
+        UsdGeom.Xform.Define(self.stage, "/World/Fields/Surface")
+        self.topology_key = self.equilibrium_key = self.color_key = self.applied_field_key = None
+        self.field_topology_loaded = False
 
     def _apply_state(self, previous):
         state = self.state
+        if state.get("mode") != previous.get("mode"):
+            carb.settings.get_settings().set("/rtx/rendermode", "RealTimePathTracing")
         view = state.get("view", "overview")
         if view != previous.get("view"):
             self._set_camera(view)
-        visible = state.get("visible", {})
-        for name, component in self.components.items():
-            UsdGeom.Imageable(component).GetVisibilityAttr().Set("inherited" if visible.get(name, True) else "invisible")
-        cutaway = float(state.get("cutaway", 80))
-        hidden_count = max(0, min(18, round(cutaway / 20)))
-        exploded = float(state.get("explode", 0))
-        for component_id, number, prim in self.sectors:
-            UsdGeom.Imageable(prim).GetVisibilityAttr().Set("invisible" if number >= 18 - hidden_count else "inherited")
-            xform = UsdGeom.Xformable(prim)
-            op = next((item for item in xform.GetOrderedXformOps() if item.GetOpName() == "xformOp:translate:explode"), None)
-            if op is None:
-                op = xform.AddTranslateOp(opSuffix="explode")
-            # This translate follows each sector's rotateZ, so the direction is local.
-            angle = math.radians(10)
-            component_index = list(self.components).index(component_id)
-            offset = exploded * (1.0 + component_index * 0.32)
-            op.Set(Gf.Vec3d(math.cos(angle) * offset, math.sin(angle) * offset, 0))
+        if any(state.get(key) != previous.get(key) for key in ("design", "visible", "cutaway", "explode")):
+            self._apply_geometry_visibility()
         selected = state.get("selected")
         if selected != previous.get("selected"):
             self._select(selected)
-        self._apply_materials()
-        self._field_visibility()
-        field_prim = self.stage.GetPrimAtPath("/World/Fields/FieldLines")
-        if field_prim:
-            show = bool(state.get("fieldLines")) or state.get("mode") == "magnetic"
-            UsdGeom.Imageable(field_prim).GetVisibilityAttr().Set("inherited" if show else "invisible")
-        if any(state.get(key) != previous.get(key) for key in ("view", "mode", "visible", "cutaway", "explode", "opacity", "fieldLines")):
+        if state.get("opacity") != previous.get("opacity") or state.get("design") != previous.get("design"):
+            self._apply_materials()
+        if any(state.get(key) != previous.get(key) for key in ("design", "equilibrium", "view", "mode", "visible", "cutaway", "explode", "opacity", "fieldLines")):
             if self.reset_task:
                 self.reset_task.cancel()
             self.reset_task = asyncio.ensure_future(self._reset_renderer())
 
-    async def _reset_renderer(self):
+    def _apply_geometry_visibility(self):
+        self.geometry_controller.apply(self.state)
+
+    async def _reset_renderer(self, settle_frames=3):
         app = omni.kit.app.get_app()
         context = omni.usd.get_context()
-        for _ in range(3):
+        for _ in range(settle_frames):
             await app.next_update_async()
         while self.alive and context.get_stage_streaming_status():
             await app.next_update_async()
         if self.alive:
-            context.reset_renderer_accumulation()
+            carb.settings.get_settings().set("/rtx-transient/post/dlss/forceParamReset", True)
+            self.render_reset = {"revision": self.revision, "field_key": self.applied_field_key, "time": time.time()}
 
     def _set_camera(self, name):
         viewport = get_active_viewport()
         camera_path = f"/World/Cameras/{name}"
         if viewport and self.stage.GetPrimAtPath(camera_path):
-            viewport.camera_path = camera_path
+            if str(viewport.camera_path) != camera_path:
+                viewport.camera_path = camera_path
             self.camera_view = name
 
     def _orbit(self):
@@ -283,7 +370,7 @@ class FusionTwinExtension(omni.ext.IExt):
     def _highlight_selection(self):
         paths = []
         if self.selected:
-            if self.state.get("mode") in ("temperature", "heatflux") and self.selected in ("blanket", "divertor") and self.field_topology_loaded:
+            if self.state.get("mode") in ("temperature", "heatflux", "delta_temperature", "delta_heatflux") and self.selected in ("blanket", "divertor") and self.field_topology_loaded:
                 surface = self.stage.GetPrimAtPath("/World/Fields/Surface")
                 for sector in surface.GetChildren():
                     mesh = sector.GetChild(self.selected)
@@ -317,14 +404,38 @@ class FusionTwinExtension(omni.ext.IExt):
         dims = bounds.GetSize()
         self.measurement = {"type": "bounds", "component": self.selected, "dimensions_m": [round(float(v), 3) for v in dims], "unit": "m"}
 
-    def _command(self, command):
+    async def _execute_command(self, record):
+        try:
+            if not self._command_context_matches(record.get("context", {})):
+                self.command_consumer.finish(record, "cancelled", error="scene_changed")
+                return
+            result = await self._command({**record["action"], "request_id": record["request_id"]}, record.get("context", {}))
+            self.command_consumer.finish(record, result=result)
+            self.command_seq = record["seq"]
+        except asyncio.CancelledError:
+            self.command_consumer.finish(record, "cancelled", error="session_or_scene_changed")
+        except Exception as exc:
+            self.command_consumer.finish(record, "failed", error=str(exc))
+        finally:
+            if self.command_task is asyncio.current_task():
+                self.command_task = None
+            self._report()
+
+    def _command_context_matches(self, context):
+        values = {**self.state, "topology_key": self.topology_key, "interaction_key": self.interaction_key(self.state)}
+        # field_key retains the accepted packet for GC; thermal changes do not move pick geometry.
+        return all(values.get(key) == value for key, value in context.items() if key != "field_key")
+
+    async def _command(self, command, context):
         kind = command.get("type", command.get("action", ""))
+        capture_result = {}
         if kind in ("measure_start", "measure_clear"):
             self.measure_points = []
             self.measurement = None
         elif kind == "capture":
-            if not self.capture_pending:
-                self.capture_task = asyncio.ensure_future(self._capture())
+            while self.capture_pending:
+                await omni.kit.app.get_app().next_update_async()
+            capture_result = await self._capture(request_id=command["request_id"], raise_errors=True)
         elif kind == "reset_camera":
             view = command.get("view", self.state.get("view", "overview"))
             camera = self.stage.GetPrimAtPath(f"/World/Cameras/{view}")
@@ -333,27 +444,34 @@ class FusionTwinExtension(omni.ext.IExt):
             self._set_camera(view)
         elif kind in ("pick", "measure") and "x" in command and "y" in command:
             viewport = get_active_viewport()
-            if viewport:
-                width, height = viewport.resolution
-                pixel = (int(float(command["x"]) * width), int(float(command["y"]) * height))
-                def done(path, world_pos, *_):
-                    if path and path.startswith("/World/Machine/"):
-                        self._select(path.split("/")[3])
-                    elif path and path.startswith("/World/Fields/Surface/"):
-                        self._select(path.rsplit("/", 1)[-1])
-                    if kind == "measure" and path:
-                        self.measure_points.append([float(v) for v in world_pos])
-                        self.measure_points = self.measure_points[-2:]
-                        if len(self.measure_points) == 2:
-                            a, b = self.measure_points
-                            distance = math.sqrt(sum((a[i] - b[i]) ** 2 for i in range(3)))
-                            self.measurement = {"type": "distance", "points": self.measure_points, "distance_m": round(distance, 4), "unit": "m"}
-                        else:
-                            self.measurement = {"type": "point", "points": self.measure_points, "unit": "m"}
-                    self._report()
-                viewport.request_query(pixel, done)
+            if not viewport:
+                raise RuntimeError("Viewport is not ready")
+            width, height = viewport.resolution
+            pixel = (min(width - 1, int(float(command["x"]) * width)), min(height - 1, int(float(command["y"]) * height)))
+            future = asyncio.get_running_loop().create_future()
+            def done(path, world_pos, *_):
+                if not future.done():
+                    future.set_result((path, world_pos))
+            viewport.request_query(pixel, done)
+            path, world_pos = await asyncio.wait_for(future, timeout=10)
+            if not self._command_context_matches(context):
+                raise asyncio.CancelledError()
+            if path and path.startswith("/World/Machine/"):
+                self._select(path.split("/")[3])
+            elif path and path.startswith("/World/Fields/Surface/"):
+                self._select(path.rsplit("/", 1)[-1])
+            if kind == "measure" and path:
+                self.measure_points.append([float(v) for v in world_pos])
+                self.measure_points = self.measure_points[-2:]
+                if len(self.measure_points) == 2:
+                    a, b = self.measure_points
+                    distance = math.sqrt(sum((a[i] - b[i]) ** 2 for i in range(3)))
+                    self.measurement = {"type": "distance", "points": self.measure_points, "distance_m": round(distance, 4), "unit": "m"}
+                else:
+                    self.measurement = {"type": "point", "points": self.measure_points, "unit": "m"}
         elif kind == "measure":
             self._measure_component()
+        return {"measurement": self.measurement, "selected": self.selected, **capture_result}
 
     def _analysis_material(self, name, color, opacity):
         path = f"/World/Analysis/Materials/{name}"
@@ -391,75 +509,81 @@ class FusionTwinExtension(omni.ext.IExt):
                         binding.Bind(UsdShade.Material(self.stage.GetPrimAtPath(original)))
                     else:
                         binding.UnbindDirectBinding()
-        self._apply_fields()
 
-    def _apply_fields(self):
-        # The producer owns engineering calculations; this consumer only draws its outputs.
-        self.stage.GetPrimAtPath("/World/Fields/Surface").SetActive(True)
-        fields_path = self.runtime / "fields.json"
-        if not fields_path.exists():
-            return
-        try:
-            fields = json.loads(fields_path.read_text(encoding="utf-8-sig"))
-        except (json.JSONDecodeError, PermissionError):
-            return
-        mode = self.state.get("mode", "assembly")
-        npz_path = self.runtime / "fields.npz"
-        if not npz_path.exists():
-            return
+    def _apply_fields(self, reference, data):
         import numpy as np
+
+        topology_changed = reference["topology_key"] != self.topology_key
+        equilibrium_changed = reference["equilibrium_key"] != self.equilibrium_key
+        if topology_changed:
+            self.stage.RemovePrim("/World/Fields/Surface")
+            UsdGeom.Xform.Define(self.stage, "/World/Fields/Surface")
+            self.field_topology_loaded = False
+        self.stage.GetPrimAtPath("/World/Fields/Surface").SetActive(True)
+        mode = self.state.get("mode", "assembly")
+        field_key = {"heatflux": "heatflux_rgb", "delta_heatflux": "delta_heatflux_rgb",
+                     "delta_temperature": "delta_temperature_rgb"}.get(mode, "temperature_rgb")
+        color_key = (reference["key"], field_key)
+
         def linear_colors(values):
             rgb = np.asarray(values, dtype=np.float32)
             return Vt.Vec3fArray.FromNumpy(np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4).astype(np.float32))
-        with np.load(BytesIO(npz_path.read_bytes()), allow_pickle=False) as data:
-            if "surface_points" in data:
-                points = Vt.Vec3fArray.FromNumpy(np.asarray(data["surface_points"], dtype=np.float32))
-                triangles = np.asarray(data["surface_triangles"], dtype=np.int32)
-                field_key = "heatflux_rgb" if mode == "heatflux" else "temperature_rgb"
-                colors = linear_colors(data[field_key])
-                material = self._vertex_material()
-                for number in range(18):
-                    sector = UsdGeom.Xform.Define(self.stage, f"/World/Fields/Surface/sector_{number:02d}")
+
+        if topology_changed or color_key != self.color_key:
+            points = Vt.Vec3fArray.FromNumpy(np.asarray(data["surface_points"], dtype=np.float32))
+            triangles = np.asarray(data["surface_triangles"], dtype=np.int32)
+            colors = linear_colors(data[field_key])
+            material = self._vertex_material() if topology_changed else None
+            for number in range(18):
+                sector = UsdGeom.Xform.Define(self.stage, f"/World/Fields/Surface/sector_{number:02d}")
+                if not self.field_topology_loaded:
+                    sector.AddRotateZOp().Set(number * 20.0)
+                for component_index, component_id in enumerate(("blanket", "divertor")):
+                    mesh = UsdGeom.Mesh.Define(self.stage, str(sector.GetPath()) + "/" + component_id)
                     if not self.field_topology_loaded:
-                        sector.AddRotateZOp().Set(number * 20.0)
-                    for component_index, component_id in enumerate(("blanket", "divertor")):
-                        mesh = UsdGeom.Mesh.Define(self.stage, str(sector.GetPath()) + "/" + component_id)
-                        if not self.field_topology_loaded:
-                            subset = triangles[data["surface_triangle_component"] == component_index] if "surface_triangle_component" in data else triangles
-                            mesh.CreatePointsAttr(points)
-                            mesh.CreateFaceVertexCountsAttr(Vt.IntArray([3] * len(subset)))
-                            mesh.CreateFaceVertexIndicesAttr(Vt.IntArray.FromNumpy(subset.reshape(-1)))
-                            mesh.CreateSubdivisionSchemeAttr("none")
-                            mesh.CreateDoubleSidedAttr(True)
-                            mesh.AddTranslateOp(opSuffix="explode")
-                            UsdShade.MaterialBindingAPI.Apply(mesh.GetPrim()).Bind(material)
-                        mesh.CreateDisplayColorPrimvar(UsdGeom.Tokens.vertex).Set(colors)
-                self.field_topology_loaded = True
-            if "slice_points" in data:
-                mesh = UsdGeom.Mesh.Define(self.stage, "/World/Fields/Slice")
-                if not mesh.GetPointsAttr().HasAuthoredValueOpinion():
-                    points = Vt.Vec3fArray.FromNumpy(np.asarray(data["slice_points"], dtype=np.float32))
-                    triangles = np.asarray(data["slice_triangles"], dtype=np.int32)
-                    mesh.CreatePointsAttr(points)
-                    mesh.CreateFaceVertexCountsAttr(Vt.IntArray([3] * len(triangles)))
-                    mesh.CreateFaceVertexIndicesAttr(Vt.IntArray.FromNumpy(triangles.reshape(-1)))
-                    mesh.CreateSubdivisionSchemeAttr("none")
-                    mesh.CreateDoubleSidedAttr(True)
-                    UsdShade.MaterialBindingAPI.Apply(mesh.GetPrim()).Bind(self._vertex_material())
-                mesh.CreateDisplayColorPrimvar(UsdGeom.Tokens.vertex).Set(linear_colors(data["slice_rgb"]))
-            if "magnetic_lines" in data:
-                lines = data["magnetic_lines"]
-                curves = UsdGeom.BasisCurves.Define(self.stage, "/World/Fields/FieldLines")
-                curves.CreateTypeAttr("linear")
-                curves.CreateWrapAttr("nonperiodic")
-                curves.CreateCurveVertexCountsAttr(Vt.IntArray([len(line) for line in lines]))
-                curves.CreatePointsAttr(Vt.Vec3fArray.FromNumpy(np.asarray(lines.reshape(-1, 3), dtype=np.float32)))
-                curves.CreateWidthsAttr([0.028])
-                curves.SetWidthsInterpolation("constant")
-                curves.CreateDisplayColorAttr([Gf.Vec3f(0.12, 0.8, 0.95)])
-                show = self.state.get("fieldLines") or mode == "magnetic"
-                curves.GetVisibilityAttr().Set("inherited" if show else "invisible")
-        self._field_visibility()
+                        subset = triangles[data["surface_triangle_component"] == component_index]
+                        mesh.CreatePointsAttr(points)
+                        mesh.CreateFaceVertexCountsAttr(Vt.IntArray([3] * len(subset)))
+                        mesh.CreateFaceVertexIndicesAttr(Vt.IntArray.FromNumpy(subset.reshape(-1)))
+                        mesh.CreateSubdivisionSchemeAttr("none")
+                        mesh.CreateDoubleSidedAttr(True)
+                        if "surface_normals" in data:
+                            mesh.CreateNormalsAttr(Vt.Vec3fArray.FromNumpy(np.asarray(data["surface_normals"], dtype=np.float32)))
+                            mesh.SetNormalsInterpolation(UsdGeom.Tokens.vertex)
+                        mesh.AddTranslateOp(opSuffix="explode")
+                        UsdShade.MaterialBindingAPI.Apply(mesh.GetPrim()).Bind(material)
+                    mesh.CreateDisplayColorPrimvar(UsdGeom.Tokens.vertex).Set(colors)
+            self.field_topology_loaded = True
+            self.color_key = color_key
+
+        mesh = UsdGeom.Mesh.Define(self.stage, "/World/Fields/Slice")
+        if equilibrium_changed or not mesh.GetPointsAttr().HasAuthoredValueOpinion():
+            points = Vt.Vec3fArray.FromNumpy(np.asarray(data["slice_points"], dtype=np.float32))
+            triangles = np.asarray(data["slice_triangles"], dtype=np.int32)
+            mesh.CreatePointsAttr(points)
+            mesh.CreateFaceVertexCountsAttr(Vt.IntArray([3] * len(triangles)))
+            mesh.CreateFaceVertexIndicesAttr(Vt.IntArray.FromNumpy(triangles.reshape(-1)))
+            mesh.CreateSubdivisionSchemeAttr("none")
+            mesh.CreateDoubleSidedAttr(True)
+            UsdShade.MaterialBindingAPI.Apply(mesh.GetPrim()).Bind(self._vertex_material())
+        if reference["key"] != self.applied_field_key:
+            mesh.CreateDisplayColorPrimvar(UsdGeom.Tokens.vertex).Set(linear_colors(data["slice_rgb"]))
+
+        if equilibrium_changed:
+            lines = data["magnetic_lines"]
+            curves = UsdGeom.BasisCurves.Define(self.stage, "/World/Fields/FieldLines")
+            curves.CreateTypeAttr("linear")
+            curves.CreateWrapAttr("nonperiodic")
+            curves.CreateCurveVertexCountsAttr(Vt.IntArray([len(line) for line in lines]))
+            curves.CreatePointsAttr(Vt.Vec3fArray.FromNumpy(np.asarray(lines.reshape(-1, 3), dtype=np.float32)))
+            curves.CreateWidthsAttr([0.028])
+            curves.SetWidthsInterpolation("constant")
+            curves.CreateDisplayColorAttr([Gf.Vec3f(0.12, 0.8, 0.95)])
+            curves.GetVisibilityAttr().Set("inherited" if self.state.get("fieldLines") or mode == "magnetic" else "invisible")
+        self.stage.GetPrimAtPath("/World/Fields/Surface").SetActive(mode in ("temperature", "heatflux", "delta_temperature", "delta_heatflux"))
+        mesh.GetVisibilityAttr().Set("inherited" if mode == "slice" else "invisible")
+        self.topology_key = reference["topology_key"]
+        self.equilibrium_key = reference["equilibrium_key"]
 
     def _vertex_material(self):
         path = "/World/Fields/Materials/ScalarField"
@@ -482,8 +606,11 @@ class FusionTwinExtension(omni.ext.IExt):
     def _field_visibility(self):
         mode = self.state.get("mode", "assembly")
         visible = self.state.get("visible", {})
+        plasma = self.components.get("plasma")
+        if plasma:
+            UsdGeom.Imageable(plasma).GetVisibilityAttr().Set("inherited" if mode == "assembly" and visible.get("plasma", True) else "invisible")
         surface = self.stage.GetPrimAtPath("/World/Fields/Surface")
-        show_surface = mode in ("temperature", "heatflux") and self.field_topology_loaded
+        show_surface = mode in ("temperature", "heatflux", "delta_temperature", "delta_heatflux") and self.field_topology_loaded
         if surface:
             UsdGeom.Imageable(surface).GetVisibilityAttr().Set("inherited")
             hidden_count = max(0, min(18, round(float(self.state.get("cutaway", 80)) / 20)))
@@ -504,11 +631,20 @@ class FusionTwinExtension(omni.ext.IExt):
         slice_prim = self.stage.GetPrimAtPath("/World/Fields/Slice")
         if slice_prim:
             UsdGeom.Imageable(slice_prim).GetVisibilityAttr().Set("inherited" if mode == "slice" else "invisible")
+        curves = self.stage.GetPrimAtPath("/World/Fields/FieldLines")
+        if curves:
+            UsdGeom.Imageable(curves).GetVisibilityAttr().Set("inherited" if self.state.get("fieldLines") or mode == "magnetic" else "invisible")
         self._highlight_selection()
 
-    async def _capture(self):
+    async def _capture(self, request_id=None, raise_errors=False):
         self.capture_pending = True
         try:
+            immutable = None
+            if request_id:
+                identifier = hashlib.sha256(request_id.encode("utf-8")).hexdigest()
+                immutable = self.runtime / "captures" / f"{identifier}.png"
+                if immutable.is_file():
+                    return {"capture_path": f"runtime/captures/{identifier}.png", "capture_url": f"/api/captures/{identifier}.png"}
             viewport = get_active_viewport()
             if viewport:
                 viewport.resolution = self.render_resolution
@@ -527,11 +663,21 @@ class FusionTwinExtension(omni.ext.IExt):
                     staging = self.runtime / "preview.next.png"
                     shutil.copyfile(capture_file, staging)
                     os.replace(staging, target)
+                    if immutable:
+                        immutable.parent.mkdir(exist_ok=True)
+                        staging = immutable.with_suffix(".next.png")
+                        shutil.copyfile(capture_file, staging)
+                        os.replace(staging, immutable)
                 self.capture_path = "runtime/preview.png"
                 self.error = None
+                return ({"capture_path": f"runtime/captures/{identifier}.png", "capture_url": f"/api/captures/{identifier}.png"}
+                        if immutable else {"capture_path": "runtime/preview.png", "capture_url": "/api/preview.png"})
+            raise RuntimeError("Viewport is not ready")
         except Exception:
             self.error = traceback.format_exc()
             carb.log_error(self.error)
+            if raise_errors:
+                raise
         finally:
             self.capture_pending = False
             self._report()
@@ -540,20 +686,43 @@ class FusionTwinExtension(omni.ext.IExt):
         field_visibility = {}
         viewport = get_active_viewport()
         settings = carb.settings.get_settings()
+        render_mode = settings.get("/rtx/rendermode")
+        render_name = {"PathTracing": "RTX Path Tracing", "RealTimePathTracing": "RTX Real-Time 2.0",
+                       "RaytracedLighting": "RTX Real-Time (Legacy)"}.get(render_mode, str(render_mode))
+        path_tracing = render_mode == "PathTracing"
         if self.stage:
             for path in ("/World/Fields/Surface", "/World/Fields/Surface/sector_00/blanket", "/World/Fields/Surface/sector_00/divertor", "/World/Fields/Slice", "/World/Fields/FieldLines"):
                 prim = self.stage.GetPrimAtPath(path)
                 if prim:
                     field_visibility[path] = {"active": prim.IsActive(), "authored": UsdGeom.Imageable(prim).GetVisibilityAttr().Get(), "effective": UsdGeom.Imageable(prim).ComputeVisibility()}
         payload = {
-            "ready": bool(self.stage and get_active_viewport()),
+            "server_epoch": self.command_consumer.server_epoch,
+            "renderer_epoch": self.command_consumer.renderer_epoch,
+            "command_acks": list(self.command_consumer.acks.values()),
+            "current_command": self.command_consumer.current,
+            "ready": bool(self.scene_ready and self.stage and get_active_viewport() and self.applied_field_key is not None and not self.error),
             "applied_revision": self.revision,
+            "applied_field_key": self.applied_field_key,
+            "apply_timing": getattr(self, "apply_timing", None),
+            "render_reset": getattr(self, "render_reset", None),
+            "dlss_reset_pending": settings.get("/rtx-transient/post/dlss/forceParamReset"),
+            "responsive_denoising_supported": settings.get("/rtx-transient/dldenoiser/responsiveDenoisingSupported"),
+            "responsive_denoising": settings.get("/rtx/dldenoiser/responsiveDenoising"),
+            "anti_aliasing": settings.get("/rtx/post/aa/op"),
+            "topology_key": self.topology_key,
+            "equilibrium_key": self.equilibrium_key,
+            "interaction_key": self.interaction_key(self.state),
             "fps": round(self.fps, 1),
-            "gpu": "NVIDIA GeForce RTX 5070 Ti",
-            "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Path Tracing",
-            "render_mode": settings.get("/rtx/rendermode"),
-            "samples_per_pixel": settings.get("/rtx/pathtracing/spp"),
-            "accumulation_samples": settings.get("/rtx/pathtracing/totalSpp"),
+            "gpu": self.gpu_name,
+            "engine": f"NVIDIA Omniverse Kit 110.1.3 / {render_name}",
+            "render_mode": render_mode,
+            "samples_per_pixel": settings.get("/rtx/pathtracing/spp") if path_tracing else None,
+            "accumulation_samples": settings.get("/rtx/pathtracing/totalSpp") if path_tracing else None,
+            "sampling_strategy": "progressive" if path_tracing else "temporal_reconstruction",
+            "rt2_enabled": settings.get("/rtx-transient/rt2Enabled"),
+            "rt2_cached": settings.get("/rtx/rtpt/cached/enabled"),
+            "auto_exposure": settings.get("/rtx/post/histogram/enabled"),
+            "camera_path": str(viewport.camera_path) if viewport else None,
             "selected": self.selected,
             "mode": self.state.get("mode"),
             "field_visibility": field_visibility,
@@ -568,6 +737,8 @@ class FusionTwinExtension(omni.ext.IExt):
             "render_resolution": list(viewport.resolution) if viewport else list(self.render_resolution),
             "quality": self.quality,
         }
+        if self.nvidia_workflow:
+            payload.update(self.nvidia_workflow.status)
         target = self.runtime / "renderer.json"
         tmp = self.runtime / "renderer.tmp"
         try:
@@ -578,6 +749,10 @@ class FusionTwinExtension(omni.ext.IExt):
 
     def on_shutdown(self):
         self.alive = False
+        if self.nvidia_workflow:
+            self.nvidia_workflow.close()
+        if self.command_task:
+            self.command_task.cancel()
         if self.reset_task:
             self.reset_task.cancel()
         if self.capture_task:

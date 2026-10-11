@@ -3,14 +3,10 @@ import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { base, snapshot, post, complete } from './api.mjs';
 
-const base = 'http://127.0.0.1:8765';
 const output = fileURLToPath(new URL('../../runtime/qa/', import.meta.url));
 await mkdir(output, { recursive: true });
-const snapshot = async () => (await fetch(`${base}/api/state`)).json();
-const post = async (route, value) => (await fetch(`${base}/api/${route}`, {
-  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value),
-})).json();
 const original = (await snapshot()).state;
 const browser = await chromium.launch({ channel: 'msedge', headless: true, args: ['--autoplay-policy=no-user-gesture-required', '--no-proxy-server', ...(process.env.QA_SOFTWARE_BROWSER === '1' ? ['--disable-gpu'] : [])] });
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
@@ -56,11 +52,8 @@ try {
   });
   await writeFile(path.join(output, 'clarity-stream-1440p.png'), Buffer.from(encodedFrame, 'base64'));
   const capture = await post('action', { type: 'capture' });
-  await page.waitForFunction(async seq => {
-    const { renderer } = await (await fetch('/api/state')).json();
-    return renderer.command_seq >= seq && !renderer.capture_pending;
-  }, capture.command_seq, { timeout: 15000 });
-  const nativePNG = Buffer.from(await (await fetch(`${base}/api/preview.png`)).arrayBuffer());
+  const captured = await complete(capture.request_id);
+  const nativePNG = Buffer.from(await (await fetch(`${base}${captured.result.capture_url}`)).arrayBuffer());
   assert.equal(nativePNG.readUInt32BE(16), 2560);
   assert.equal(nativePNG.readUInt32BE(20), 1440);
   await writeFile(path.join(output, 'clarity-native-1440p.png'), nativePNG);
