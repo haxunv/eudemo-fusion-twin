@@ -1,0 +1,10 @@
+{
+  "python": ".venv/Scripts/python.exe",
+  "kit_executable": "C:/FusionTwinRuntime/kit/kit.exe",
+  "extension_folders": [
+    "C:/FusionTwinRuntime/extscache",
+    "C:/FusionTwinRuntime/exts",
+    "C:/FusionTwinRuntime/kit-cae/exts",
+    "C:/FusionTwinRuntime/kit-cae/apps"
+  ]
+}
