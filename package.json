@@ -1,0 +1,16 @@
+{
+  "name": "eudemo-fusion-digital-twin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:streamer": "vite build --config web/streamer/vite.config.js",
+    "check:web": "node --check web/app.js && node --check web/streamer/index.js"
+  },
+  "dependencies": {
+    "@nvidia/omniverse-webrtc-streaming-library": "5.6.0"
+  },
+  "devDependencies": {
+    "vite": "8.3.4"
+  }
+}

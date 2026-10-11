@@ -1,0 +1,410 @@
+{
+  "schema_version": 1,
+  "title": "EU-DEMO Fusion Digital Twin",
+  "stage": "scene/fusion.usda",
+  "unit": "m",
+  "up_axis": "Z",
+  "components": [
+    {
+      "id": "tf_coils",
+      "name_en": "Toroidal field coils",
+      "name_zh": "环向场线圈",
+      "usd_path": "/World/Machine/tf_coils",
+      "material": "steel",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -16.909812927246094,
+          -16.761366839483358,
+          -9.25635051727295
+        ],
+        [
+          16.909812927246094,
+          16.761366839483355,
+          8.606378555297852
+        ]
+      ],
+      "part_count": 54,
+      "triangle_count": 98136,
+      "unique_part_count": 3,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": true,
+      "source_step": "source/eudemo/conventional/cad/tf_coils.stp"
+    },
+    {
+      "id": "pf_coils",
+      "name_en": "Poloidal field coils",
+      "name_zh": "极向场线圈",
+      "usd_path": "/World/Machine/pf_coils",
+      "material": "coil_blue",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -18.29206145294198,
+          -18.29205966978584,
+          -10.861262321472168
+        ],
+        [
+          18.292061452941983,
+          18.292059669785843,
+          10.211291313171387
+        ]
+      ],
+      "part_count": 324,
+      "triangle_count": 38448,
+      "unique_part_count": 18,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": true,
+      "source_step": "source/eudemo/conventional/cad/pf_coils.stp"
+    },
+    {
+      "id": "cs_coils",
+      "name_en": "Central solenoid",
+      "name_zh": "中央螺线管",
+      "usd_path": "/World/Machine/cs_coils",
+      "material": "copper",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -3.2232899876202143,
+          -3.2232899642553607,
+          -9.256407737731934
+        ],
+        [
+          3.2232899876202143,
+          3.2232899642553607,
+          8.606968879699707
+        ]
+      ],
+      "part_count": 270,
+      "triangle_count": 32040,
+      "unique_part_count": 15,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": true,
+      "source_step": "source/eudemo/conventional/cad/pf_coils.stp"
+    },
+    {
+      "id": "coil_structures",
+      "name_en": "Magnet support structures",
+      "name_zh": "磁体支撑结构",
+      "usd_path": "/World/Machine/coil_structures",
+      "material": "structure",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -18.416954040527344,
+          -18.254293503679577,
+          -15.375
+        ],
+        [
+          18.416954040527344,
+          18.254293503679577,
+          10.26129150390625
+        ]
+      ],
+      "part_count": 270,
+      "triangle_count": 23652,
+      "unique_part_count": 15,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": true,
+      "source_step": "source/eudemo/conventional/cad/coil_structures.stp"
+    },
+    {
+      "id": "vacuum_vessel",
+      "name_en": "Vacuum vessel and ports",
+      "name_zh": "真空室与维护端口",
+      "usd_path": "/World/Machine/vacuum_vessel",
+      "material": "vessel",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -18.73987579345703,
+          -18.842061980981413,
+          -9.95876693725586
+        ],
+        [
+          18.73987579345703,
+          18.842061980981413,
+          10.76129150390625
+        ]
+      ],
+      "part_count": 18,
+      "triangle_count": 499752,
+      "unique_part_count": 1,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": true,
+      "source_step": "source/eudemo/conventional/cad/vacuum_vessel.stp"
+    },
+    {
+      "id": "blanket",
+      "name_en": "Breeding blanket modules",
+      "name_zh": "增殖包层模块",
+      "usd_path": "/World/Machine/blanket",
+      "material": "blanket",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -13.515964448025269,
+          -13.513237211237342,
+          -5.725409984588623
+        ],
+        [
+          13.515964448025269,
+          13.513237211237344,
+          6.918725967407227
+        ]
+      ],
+      "part_count": 270,
+      "triangle_count": 124416,
+      "unique_part_count": 15,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": true,
+      "source_step": "source/eudemo/conventional/cad/blanket.stp"
+    },
+    {
+      "id": "divertor",
+      "name_en": "Divertor cassettes",
+      "name_zh": "偏滤器盒体",
+      "usd_path": "/World/Machine/divertor",
+      "material": "tungsten",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -10.63403034210205,
+          -10.632099650534691,
+          -7.522093296051025
+        ],
+        [
+          10.63403034210205,
+          10.632099650534691,
+          -5.455014705657959
+        ]
+      ],
+      "part_count": 54,
+      "triangle_count": 73800,
+      "unique_part_count": 3,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": true,
+      "source_step": "source/eudemo/conventional/cad/divertor.stp"
+    },
+    {
+      "id": "plasma",
+      "name_en": "Plasma boundary",
+      "name_zh": "等离子体边界",
+      "usd_path": "/World/Machine/plasma",
+      "material": "plasma",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -12.039707474987939,
+          -12.039705540833486,
+          -5.428472995758057
+        ],
+        [
+          12.039707474987937,
+          12.039705540833486,
+          5.124975204467773
+        ]
+      ],
+      "part_count": 18,
+      "triangle_count": 148932,
+      "unique_part_count": 1,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": true,
+      "source_step": "source/eudemo/conventional/cad/plasma.stp"
+    },
+    {
+      "id": "thermal_shield",
+      "name_en": "Thermal shields",
+      "name_zh": "热屏蔽",
+      "usd_path": "/World/Machine/thermal_shield",
+      "material": "gold",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -18.69206188059502,
+          -18.686250979660453,
+          -11.261262893676758
+        ],
+        [
+          18.692061880595023,
+          18.686250979660453,
+          10.61129093170166
+        ]
+      ],
+      "part_count": 36,
+      "triangle_count": 393120,
+      "unique_part_count": 2,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": false,
+      "source_step": "source/eudemo/conventional/cad/thermal_shield.stp"
+    },
+    {
+      "id": "cryostat",
+      "name_en": "Cryostat and plugs",
+      "name_zh": "低温恒温器与端口塞",
+      "usd_path": "/World/Machine/cryostat",
+      "material": "vessel",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -19.294174194335938,
+          -19.292062046587965,
+          -20.600000381469727
+        ],
+        [
+          19.294174194335938,
+          19.292062046587965,
+          11.211291313171387
+        ]
+      ],
+      "part_count": 72,
+      "triangle_count": 6912,
+      "unique_part_count": 4,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": false,
+      "source_step": "source/eudemo/conventional/cad/cryostat.stp"
+    },
+    {
+      "id": "radiation_shield",
+      "name_en": "Biological shield",
+      "name_zh": "辐射屏蔽",
+      "usd_path": "/World/Machine/radiation_shield",
+      "material": "concrete",
+      "source": "Bluemira EU-DEMO-like CAD generated locally",
+      "bounds_m": [
+        [
+          -21.628690719604492,
+          -21.592062084032246,
+          -22.899999618530273
+        ],
+        [
+          21.628690719604492,
+          21.592062084032246,
+          13.51129150390625
+        ]
+      ],
+      "part_count": 72,
+      "triangle_count": 12096,
+      "unique_part_count": 4,
+      "sector_count": 18,
+      "sector_angle_deg": 20.0,
+      "default_visible": false,
+      "source_step": "source/eudemo/conventional/cad/radiation_shield.stp"
+    }
+  ],
+  "total_part_count": 1458,
+  "total_triangle_count": 1451304,
+  "unique_part_count": 81,
+  "source": [
+    {
+      "url": "https://github.com/Fusion-Power-Plant-Framework/bluemira-eudemo",
+      "commit": "12d152a2d10bdc5115f371f2a38822b3ecddffb0",
+      "working_tree_modified": true
+    },
+    {
+      "url": "https://github.com/Fusion-Power-Plant-Framework/bluemira",
+      "commit": "43467e629386f489be6d7651faa9953125138053"
+    }
+  ],
+  "cameras": {
+    "overview": {
+      "usd_path": "/World/Cameras/overview",
+      "eye_m": [
+        43,
+        -44,
+        27
+      ],
+      "target_m": [
+        0,
+        0,
+        -1.8
+      ]
+    },
+    "front": {
+      "usd_path": "/World/Cameras/front",
+      "eye_m": [
+        38,
+        -45,
+        2
+      ],
+      "target_m": [
+        0,
+        0,
+        -1.5
+      ]
+    },
+    "top": {
+      "usd_path": "/World/Cameras/top",
+      "eye_m": [
+        0,
+        0,
+        64
+      ],
+      "target_m": [
+        0,
+        0,
+        0
+      ]
+    },
+    "section": {
+      "usd_path": "/World/Cameras/section",
+      "eye_m": [
+        28,
+        -30,
+        7
+      ],
+      "target_m": [
+        2,
+        -1,
+        -0.4
+      ]
+    },
+    "divertor": {
+      "usd_path": "/World/Cameras/divertor",
+      "eye_m": [
+        18,
+        -19,
+        -2
+      ],
+      "target_m": [
+        6,
+        -4,
+        -6.2
+      ]
+    }
+  },
+  "default_camera": "/World/Cameras/overview",
+  "design_variants": [
+    "conventional",
+    "longleg"
+  ],
+  "design_variant_set": "design",
+  "cutaway": {
+    "start_deg": 280,
+    "end_deg": 360,
+    "sector_indices": [
+      14,
+      15,
+      16,
+      17
+    ],
+    "description": "80 degree opening follows four exact 20 degree CAD sectors."
+  },
+  "geometry_notes": [
+    "Full named component hierarchy from source CAD; no reactor components replaced by display primitives.",
+    "PF/CS and plasma source 22 degree wedges are resampled to 20 degrees before repetition.",
+    "Studio plinth, floor and supports are visualization-only environment geometry.",
+    "Manufacturing tolerances, watertight B-rep quality and collision clearance have not been certified."
+  ]
+}

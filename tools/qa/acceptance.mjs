@@ -1,0 +1,112 @@
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+
+const base = 'http://127.0.0.1:8765';
+const output = path.resolve('../../runtime/qa');
+await mkdir(output, { recursive: true });
+const checks = [], errors = [];
+const browser = await chromium.launch({channel:'msedge',headless:true,args:['--autoplay-policy=no-user-gesture-required','--no-proxy-server']});
+const context = await browser.newContext({viewport:{width:1600,height:1000},deviceScaleFactor:1,acceptDownloads:true});
+const page = await context.newPage();
+page.on('pageerror', error => errors.push(error.message));
+page.on('console', message => {if(message.type()==='error')errors.push(message.text());});
+const snapshot = async()=>await(await fetch(`${base}/api/state`)).json();
+async function waitState(predicate,label) {
+  for(let i=0;i<100;i++) {const s=await snapshot();if(predicate(s)&&s.renderer.applied_revision>=s.revision&&!s.renderer.error){checks.push(label);return s;}await new Promise(r=>setTimeout(r,100));}
+  throw new Error(`State did not settle: ${label}: ${JSON.stringify(await snapshot())}`);
+}
+async function slider(id,value){await page.locator(id).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));},value);}
+async function capture(name){await page.waitForTimeout(800);await page.screenshot({path:path.join(output,name)});}
+try {
+  await page.goto(base,{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('video').readyState===4,{},{timeout:30000});
+  await page.waitForTimeout(2500);
+  const videoStart=await page.locator('video').evaluate(v=>({width:v.videoWidth,height:v.videoHeight,frames:v.getVideoPlaybackQuality().totalVideoFrames,time:performance.now()}));
+  const expectedResolution=(await snapshot()).renderer.resolution;
+  assert.deepEqual([videoStart.width,videoStart.height],expectedResolution,'Decoded WebRTC dimensions must match the renderer');checks.push(`real RTX WebRTC ${videoStart.width}x${videoStart.height}`);
+  await capture('02-overview-zh.png');
+  await page.locator('[data-lang="en"]').click();
+  await page.waitForFunction(()=>document.documentElement.lang==='en');
+  assert.match(await page.title(),/Fusion Digital Twin/);checks.push('English localization');
+  await page.locator('#assembly-button').click();
+  await page.locator('[data-component="blanket"]').click();
+  await waitState(s=>s.state.selected==='blanket','CAD component selection');
+  await page.locator('[data-visible="blanket"]').uncheck();
+  await waitState(s=>s.state.visible.blanket===false,'component hide');
+  await page.locator('[data-visible="blanket"]').check();
+  await waitState(s=>s.state.visible.blanket===true,'component show');
+  await page.locator('#isolate-button').click();
+  await waitState(s=>Object.values(s.state.visible).filter(Boolean).length===1&&s.state.visible.blanket,'component isolation');
+  await page.locator('#component-measure').click();
+  await page.locator('#measure-dialog').waitFor({state:'visible'});
+  assert.equal(await page.locator('.dimension-cards strong').count(),3);checks.push('CAD dimensions dialog');
+  await page.locator('#measure-dialog [data-dialog-close]').click();
+  await page.locator('#reset-view-button').click();
+  await waitState(s=>s.state.visible.plasma&&!s.state.visible.cryostat,'restore default assembly');
+  await capture('03-assembly-en.png');
+  await page.locator('[data-close="assembly-drawer"]').click();
+  await slider('#cutaway-range',140);
+  await waitState(s=>s.state.cutaway===140,'CAD sector cutaway');
+  await slider('#explode-range',0.4);
+  await waitState(s=>s.state.explode===0.4,'CAD exploded assembly');
+  await capture('04-exploded.png');
+  await page.locator('#reset-view-button').click();
+  await waitState(s=>s.state.explode===0&&s.state.cutaway===80,'reset transformations');
+  await page.locator('[data-mode="temperature"]').click();
+  const nominal=await waitState(s=>s.state.mode==='temperature','temperature surface mode');
+  await page.locator('#scenario-select').selectOption('highload');
+  const hot=await waitState(s=>s.state.scenario==='highload'&&s.state.power===2400,'high thermal load scenario');
+  assert.ok(hot.result.peak_temperature_C>nominal.result.peak_temperature_C);assert.ok(hot.result.gpu_device.startsWith('cuda'));checks.push('real CUDA scenario response');
+  await capture('05-temperature-highload.png');
+  await page.locator('[data-tab="compare"]').click();
+  await waitState(s=>s.state.tab==='compare','comparison tab');
+  assert.ok(hot.result.comparison.delta.peak_temperature_C>0);checks.push('reference/current delta');
+  await capture('06-comparison.png');
+  await page.locator('[data-tab="explore"]').click();
+  await waitState(s=>s.state.tab==='explore','exploration restore');
+  await page.locator('[data-mode="magnetic"]').click();
+  await waitState(s=>s.state.mode==='magnetic','equilibrium magnetic lines mode');
+  await capture('07-magnetic.png');
+  await page.locator('[data-mode="slice"]').click();
+  await page.locator('[data-view="section"]').click();
+  await waitState(s=>s.state.mode==='slice'&&s.state.view==='section','plasma section mode and camera');
+  await capture('08-slice.png');
+  await page.locator('[data-mode="heatflux"]').click();
+  await waitState(s=>s.state.mode==='heatflux','heat flux surface mode');
+  await page.locator('#play-button').click();
+  const playing=await waitState(s=>s.state.playing,'thermal timeline play');
+  await waitState(s=>s.state.phase>playing.state.phase,'thermal time advances');
+  await page.locator('#play-button').click();
+  await waitState(s=>!s.state.playing,'thermal timeline pause');
+  const exportPromise=page.waitForEvent('download');
+  await page.locator('#export-button').click();
+  const exportFile=await exportPromise;await exportFile.saveAs(path.join(output,'exported-scenario.json'));checks.push('scenario JSON download');
+  const screenshotPromise=page.waitForEvent('download');
+  await page.locator('#screenshot-button').click();
+  const screenshot=await screenshotPromise;await screenshot.saveAs(path.join(output,'exported-rtx.png'));checks.push('actual video screenshot download');
+  await page.locator('#provenance-button').click();
+  await page.locator('#provenance-dialog').waitFor({state:'visible'});
+  assert.match(await page.locator('#provenance-dialog').innerText(),/synthetic|Synthetic|simplified/i);checks.push('data provenance disclosure');
+  await page.locator('#provenance-dialog [data-dialog-close]').click();
+  for(const kind of ['cad','usd']){const response=await fetch(`${base}/api/download/${kind}.zip`);assert.equal(response.status,200);assert.ok(Number(response.headers.get('content-length'))>1000000);checks.push(`${kind.toUpperCase()} complete asset ZIP`);}
+  const invalid=await fetch(`${base}/api/state`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({power:-1})});assert.equal(invalid.status,400);checks.push('invalid state rejected');
+  await page.locator('[data-mode="assembly"]').click();
+  await page.locator('#scenario-select').selectOption('nominal');
+  await page.locator('#reset-view-button').click();
+  await slider('#phase-range',0.65);
+  await page.locator('[data-lang="zh"]').click();
+  await waitState(s=>s.state.mode==='assembly'&&s.state.scenario==='nominal'&&s.state.view==='overview'&&s.state.phase===0.65,'default view restored');
+  await capture('09-final-zh.png');
+  const videoEnd=await page.locator('video').evaluate(v=>({frames:v.getVideoPlaybackQuality().totalVideoFrames,dropped:v.getVideoPlaybackQuality().droppedVideoFrames,time:performance.now()}));
+  const fps=(videoEnd.frames-videoStart.frames)/((videoEnd.time-videoStart.time)/1000);
+  assert.ok(fps>20);checks.push('sustained received video >20fps');
+  assert.deepEqual(errors,[]);checks.push('no browser JavaScript errors');
+  await writeFile(path.join(output,'acceptance.json'),JSON.stringify({passed:true,checks,fps,videoStart,videoEnd,errors,final:await snapshot()},null,2));
+  console.log(JSON.stringify({passed:true,checks:checks.length,fps,errors}));
+} catch(error) {
+  await page.screenshot({path:path.join(output,'failure.png')});
+  await writeFile(path.join(output,'acceptance.json'),JSON.stringify({passed:false,checks,errors,failure:error.stack,state:await snapshot()},null,2));
+  throw error;
+} finally {await browser.close();}

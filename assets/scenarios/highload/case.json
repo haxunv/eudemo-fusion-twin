@@ -1,0 +1,286 @@
+{
+  "state": {
+    "power": 2400.0,
+    "flow": 0.85,
+    "inlet": 320.0,
+    "scenario": "highload",
+    "phase": 0.65
+  },
+  "result": {
+    "peak_temperature_C": 935.95,
+    "peak_heatflux_MW_m2": 11.489,
+    "outlet_temperature_C": 475.14,
+    "cooling_margin_C": -35.95,
+    "limit_temperature_C": 900.0,
+    "mass_flow_kg_s": 2975.0,
+    "thermal_power_MW": 2400.0,
+    "gpu_ms": 0.051,
+    "compute_backend": "CUDA / Warp",
+    "gpu_device": "cuda:0",
+    "gpu_name": "NVIDIA GeForce RTX 5070 Ti",
+    "gpu_timing_scope": "Warp launch + synchronized kernel, excludes host transfer",
+    "field_samples": 5542,
+    "magnetic_line_count": 24,
+    "magnetic_trace_ms": 1.465,
+    "source_label": "synthetic_thermal_bluemira_equilibrium",
+    "scenario_label": "highload",
+    "history": [
+      {
+        "phase": 0.0,
+        "time_s": 0.0,
+        "heatflux": 2.549,
+        "temperature": 495.4,
+        "peak_temperature_C": 495.4
+      },
+      {
+        "phase": 0.0333,
+        "time_s": 20.0,
+        "heatflux": 4.429,
+        "temperature": 588.06,
+        "peak_temperature_C": 588.06
+      },
+      {
+        "phase": 0.0667,
+        "time_s": 40.0,
+        "heatflux": 5.918,
+        "temperature": 661.44,
+        "peak_temperature_C": 661.44
+      },
+      {
+        "phase": 0.1,
+        "time_s": 60.0,
+        "heatflux": 7.097,
+        "temperature": 719.55,
+        "peak_temperature_C": 719.55
+      },
+      {
+        "phase": 0.1333,
+        "time_s": 80.0,
+        "heatflux": 8.031,
+        "temperature": 765.56,
+        "peak_temperature_C": 765.56
+      },
+      {
+        "phase": 0.1667,
+        "time_s": 100.0,
+        "heatflux": 8.77,
+        "temperature": 802.0,
+        "peak_temperature_C": 802.0
+      },
+      {
+        "phase": 0.2,
+        "time_s": 120.0,
+        "heatflux": 9.356,
+        "temperature": 830.86,
+        "peak_temperature_C": 830.86
+      },
+      {
+        "phase": 0.2333,
+        "time_s": 140.0,
+        "heatflux": 9.82,
+        "temperature": 853.71,
+        "peak_temperature_C": 853.71
+      },
+      {
+        "phase": 0.2667,
+        "time_s": 160.0,
+        "heatflux": 10.187,
+        "temperature": 871.8,
+        "peak_temperature_C": 871.8
+      },
+      {
+        "phase": 0.3,
+        "time_s": 180.0,
+        "heatflux": 10.478,
+        "temperature": 886.13,
+        "peak_temperature_C": 886.13
+      },
+      {
+        "phase": 0.3333,
+        "time_s": 200.0,
+        "heatflux": 10.708,
+        "temperature": 897.48,
+        "peak_temperature_C": 897.48
+      },
+      {
+        "phase": 0.3667,
+        "time_s": 220.0,
+        "heatflux": 10.89,
+        "temperature": 906.46,
+        "peak_temperature_C": 906.46
+      },
+      {
+        "phase": 0.4,
+        "time_s": 240.0,
+        "heatflux": 11.035,
+        "temperature": 913.58,
+        "peak_temperature_C": 913.58
+      },
+      {
+        "phase": 0.4333,
+        "time_s": 260.0,
+        "heatflux": 11.149,
+        "temperature": 919.21,
+        "peak_temperature_C": 919.21
+      },
+      {
+        "phase": 0.4667,
+        "time_s": 280.0,
+        "heatflux": 11.24,
+        "temperature": 923.68,
+        "peak_temperature_C": 923.68
+      },
+      {
+        "phase": 0.5,
+        "time_s": 300.0,
+        "heatflux": 11.311,
+        "temperature": 927.21,
+        "peak_temperature_C": 927.21
+      },
+      {
+        "phase": 0.5333,
+        "time_s": 320.0,
+        "heatflux": 11.368,
+        "temperature": 930.01,
+        "peak_temperature_C": 930.01
+      },
+      {
+        "phase": 0.5667,
+        "time_s": 340.0,
+        "heatflux": 11.413,
+        "temperature": 932.22,
+        "peak_temperature_C": 932.22
+      },
+      {
+        "phase": 0.6,
+        "time_s": 360.0,
+        "heatflux": 11.449,
+        "temperature": 933.98,
+        "peak_temperature_C": 933.98
+      },
+      {
+        "phase": 0.6333,
+        "time_s": 380.0,
+        "heatflux": 11.477,
+        "temperature": 935.37,
+        "peak_temperature_C": 935.37
+      },
+      {
+        "phase": 0.6667,
+        "time_s": 400.0,
+        "heatflux": 11.499,
+        "temperature": 936.47,
+        "peak_temperature_C": 936.47
+      },
+      {
+        "phase": 0.7,
+        "time_s": 420.0,
+        "heatflux": 11.517,
+        "temperature": 937.34,
+        "peak_temperature_C": 937.34
+      },
+      {
+        "phase": 0.7333,
+        "time_s": 440.0,
+        "heatflux": 11.531,
+        "temperature": 938.03,
+        "peak_temperature_C": 938.03
+      },
+      {
+        "phase": 0.7667,
+        "time_s": 460.0,
+        "heatflux": 11.542,
+        "temperature": 938.58,
+        "peak_temperature_C": 938.58
+      },
+      {
+        "phase": 0.8,
+        "time_s": 480.0,
+        "heatflux": 11.551,
+        "temperature": 939.01,
+        "peak_temperature_C": 939.01
+      },
+      {
+        "phase": 0.8333,
+        "time_s": 500.0,
+        "heatflux": 11.558,
+        "temperature": 939.35,
+        "peak_temperature_C": 939.35
+      },
+      {
+        "phase": 0.8667,
+        "time_s": 520.0,
+        "heatflux": 11.563,
+        "temperature": 939.62,
+        "peak_temperature_C": 939.62
+      },
+      {
+        "phase": 0.9,
+        "time_s": 540.0,
+        "heatflux": 11.568,
+        "temperature": 939.84,
+        "peak_temperature_C": 939.84
+      },
+      {
+        "phase": 0.9333,
+        "time_s": 560.0,
+        "heatflux": 11.571,
+        "temperature": 940.01,
+        "peak_temperature_C": 940.01
+      },
+      {
+        "phase": 0.9667,
+        "time_s": 580.0,
+        "heatflux": 11.574,
+        "temperature": 940.14,
+        "peak_temperature_C": 940.14
+      },
+      {
+        "phase": 1.0,
+        "time_s": 600.0,
+        "heatflux": 11.576,
+        "temperature": 940.25,
+        "peak_temperature_C": 940.25
+      }
+    ],
+    "comparison": {
+      "baseline": {
+        "peak_temperature_C": 666.85,
+        "peak_heatflux_MW_m2": 7.092,
+        "outlet_temperature_C": 409.89,
+        "cooling_margin_C": 233.15,
+        "limit_temperature_C": 900.0,
+        "mass_flow_kg_s": 3500.0,
+        "thermal_power_MW": 2000.0
+      },
+      "candidate": {
+        "peak_temperature_C": 935.95,
+        "peak_heatflux_MW_m2": 11.489,
+        "outlet_temperature_C": 475.14,
+        "cooling_margin_C": -35.95,
+        "limit_temperature_C": 900.0,
+        "mass_flow_kg_s": 2975.0,
+        "thermal_power_MW": 2400.0
+      },
+      "delta": {
+        "peak_temperature_C": 269.1,
+        "peak_heatflux_MW_m2": 4.397,
+        "outlet_temperature_C": 65.25,
+        "cooling_margin_C": -269.1,
+        "limit_temperature_C": 0.0,
+        "mass_flow_kg_s": -525.0,
+        "thermal_power_MW": 400.0
+      }
+    },
+    "assumptions": {
+      "thermal": "Synthetic surface heat-flux distribution and wall thermal resistance; not normalized as a conservative full-reactor heat solution",
+      "coolant": "Separate assumed helium circuit energy balance: cp=5200 J/(kg K), nominal flow=3500 kg/s",
+      "limit": "900 degC demonstration threshold; not a material qualification limit",
+      "magnetics": "Bluemira reference equilibrium, Bphi=fvac/R approximation; unchanged by thermal controls",
+      "plasma_slice": "Synthetic 25 keV core profile shaped by source normalized poloidal flux"
+    }
+  },
+  "data_class": "synthetic_demo",
+  "geometry": "conventional",
+  "source_equilibrium": "assets/source/eudemo/conventional/equilibria/reference.npz"
+}

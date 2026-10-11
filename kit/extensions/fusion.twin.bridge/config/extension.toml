@@ -1,0 +1,11 @@
+[package]
+title = "Fusion Twin File Bridge"
+version = "0.1.0"
+description = "CAD state, selection, measurements and RTX capture."
+
+[dependencies]
+"omni.usd" = {}
+"omni.kit.viewport.utility" = {}
+
+[[python.module]]
+name = "fusion.twin.bridge"

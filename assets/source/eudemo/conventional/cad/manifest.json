@@ -1,0 +1,508 @@
+{
+ "plasma": {
+  "p000": {
+   "name": "LCFS",
+   "path": "Plasma/LCFS",
+   "material": null,
+   "n_tris": 8274
+  }
+ },
+ "vacuum_vessel": {
+  "p000": {
+   "name": "Body 1",
+   "path": "VacuumVessel/Body 1",
+   "material": "inb_vacuum_vessel",
+   "n_tris": 27764
+  }
+ },
+ "thermal_shield": {
+  "p000": {
+   "name": "VVTS 1 1",
+   "path": "Thermal Shield/VVTS 1 1",
+   "material": "SS316L",
+   "n_tris": 21280
+  },
+  "p001": {
+   "name": "Cryostat TS 1 1",
+   "path": "Thermal Shield/Cryostat TS 1 1",
+   "material": "SS316L",
+   "n_tris": 560
+  }
+ },
+ "divertor": {
+  "p000": {
+   "name": "segment_0 1 1",
+   "path": "Divertor/segment_0 1 1",
+   "material": "SS316L",
+   "n_tris": 1362
+  },
+  "p001": {
+   "name": "segment_1 1 1",
+   "path": "Divertor/segment_1 1 1",
+   "material": "SS316L",
+   "n_tris": 1362
+  },
+  "p002": {
+   "name": "segment_2 1 1",
+   "path": "Divertor/segment_2 1 1",
+   "material": "SS316L",
+   "n_tris": 1376
+  }
+ },
+ "blanket": {
+  "p000": {
+   "name": "IBS_FW_0 1 1",
+   "path": "Blanket/IBS_FW_0 1 1",
+   "material": "FW_material",
+   "n_tris": 650
+  },
+  "p001": {
+   "name": "IBS_FW_1 1 1",
+   "path": "Blanket/IBS_FW_1 1 1",
+   "material": "FW_material",
+   "n_tris": 650
+  },
+  "p002": {
+   "name": "IBS_BZ_0 1 1",
+   "path": "Blanket/IBS_BZ_0 1 1",
+   "material": "BZ_material",
+   "n_tris": 654
+  },
+  "p003": {
+   "name": "IBS_BZ_1 1 1",
+   "path": "Blanket/IBS_BZ_1 1 1",
+   "material": "BZ_material",
+   "n_tris": 654
+  },
+  "p004": {
+   "name": "IBS_MANIFOLD_0 1 1",
+   "path": "Blanket/IBS_MANIFOLD_0 1 1",
+   "material": "Manifold_material",
+   "n_tris": 668
+  },
+  "p005": {
+   "name": "IBS_MANIFOLD_1 1 1",
+   "path": "Blanket/IBS_MANIFOLD_1 1 1",
+   "material": "Manifold_material",
+   "n_tris": 756
+  },
+  "p006": {
+   "name": "OBS_FW_0 1 1",
+   "path": "Blanket/OBS_FW_0 1 1",
+   "material": "FW_material",
+   "n_tris": 262
+  },
+  "p007": {
+   "name": "OBS_FW_1 1 1",
+   "path": "Blanket/OBS_FW_1 1 1",
+   "material": "FW_material",
+   "n_tris": 262
+  },
+  "p008": {
+   "name": "OBS_FW_2 1 1",
+   "path": "Blanket/OBS_FW_2 1 1",
+   "material": "FW_material",
+   "n_tris": 262
+  },
+  "p009": {
+   "name": "OBS_BZ_0 1 1",
+   "path": "Blanket/OBS_BZ_0 1 1",
+   "material": "BZ_material",
+   "n_tris": 262
+  },
+  "p010": {
+   "name": "OBS_BZ_1 1 1",
+   "path": "Blanket/OBS_BZ_1 1 1",
+   "material": "BZ_material",
+   "n_tris": 262
+  },
+  "p011": {
+   "name": "OBS_BZ_2 1 1",
+   "path": "Blanket/OBS_BZ_2 1 1",
+   "material": "BZ_material",
+   "n_tris": 262
+  },
+  "p012": {
+   "name": "OBS_MANIFOLD_0 1 1",
+   "path": "Blanket/OBS_MANIFOLD_0 1 1",
+   "material": "Manifold_material",
+   "n_tris": 436
+  },
+  "p013": {
+   "name": "OBS_MANIFOLD_1 1 1",
+   "path": "Blanket/OBS_MANIFOLD_1 1 1",
+   "material": "Manifold_material",
+   "n_tris": 436
+  },
+  "p014": {
+   "name": "OBS_MANIFOLD_2 1 1",
+   "path": "Blanket/OBS_MANIFOLD_2 1 1",
+   "material": "Manifold_material",
+   "n_tris": 436
+  }
+ },
+ "tf_coils": {
+  "p000": {
+   "name": "Winding Pack 1 1",
+   "path": "TFCoil/Winding Pack 1 1",
+   "material": "SS316L",
+   "n_tris": 1048
+  },
+  "p001": {
+   "name": "Insulation 1 1",
+   "path": "TFCoil/Insulation 1 1",
+   "material": "SS316L",
+   "n_tris": 2096
+  },
+  "p002": {
+   "name": "Casing 1 1",
+   "path": "TFCoil/Casing 1 1",
+   "material": "SS316L",
+   "n_tris": 2308
+  }
+ },
+ "pf_coils": {
+  "p000": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p001": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p002": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p003": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p004": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p005": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p006": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p007": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p008": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p009": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p010": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p011": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p012": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p013": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p014": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p015": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p016": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p017": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p018": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p019": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p020": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p021": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p022": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p023": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p024": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p025": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p026": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p027": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p028": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p029": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p030": {
+   "name": "Winding Pack",
+   "path": "Poloidal Coils/Winding Pack",
+   "material": "SS316L",
+   "n_tris": 68
+  },
+  "p031": {
+   "name": "Ground Insulation",
+   "path": "Poloidal Coils/Ground Insulation",
+   "material": "SS316L",
+   "n_tris": 144
+  },
+  "p032": {
+   "name": "Casing",
+   "path": "Poloidal Coils/Casing",
+   "material": "SS316L",
+   "n_tris": 144
+  }
+ },
+ "coil_structures": {
+  "p000": {
+   "name": "TF OIS left 1 1",
+   "path": "Coil Structures/TF OIS left 1 1",
+   "material": "SS316L",
+   "n_tris": 12
+  },
+  "p001": {
+   "name": "TF OIS right 1 1",
+   "path": "Coil Structures/TF OIS right 1 1",
+   "material": "SS316L",
+   "n_tris": 12
+  },
+  "p002": {
+   "name": "TF OIS left 2 1",
+   "path": "Coil Structures/TF OIS left 2 1",
+   "material": "SS316L",
+   "n_tris": 12
+  },
+  "p003": {
+   "name": "TF OIS right 2 1",
+   "path": "Coil Structures/TF OIS right 2 1",
+   "material": "SS316L",
+   "n_tris": 12
+  },
+  "p004": {
+   "name": "TF OIS left 3 1",
+   "path": "Coil Structures/TF OIS left 3 1",
+   "material": "SS316L",
+   "n_tris": 12
+  },
+  "p005": {
+   "name": "TF OIS right 3 1",
+   "path": "Coil Structures/TF OIS right 3 1",
+   "material": "SS316L",
+   "n_tris": 12
+  },
+  "p006": {
+   "name": "TF OIS left 4 1",
+   "path": "Coil Structures/TF OIS left 4 1",
+   "material": "SS316L",
+   "n_tris": 12
+  },
+  "p007": {
+   "name": "TF OIS right 4 1",
+   "path": "Coil Structures/TF OIS right 4 1",
+   "material": "SS316L",
+   "n_tris": 12
+  },
+  "p008": {
+   "name": "PFCoilSupport 0 1",
+   "path": "Coil Structures/PFCoilSupport 0 1",
+   "material": "SS316L",
+   "n_tris": 96
+  },
+  "p009": {
+   "name": "PFCoilSupport 1 1",
+   "path": "Coil Structures/PFCoilSupport 1 1",
+   "material": "SS316L",
+   "n_tris": 184
+  },
+  "p010": {
+   "name": "PFCoilSupport 2 1",
+   "path": "Coil Structures/PFCoilSupport 2 1",
+   "material": "SS316L",
+   "n_tris": 164
+  },
+  "p011": {
+   "name": "PFCoilSupport 3 1",
+   "path": "Coil Structures/PFCoilSupport 3 1",
+   "material": "SS316L",
+   "n_tris": 224
+  },
+  "p012": {
+   "name": "PFCoilSupport 4 1",
+   "path": "Coil Structures/PFCoilSupport 4 1",
+   "material": "SS316L",
+   "n_tris": 184
+  },
+  "p013": {
+   "name": "PFCoilSupport 5 1",
+   "path": "Coil Structures/PFCoilSupport 5 1",
+   "material": "SS316L",
+   "n_tris": 96
+  },
+  "p014": {
+   "name": "ITER-like gravity support 1",
+   "path": "Coil Structures/ITER-like gravity support 1",
+   "material": "SS316L",
+   "n_tris": 270
+  }
+ },
+ "cryostat": {
+  "p000": {
+   "name": "Cryostat VV 1 1",
+   "path": "Cryostat/Cryostat VV 1 1",
+   "material": "SS316L",
+   "n_tris": 300
+  },
+  "p001": {
+   "name": "CryostatPortPlug 0 1",
+   "path": "Cryostat/CryostatPortPlug 0 1",
+   "material": "SS316L",
+   "n_tris": 28
+  },
+  "p002": {
+   "name": "CryostatPortPlug 1 1",
+   "path": "Cryostat/CryostatPortPlug 1 1",
+   "material": "SS316L",
+   "n_tris": 28
+  },
+  "p003": {
+   "name": "CryostatPortPlug 2 1",
+   "path": "Cryostat/CryostatPortPlug 2 1",
+   "material": "SS316L",
+   "n_tris": 28
+  }
+ },
+ "radiation_shield": {
+  "p000": {
+   "name": "Body 1 1",
+   "path": "RadiationShield/Body 1 1",
+   "material": "HeavyConcrete",
+   "n_tris": 444
+  },
+  "p001": {
+   "name": "RadiationPortPlug 0 1",
+   "path": "RadiationShield/RadiationPortPlug 0 1",
+   "material": "HeavyConcrete",
+   "n_tris": 76
+  },
+  "p002": {
+   "name": "RadiationPortPlug 1 1",
+   "path": "RadiationShield/RadiationPortPlug 1 1",
+   "material": "HeavyConcrete",
+   "n_tris": 76
+  },
+  "p003": {
+   "name": "RadiationPortPlug 2 1",
+   "path": "RadiationShield/RadiationPortPlug 2 1",
+   "material": "HeavyConcrete",
+   "n_tris": 76
+  }
+ }
+}

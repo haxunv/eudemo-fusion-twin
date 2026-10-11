@@ -1,0 +1,1040 @@
+{
+  "source_kind": "open_source_concept_design_generated_locally",
+  "geometry": "Bluemira EU-DEMO-like parametric CAD; not manufacturing drawings",
+  "repositories": [
+    {
+      "url": "https://github.com/Fusion-Power-Plant-Framework/bluemira-eudemo",
+      "commit": "12d152a2d10bdc5115f371f2a38822b3ecddffb0",
+      "working_tree_modified": true
+    },
+    {
+      "url": "https://github.com/Fusion-Power-Plant-Framework/bluemira",
+      "commit": "43467e629386f489be6d7651faa9953125138053"
+    }
+  ],
+  "source_workspace": "D:\\nvcode\\fusion-twin\\source\\specializations\\fusion\\data\\eudemo",
+  "generation": {
+    "script": "source/provenance/legacy_harvest_eudemo.py",
+    "radial_build": "mock PROCESS baseline inputs",
+    "geometry_engine": "Bluemira / FreeCAD",
+    "equilibria": "Bluemira free-boundary numerical solutions; custom ramp and leg constraints",
+    "mesh_deflection_m": 0.02
+  },
+  "known_data_issues": [
+    "Source machine.json labels P_fus=1994.6 with unit W. The source is preserved; this field must not be used as a validated SI power.",
+    "Longleg is a local design variant with div_L2D_ib=1.30 and div_L2D_ob=1.85.",
+    "Source provides no physical sensor telemetry, validated time-dependent transport, or AI predictions."
+  ],
+  "licenses": {
+    "bluemira": "LGPL-2.1-or-later",
+    "eudemo": "Top-level MIT; retain file-level LGPL notices where present",
+    "harvest_script": "LGPL-2.1-or-later, retained source notice"
+  },
+  "files": [
+    {
+      "path": "source/eudemo/conventional/cad/blanket.stp",
+      "bytes": 2537621,
+      "sha256": "b3fdc7ef27e0c980a5eafca006aed9ec8e89574835ffd08a0d8808714309838e"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p000.npz",
+      "bytes": 5532,
+      "sha256": "02fb60542b381b7433d0359b9691101c69decdf6c1fe3e828254cc1d44eecd6d"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p001.npz",
+      "bytes": 5756,
+      "sha256": "3a1ee115f2fa073fd0badbf0d518c8604885df27701e9c27bf62cbfa89bfb7e4"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p002.npz",
+      "bytes": 5645,
+      "sha256": "a0272c7a35d4be19d94c5c5f8e8c092743fde95cbede7478a46b5b43eba386cd"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p003.npz",
+      "bytes": 5846,
+      "sha256": "0284036b1b755e21a71986d74796f0a88eb6ccc8882f58ca31ec27779fa2cb59"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p004.npz",
+      "bytes": 5943,
+      "sha256": "85d7d204b544f1707eb756d20a39e28dfedcc4655996d194488c678d6af143b9"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p005.npz",
+      "bytes": 6951,
+      "sha256": "bc534b21933b5bf7eadee606a421bf2feac226f1db5d9bee80e5dde452e66067"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p006.npz",
+      "bytes": 2591,
+      "sha256": "452e7b9d727c1deaf93d03b5fb922cdd85911e3c3efa8e7eb52096c1025ad55e"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p007.npz",
+      "bytes": 2713,
+      "sha256": "012d29a6e187f3dd8e9d5e0bb290e0e6e0493252f6ef89f9c3067e15408b121b"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p008.npz",
+      "bytes": 2663,
+      "sha256": "8af20c02e232ea2e4fa65bfb85158492f5fd7bf16f7fd53fa0cf52f6db972ac5"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p009.npz",
+      "bytes": 2615,
+      "sha256": "d6db903fd12a5b9a84f6a668b510db3438ffc67668c6893040b6de6041cd0993"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p010.npz",
+      "bytes": 2722,
+      "sha256": "dbbd783f7cba1f465e730c3b84dc71bf949e7edc7b5569f4cf2950fd8ac72253"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p011.npz",
+      "bytes": 2674,
+      "sha256": "65f1b1af6e89b0593aec7b91551f2769ff759f5ca3df22d0b84877b53c15fff6"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p012.npz",
+      "bytes": 3911,
+      "sha256": "ecd3411f6823dd0dca7de1fbb970f8f51b61f7d90a9cfec8086bd0cdbb9d1559"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p013.npz",
+      "bytes": 4110,
+      "sha256": "17faf6f1653e2561734104712a968bf5434203249ede842ce0e8fbf2ef85ccb0"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/blanket__p014.npz",
+      "bytes": 4045,
+      "sha256": "4e50e46528f0bb2fe30ce2d5920f76df4ac8322b4c5a25b43b4b54e2cef1c7a5"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures.stp",
+      "bytes": 1373595,
+      "sha256": "05fd423961377961cdaf3897957137b47f988df9996d92ed0656e98d8746e207"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p000.npz",
+      "bytes": 522,
+      "sha256": "6f10123b96ec49a751afb1d028ec2d8c5a4a00a6e5d094ca86bb0938d1d5fb0e"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p001.npz",
+      "bytes": 528,
+      "sha256": "029da8eaa804340d2a4639358c8a3558e0e3e45f5197873999592f973e3fa6ae"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p002.npz",
+      "bytes": 523,
+      "sha256": "f1c0d7db875388d0d5cfe3c1dfbd12290e5618b0643776ef4a7c1e55b136b405"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p003.npz",
+      "bytes": 526,
+      "sha256": "851de76920cc51e51a964f5c20160e49e4972bc8f86c9bc859c813bf9b168b8e"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p004.npz",
+      "bytes": 526,
+      "sha256": "44bf8c885ffdc4de98404502bf19b598b88bbfaf777f182e3547c3082108975c"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p005.npz",
+      "bytes": 526,
+      "sha256": "f9c8f867fef83691365f28371016337bd08e07364ee24b550aa1cb1786a417f2"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p006.npz",
+      "bytes": 524,
+      "sha256": "f076f9b32ede5105996c69be9e9fd7584f1e30a6c09548fc2fd00dcd4dcd4bf6"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p007.npz",
+      "bytes": 525,
+      "sha256": "42b8dad050ad804fab37fed1e7f7eb4b39344868dc8b9d2e6cfa3ecfda5b23cc"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p008.npz",
+      "bytes": 919,
+      "sha256": "4b06d921ba891e5379519d967649881913f61b9896603603227de747296caf7f"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p009.npz",
+      "bytes": 1516,
+      "sha256": "26646e1903397f6f8e9bdd22d0d68c577c48fb460df35c1d40d84f843b05da2e"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p010.npz",
+      "bytes": 1321,
+      "sha256": "99b1255f3b944a97ffdc8212f4124812f61283fa6c09d2aea6c98881e75edc53"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p011.npz",
+      "bytes": 1687,
+      "sha256": "68ef2eff85de81e9147aa6ee1d04b2b64385d67e089f739f4874f4986c4e64cd"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p012.npz",
+      "bytes": 1514,
+      "sha256": "1241014d0d5435fca1ce1773d9be8c8556f0359e9c450e7b73828774930b49ed"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p013.npz",
+      "bytes": 898,
+      "sha256": "b13bb3631285cb2d75cb6a2c630d470d402dcc9d87481eb80a38b6bae3347ca7"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/coil_structures__p014.npz",
+      "bytes": 1769,
+      "sha256": "bffd53a33cb3c594507f421f86194e1b951942485ba683bcdc79862c421e823b"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/cryostat.stp",
+      "bytes": 242866,
+      "sha256": "aa79c09923664ef51c13056527af66321af1e436be3cf76eb8260891637e8eca"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/cryostat__p000.npz",
+      "bytes": 2329,
+      "sha256": "c0bc89352a05fd86d5ac2cfbc6ad43e8496260467895cc52b48b279a15faf9d0"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/cryostat__p001.npz",
+      "bytes": 609,
+      "sha256": "3a300fab1b36c41e78294d1ecec39772d946708361bac67f84642a536ef15ad6"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/cryostat__p002.npz",
+      "bytes": 608,
+      "sha256": "c143654d2f9bfae31c46e8be08af17d329250b25860e6233a82bb8c82f15a20d"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/cryostat__p003.npz",
+      "bytes": 621,
+      "sha256": "caf5f30d0123282bd95758698c177d9649f962fe9efc16fefa4bcda2535f9733"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/divertor.stp",
+      "bytes": 949680,
+      "sha256": "2c69fa7d00d322abf8d78e96019e53073b3e8ada2741a1af28f1d16fd3fd11b5"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/divertor__p000.npz",
+      "bytes": 11718,
+      "sha256": "04b70613f71139930b76d02f68afb00fcca6a666bdbe8c1f15e2d637916d748a"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/divertor__p001.npz",
+      "bytes": 12235,
+      "sha256": "5d8981ea4db764c56ba6bdef4e11681f99e099d32d0b41b5197710909922edf8"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/divertor__p002.npz",
+      "bytes": 12388,
+      "sha256": "7146183aecaa189b311569d652c112204e78d5a3729f1bc5fff4d39fb436d2d9"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/manifest.json",
+      "bytes": 10803,
+      "sha256": "60d07b316c222f825817580dd2be0bc4adcfe668fdbf2e9ec4acbc39a6996425"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils.stp",
+      "bytes": 943304,
+      "sha256": "b7702a9604cde80a225dcb11b9c18f7c241fc9ac4759e021b92dd7fab6321a4a"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p000.npz",
+      "bytes": 867,
+      "sha256": "b435edf0e694855d320031b7393ef58ab79ddde73bcaa7b1426c6e62af065fee"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p001.npz",
+      "bytes": 1334,
+      "sha256": "cd6720e20668bd30bf113f66a96f5bcc13ef9a33cd7a6a741ed57e87b8da1cf5"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p002.npz",
+      "bytes": 1334,
+      "sha256": "67b9e909382d880c08756fd4671b0de70afbe778341ad72ede2646abe4003f70"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p003.npz",
+      "bytes": 871,
+      "sha256": "3736945688c948e906e859227b61a75287b070de5160720d894be980e8259a88"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p004.npz",
+      "bytes": 1332,
+      "sha256": "5c841a3fa04bdcc106d8799eae072e2c34222d15706cc995bd37a2dc93dcd5bc"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p005.npz",
+      "bytes": 1327,
+      "sha256": "e6328c51a5e3bf34eb6643a8c9ad82bb050591f5e5c7848a5d53cb02da6e7de4"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p006.npz",
+      "bytes": 868,
+      "sha256": "4d7b1d270dceda0b46a5d142b0d234a728c205dde997ad7bae690614b0c1a662"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p007.npz",
+      "bytes": 1324,
+      "sha256": "1bd5b8e71e6c1088ba70bdaa60b31458c433d796f929d3bf9d06cce7096a2973"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p008.npz",
+      "bytes": 1326,
+      "sha256": "af9820196d7906ecbe5cfccee7615b6147a4d9afb4de6a220718ec384b43cad5"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p009.npz",
+      "bytes": 872,
+      "sha256": "0fc344bcc325f2bb9fc9d0bcd06b2f405e581b585cd75c6b48427721bbed6ac1"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p010.npz",
+      "bytes": 1341,
+      "sha256": "c16c1d174cba9573298dc6f4c8fe58c3d5b60e7ae4e81de4ffa0ed7a85e66475"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p011.npz",
+      "bytes": 1321,
+      "sha256": "ea324a93f37ec83bf3bd3801d2c0deed8ead76590cb8144e36a377724aa012c9"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p012.npz",
+      "bytes": 871,
+      "sha256": "3f9a7845745bfe644733cf993e9ad8c425bb531043d567838f77fb878c608a82"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p013.npz",
+      "bytes": 1333,
+      "sha256": "424a9ba5654e8a1003a8c2f8a26b08bd11fb248fca1a57dcd95ea95abd438cbd"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p014.npz",
+      "bytes": 1332,
+      "sha256": "fcdcea8ad48491f17cf59c5aa275a2042dd34b01d31e27ce45c53246dd89d1dd"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p015.npz",
+      "bytes": 871,
+      "sha256": "e94077f1a3cf4e9c40d08274b0fa6ac36065e1458dbcc66665d47f8eeebfdf16"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p016.npz",
+      "bytes": 1336,
+      "sha256": "77dbe93f70b274305c8056d6d6a1e8732b22cd37b4b11e7372d1725b739a8928"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p017.npz",
+      "bytes": 1333,
+      "sha256": "1c3c5ca3f4f25755a7eaeb357fffd0d505db90df5bba1ca0b1fc949a81e110a0"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p018.npz",
+      "bytes": 873,
+      "sha256": "345b97482588ebd08a1d2030880dcbb8959d0ea28e787597c183c987cc8653c4"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p019.npz",
+      "bytes": 1326,
+      "sha256": "5044374a01edf8a7efe623886f771a139d58f0aa3db4bb5b4dd2c5baa0fc1d40"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p020.npz",
+      "bytes": 1330,
+      "sha256": "9ee0b96526b321adcec3c0d074c90967cc0f6b1198ba3d6dd1ef8d4847ee6d05"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p021.npz",
+      "bytes": 871,
+      "sha256": "ce46d689c2f59b287cc0b2b178b8037f04e1f9b16284897da6bfdb0b36a04391"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p022.npz",
+      "bytes": 1332,
+      "sha256": "9bbade292e48837eac8e4537286ae2ffc10084dfa7f34955f80d2b28f5b4d24d"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p023.npz",
+      "bytes": 1331,
+      "sha256": "1e1b3d8cde751399fc17860afd10c12f84ad6a134117c7d7c109abf37b8ee9cf"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p024.npz",
+      "bytes": 870,
+      "sha256": "7166d691358aabad3b38beda7db4604add54a7f4deae5504277a980340fb224a"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p025.npz",
+      "bytes": 1331,
+      "sha256": "f528296cccc628aa400a612c0e51d1a4dd257d65152359c287da2826c1370452"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p026.npz",
+      "bytes": 1329,
+      "sha256": "1d5ea9883f8e27000465efd1d33334606f06bf1bd80336b731b87743d467715c"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p027.npz",
+      "bytes": 872,
+      "sha256": "517e839503aa5493b57456b2fd83565e569272cdc4474aef3eb8dda387e2f7af"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p028.npz",
+      "bytes": 1333,
+      "sha256": "87fb1f3e123824a28b7fefdb0c76002291c9be520eb276ef56c6df1729e0ab4e"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p029.npz",
+      "bytes": 1330,
+      "sha256": "56740d799fd581fefda723b3b29fca65937be4a853df6bca39c2661e77a6fb2c"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p030.npz",
+      "bytes": 859,
+      "sha256": "4eae64079e9b44b8757b041ccb749755d8162f75aa616151b8dcb9ea07d9b5a4"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p031.npz",
+      "bytes": 1331,
+      "sha256": "3de367737e688f6cdf13b94d49fe0c48f142454d219aea208da2a92fcb9b93f0"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/pf_coils__p032.npz",
+      "bytes": 1326,
+      "sha256": "45bd7a277a3bd8f09a51b6e1b1610a94b116474afa01b9675376dbcf1543fc1f"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/plasma.stp",
+      "bytes": 143255,
+      "sha256": "c1f5aab03061f4fb9e78a32e172d604638c0cf2ea0849ee413dfad172fae1189"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/plasma__p000.npz",
+      "bytes": 72096,
+      "sha256": "4bbb6b73bc9b499eaa8cd0ef4c7065a01e4f600e2325e136cdd82f5814efe51f"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/radiation_shield.stp",
+      "bytes": 525600,
+      "sha256": "39674c31dbbd3a2820178cdbf0feb42e52bd1f4ed728e5d83355e7fd08b63de4"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/radiation_shield__p000.npz",
+      "bytes": 3326,
+      "sha256": "62edc6466c812b94b4ed025f12ae99d71f4696b135e5eb2da2f3f59090000f3c"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/radiation_shield__p001.npz",
+      "bytes": 902,
+      "sha256": "978da07555d2bf9f4158cf03b31a356afd3760eba5e09493fa2bf9fef537387d"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/radiation_shield__p002.npz",
+      "bytes": 907,
+      "sha256": "893e33eeadf1c3bc59ddf06aee271ee756e4158cd33cda3e6357bbd00e202bb5"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/radiation_shield__p003.npz",
+      "bytes": 937,
+      "sha256": "dbf65abd853b476598e88d3804f5329d85a4afced3a452affcc1e86dc785ca8c"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/tf_coils.stp",
+      "bytes": 496440,
+      "sha256": "25ec8410c22de1ea5583fe807b37681b9c1762569dad4196ebee110efcb20d6a"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/tf_coils__p000.npz",
+      "bytes": 7519,
+      "sha256": "ec55b9720c2c3679828f13a404831dc81a1c7f9f7676f0fe0cbefbd667bdc223"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/tf_coils__p001.npz",
+      "bytes": 14592,
+      "sha256": "feb3c11c384bce01e2f30874fad6a0cbcb4bd767ef3c78765c5bf05c1b1e29d1"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/tf_coils__p002.npz",
+      "bytes": 15542,
+      "sha256": "a316a6fbc2a364fb6cfd794ddf0da525fa4bfb457ca398a92aa3af956bf0759f"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/thermal_shield.stp",
+      "bytes": 2420195,
+      "sha256": "4a047a4cc173a8daa7d3aae87a0e2f54b1ba09b211ac4338a8b0e92e48d06ef3"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/thermal_shield__p000.npz",
+      "bytes": 171038,
+      "sha256": "361a6698667742feb883da0daf1fbe52ca3c89114b068098f1cea1c0d0596b74"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/thermal_shield__p001.npz",
+      "bytes": 4892,
+      "sha256": "0a4e0942f9f972fe9ce69376a828163dc90cd1bd5c3df8b61d7664bb329168d6"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/vacuum_vessel.stp",
+      "bytes": 3666500,
+      "sha256": "bf12455d2074912e9986521dd7a5f11d7412a2439b89328899992e8a91c6ba71"
+    },
+    {
+      "path": "source/eudemo/conventional/cad/vacuum_vessel__p000.npz",
+      "bytes": 225310,
+      "sha256": "5fdb766ac437df650d1c977a6b62241f33fec2a44b7e3a2fe5a01d8fa8733ddd"
+    },
+    {
+      "path": "source/eudemo/conventional/equilibria/eof.npz",
+      "bytes": 209420,
+      "sha256": "6533b805d698c6714a577bff55b5dc87ffdd0d6a5a2da87424dd13e4432add60"
+    },
+    {
+      "path": "source/eudemo/conventional/equilibria/eof_legs.npz",
+      "bytes": 209582,
+      "sha256": "ae2d897a1721dd7019066d10af8509526874cea080c76bc8f1cbb2d37a2a5ba6"
+    },
+    {
+      "path": "source/eudemo/conventional/equilibria/rampdown.npz",
+      "bytes": 208379,
+      "sha256": "c817d384a63458ce8049332d4241d688cc20070c910ae56792961715f1864af3"
+    },
+    {
+      "path": "source/eudemo/conventional/equilibria/rampup.npz",
+      "bytes": 208600,
+      "sha256": "4b78a785517f595f19a4d3bf862157dd5c32eb48ec9089f6dfaadc0d145bf29c"
+    },
+    {
+      "path": "source/eudemo/conventional/equilibria/reference.npz",
+      "bytes": 208477,
+      "sha256": "85cb41c125e0d3449ddf90df85b6a7c2e20cd5124e491aeb51edde6d68347ff4"
+    },
+    {
+      "path": "source/eudemo/conventional/equilibria/sof.npz",
+      "bytes": 209037,
+      "sha256": "5d585249a444597349a69a0c07beda7ccb32adb6cefc486fef74c4c1a20559da"
+    },
+    {
+      "path": "source/eudemo/conventional/equilibria/sof_legs.npz",
+      "bytes": 208147,
+      "sha256": "785a895dff954c90326972ffaff1dd314154c01ad268de6ed1eda1084d218c3f"
+    },
+    {
+      "path": "source/eudemo/conventional/machine.json",
+      "bytes": 148243,
+      "sha256": "bc1a10b8cc21117a509585f88e86089450b9ed0d32eb935a2f38efb54917146a"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket.stp",
+      "bytes": 2385530,
+      "sha256": "ff54ea4409a89347442c9700de7c9f3fbe245172a296bb32e80eee4df97dc5fa"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p000.npz",
+      "bytes": 5309,
+      "sha256": "e8bfcccc2fa0e8fe61f05ab3d645c2428ead3a0824fb68253c2d87c7eb7901e6"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p001.npz",
+      "bytes": 5526,
+      "sha256": "eff15ad8381903bf0935a8cf4e064bdbb0df8228682319f795fef3d972158ae8"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p002.npz",
+      "bytes": 5438,
+      "sha256": "aac3a9a06c75d83ec915d529460f1c45334214012c38309cc8306ae73334f007"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p003.npz",
+      "bytes": 5644,
+      "sha256": "716c66b36ad028682bf7995cae08fbebc0617a398d65c418096fca01ccb505e5"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p004.npz",
+      "bytes": 5927,
+      "sha256": "b03fc280bf5fa193eb2666e66dc705871865ce448bef5b3d2b3ba0ec1347a942"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p005.npz",
+      "bytes": 6609,
+      "sha256": "5a3a14436b410b9b66a161d55df23b53765086d510d5a495789cadfda2f8c3ea"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p006.npz",
+      "bytes": 2601,
+      "sha256": "aa6ad002291c6b5292e54f518f0b2c723cfd400c19e4c426ca7414f831935ebf"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p007.npz",
+      "bytes": 2724,
+      "sha256": "5a4a506e1e574b9e23972f7b02535cc531e57fb2a1db7c48428e90615c7588a6"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p008.npz",
+      "bytes": 2686,
+      "sha256": "42edd447dfa26f1e0e0a9f0c75acac8421a55ccf2e93d616f57856c87cb0c140"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p009.npz",
+      "bytes": 2617,
+      "sha256": "06682b4131b99abdc6a849fdb7bac0c0718a3250fac9d2fe1902f1257f142683"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p010.npz",
+      "bytes": 2728,
+      "sha256": "246f4f8437c309e14c5080d0520d6f40300a5ae7f8352935a60df30d5445e4ee"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p011.npz",
+      "bytes": 2684,
+      "sha256": "3fdb18df789ed020c1101c17c6131511df33f698f24d7b8e7e0dc2cbe54d4c46"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p012.npz",
+      "bytes": 3754,
+      "sha256": "dc4bde8bccc298e0014dd64e867119d6c107125c1289c3dc7b10e8174f62d0df"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p013.npz",
+      "bytes": 3935,
+      "sha256": "fd3f71ed43983e14779ca6393b687f88515a04b46e0e879ef8c4ee1be97c4e73"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/blanket__p014.npz",
+      "bytes": 3874,
+      "sha256": "ccb28e19629cd8f026f79f2c3c8dc5dea72efefcaeee1af419ba54df3467ee53"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures.stp",
+      "bytes": 1333301,
+      "sha256": "fb885ec714194e0dba245bcd5ad7bad65bae0394c67191efc981073e2713f2f8"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p000.npz",
+      "bytes": 522,
+      "sha256": "1e231426276d590abd78e74375bcc47c4fc996ef15d56833fd4461efa141ce8a"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p001.npz",
+      "bytes": 528,
+      "sha256": "764227baa349940a6fe6f9f1af08ea09c1accb04e54f2144806dd8f9e759fa40"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p002.npz",
+      "bytes": 524,
+      "sha256": "fa2a503866b2bb5c072dd7faf802d97e8e73d7f9e6632d17ac076c0265376f39"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p003.npz",
+      "bytes": 526,
+      "sha256": "e6d5edaf1c736460df1c8383cdb4e16300461322670ee6d8e5e8af4c526cdf05"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p004.npz",
+      "bytes": 526,
+      "sha256": "487c932015dbca4a7f46489fcc46456641cc0d26ed03bf21d9365229fda8f536"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p005.npz",
+      "bytes": 525,
+      "sha256": "14ef03d68e78d2a65a7fd10f1e133788fc57a0d819e61b2346b032a217b301bc"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p006.npz",
+      "bytes": 528,
+      "sha256": "73e6329382a5777eb926a25f4fa5c7d5ab3bfb91ea0386906fdfa489e380299f"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p007.npz",
+      "bytes": 524,
+      "sha256": "823ea654d941798b2be483a21539e90a9367e81bc7251938083a8b90dd23125c"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p008.npz",
+      "bytes": 895,
+      "sha256": "73ae78b6db4fae2c7511b8f42b666db7bfbaeed79e9f2ed13cda6235a179dc5d"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p009.npz",
+      "bytes": 1209,
+      "sha256": "36227eb2f0029ac877f45c4be380339135689170abbf88863a68bdec6bb4bd0f"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p010.npz",
+      "bytes": 1508,
+      "sha256": "fbd3dce4a7ad409f5ea4fe0da90753bc1db9a7d26dd9a38ccbd9c2c59b04c749"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p011.npz",
+      "bytes": 1586,
+      "sha256": "e293e6c2fe63181b7f8b5ad3a54dd3c359209d2cea1d3f5872513d3e62a4af7b"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p012.npz",
+      "bytes": 1513,
+      "sha256": "56019145fe2c20db21b0569efb9480faaf8f3815cebcde0539b30e2952af8942"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p013.npz",
+      "bytes": 934,
+      "sha256": "66962aa7d3d5b01ba0e9d0bfd27aafc4ed0ffb3008365bfb5c4847b728b4fdec"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/coil_structures__p014.npz",
+      "bytes": 1721,
+      "sha256": "b006c4f8eafe66f78b62b507ae5662474008995b44555fcb313c241d8a1c9cdc"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/cryostat.stp",
+      "bytes": 242757,
+      "sha256": "0323f48bd27a5b970e0f7880619f71daaa42a200dd7ce143e7e842402c1adbb7"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/cryostat__p000.npz",
+      "bytes": 2325,
+      "sha256": "23daf9070708f59bdda17258c26f5dd909204fd9712f78442160f4f00536241a"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/cryostat__p001.npz",
+      "bytes": 608,
+      "sha256": "63096a6c04a8903e18c03ac80e0b44b852e8f0f597a9ef0d1a1dd233b9c50a8a"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/cryostat__p002.npz",
+      "bytes": 607,
+      "sha256": "3ee75e4cdf117c0fb3cf150ad39047287794630487a4014e23d60649db45bd85"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/cryostat__p003.npz",
+      "bytes": 623,
+      "sha256": "252ab02fc5f14e9ac5d12a9ae18a7777db4134ec2308cfe00e2f5f23cfe4df2d"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/divertor.stp",
+      "bytes": 1098162,
+      "sha256": "3303889e994d6ed0490b9d68811310ea73a8d0e64d728f9a8d19cdd67f938092"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/divertor__p000.npz",
+      "bytes": 13154,
+      "sha256": "a80faa78ca05ccf39065c7796558655ba3a6ccebcb5b8b833cc670965f400752"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/divertor__p001.npz",
+      "bytes": 13778,
+      "sha256": "1bf611b2fcb587c98507afc03645b9bfa100b3b36053be7116b533ed4b163fee"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/divertor__p002.npz",
+      "bytes": 13723,
+      "sha256": "23c9e7732f7b8d83f1fb20daac8a49b5d32812c970df275857997824240a5e5a"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/manifest.json",
+      "bytes": 10803,
+      "sha256": "88344990011bfefd293e0b5fd3751305080adc7e41a6a0689bdff61ea22c61f8"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils.stp",
+      "bytes": 943243,
+      "sha256": "a45de3ff2322d662861067b79ea53e2e570edc4854a417f7e4a28361064db535"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p000.npz",
+      "bytes": 872,
+      "sha256": "260a45f431b4e4bfb151bba07ff39835655983a2d24434ad21f317ac055c17a2"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p001.npz",
+      "bytes": 1329,
+      "sha256": "98c7029936d322253951317dbafc9c6467cde232d1bc912e68ff9d0bc72c8cf5"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p002.npz",
+      "bytes": 1336,
+      "sha256": "1c511ddb06ddba5d4ee9d33eb521d6679b028b6106abd8838fc30d94897de79b"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p003.npz",
+      "bytes": 867,
+      "sha256": "c0bdcb2ab61a7b4d8455f230f816deb33d51f5925b48bcec25b9bc8f9365e70d"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p004.npz",
+      "bytes": 1325,
+      "sha256": "4364d1ce6a7cc395f46c340f92211330dca9ac523ca39c8c57b495fee0d16bab"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p005.npz",
+      "bytes": 1328,
+      "sha256": "50f388f3a8cd8889da9f84a6e62043772e1ae46bd33ce5b8cf17c4f903d7c1c8"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p006.npz",
+      "bytes": 871,
+      "sha256": "84645865439fe4b52f4253b2eee8f2487c14c520114208521cf51e1971c35ea6"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p007.npz",
+      "bytes": 1327,
+      "sha256": "9d5da446b3e91f6109d672c61c815e6140d4f851e35bccd88c482f3e1a56c0db"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p008.npz",
+      "bytes": 1334,
+      "sha256": "57b9fa72a2c4f270aa01f534ed1995e162aadac9cd71bd49c831c30ba24745ea"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p009.npz",
+      "bytes": 868,
+      "sha256": "077e7ffca959ecc83c4359beb773ac4bbd5bc30d9eb930c4ef55f55bb483829f"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p010.npz",
+      "bytes": 1334,
+      "sha256": "7f9d15cb2a6d7015a97e6f3cc98432955357206fdc754e8b5016fce8f32967e7"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p011.npz",
+      "bytes": 1326,
+      "sha256": "aed1f0f6a951aa79933f18fb65f469efb3314e0d6e8818f6e903f91368c87fc1"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p012.npz",
+      "bytes": 860,
+      "sha256": "08b738fc3c19963a4579633825786a8c2fb58f137789d57b4ebac81c388706a3"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p013.npz",
+      "bytes": 1324,
+      "sha256": "c92a8a0d093a20bc8bc1ff67f33582e9ae2c6646bf307be1aa64fde1534e0a0e"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p014.npz",
+      "bytes": 1324,
+      "sha256": "c3ff64811a0c2ee0126f822a5296646a928ded4b5ef45e1d40b9e86422e4e85f"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p015.npz",
+      "bytes": 867,
+      "sha256": "dd1a414cf0580c44c12f267342379e92dc26b45bb1f96cc6974a5affa678b61f"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p016.npz",
+      "bytes": 1332,
+      "sha256": "81a785c9fc5a5b3f736959435f7fd43163697e169a6b0c249b22f594d805971b"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p017.npz",
+      "bytes": 1329,
+      "sha256": "686251330f6275701c45c28d85c6c4e0c6867fe2651ac7af413568005adb24a8"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p018.npz",
+      "bytes": 866,
+      "sha256": "045a4b571799301257c7f219bb101d2a6a8723ed6efeb1e8bd0bdda09bc19c80"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p019.npz",
+      "bytes": 1330,
+      "sha256": "f5ad182c57a546970580975f75844ebede9024c9d71872ed3263ca6b224cd0aa"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p020.npz",
+      "bytes": 1321,
+      "sha256": "46e4ebfe7c3ad1c2cde1ac152f3a4b1db5a1553e201d6b9a5fe91d0596a2cb05"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p021.npz",
+      "bytes": 865,
+      "sha256": "a5299de2bfca3604e0f3c3571bb94ea4d401ce4c0a8f87b713d3a039d9455bd5"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p022.npz",
+      "bytes": 1325,
+      "sha256": "ca430890a6d5b5a1adb6de18e4f14fd83353c7e921552a9bad54395f94251645"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p023.npz",
+      "bytes": 1317,
+      "sha256": "cb91fb61756ffc025c40494f25d883beea5c5c6479ddd693da732379812fd4da"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p024.npz",
+      "bytes": 863,
+      "sha256": "0e5d4f787d5d7a94a11b9d040a7ff09eaa52d63e9c84c0210ed69989c370e898"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p025.npz",
+      "bytes": 1329,
+      "sha256": "5d4bdbd60f023222c1ee3c3830ed6881555dae6215a7719bc8eb9cad70d49bb3"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p026.npz",
+      "bytes": 1324,
+      "sha256": "6063e34772478d374a83b09ea9c6e3c217b066bee9a018f39535f072b61c7dee"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p027.npz",
+      "bytes": 865,
+      "sha256": "4de0707702af268280358fe4eeb5afa6cef6909759a476fa62de26e03e305ee2"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p028.npz",
+      "bytes": 1332,
+      "sha256": "2798b52af6fe835a9bfab16e2545ef17d35748f7225d807f0e4464aeaa992bf9"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p029.npz",
+      "bytes": 1324,
+      "sha256": "c058c43bee6e7e29312e1eee65e472736e763f169e6d3a3783316c90d80b87ff"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p030.npz",
+      "bytes": 866,
+      "sha256": "c92990270cf8e8bf5145434712f52e58fd865be1064eafa0077603a6f447bd34"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p031.npz",
+      "bytes": 1330,
+      "sha256": "a93e59d1f3f9efec3a05841a953ce6bb5402e4eccfd7317c0da958b76359cb27"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/pf_coils__p032.npz",
+      "bytes": 1331,
+      "sha256": "8ba2819839e34990dff3a794b4fd5df0fc3fc2d6ef1b89f85433810d2712992e"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/plasma.stp",
+      "bytes": 143255,
+      "sha256": "a10f4350e0ddab5805b955996582e0036bc43649b2c5aecc69819423f771bd17"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/plasma__p000.npz",
+      "bytes": 72096,
+      "sha256": "4bbb6b73bc9b499eaa8cd0ef4c7065a01e4f600e2325e136cdd82f5814efe51f"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/radiation_shield.stp",
+      "bytes": 525384,
+      "sha256": "11d6e806394e7eb702aa48e29fc1ddfcc29bfc159405b538e482c7c407f301a7"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/radiation_shield__p000.npz",
+      "bytes": 3323,
+      "sha256": "31a4669990207770862b0cb3ed1cf89d2951826d244425330515537a3ab91f49"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/radiation_shield__p001.npz",
+      "bytes": 901,
+      "sha256": "de1189db24d21920efb91de506a86fedfa3633e73f65c7d78a68805ad64172c7"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/radiation_shield__p002.npz",
+      "bytes": 904,
+      "sha256": "efa06813136566da9bede59f4f2e3363fcd1a6ee0dc627fb468fade3271260c2"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/radiation_shield__p003.npz",
+      "bytes": 939,
+      "sha256": "cae98367d4228e71a28f0beb8079cb3a3fa09b6cab92e1620de1d7e24bee1354"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/tf_coils.stp",
+      "bytes": 502226,
+      "sha256": "abff6dfd9f0b74c6619373cbe55427f383a6d145c6245530ba75fef742a28406"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/tf_coils__p000.npz",
+      "bytes": 7559,
+      "sha256": "2efa91b24ad193e7c324fef9bd7d888be083ece79a37bdd7aa967b95e5bf17f3"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/tf_coils__p001.npz",
+      "bytes": 14583,
+      "sha256": "35bef7d9d8ec0fb04d189ababbf9ad0b8046be0452f35a0cf5953ea574663daf"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/tf_coils__p002.npz",
+      "bytes": 15439,
+      "sha256": "305f1aadc9fb2f70d69228ccf7af7f4ef0af29ae68d7d3323318d2a8c9c9cb2e"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/thermal_shield.stp",
+      "bytes": 2410160,
+      "sha256": "9a4ed21e30a59e360cc469f6035a27d14f16492eae6518f42fa514f3dec212d9"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/thermal_shield__p000.npz",
+      "bytes": 169113,
+      "sha256": "4a7ca6c9967422f92afcae3ef979292e27038251d63d639c92007d07f1758a86"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/thermal_shield__p001.npz",
+      "bytes": 4810,
+      "sha256": "d45a788c3f429f6a56ac2c7d8cc5db94a3591af2a7c55a5f62c9a91f2b26b63e"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/vacuum_vessel.stp",
+      "bytes": 3647995,
+      "sha256": "f71eaf2539e063835d1c470a32df0abc513be04ce849862772e9907f60592fbf"
+    },
+    {
+      "path": "source/eudemo/longleg/cad/vacuum_vessel__p000.npz",
+      "bytes": 195833,
+      "sha256": "ead5a940e9811402666f7b330467db864230f11b7108adf41129198408bf0926"
+    },
+    {
+      "path": "source/eudemo/longleg/equilibria/eof.npz",
+      "bytes": 209502,
+      "sha256": "aca4b0c5d192640156ab9cc702010404bf82281f0094ba94c9d454b35191b760"
+    },
+    {
+      "path": "source/eudemo/longleg/equilibria/eof_legs.npz",
+      "bytes": 208054,
+      "sha256": "cb9610499bb27a15a4be66edaaefb5ae04bd1eacf46a7c46c05c10b394da485d"
+    },
+    {
+      "path": "source/eudemo/longleg/equilibria/rampdown.npz",
+      "bytes": 208269,
+      "sha256": "c09f8dcc1379cd463dea6c06e526bc1cd996a9e8bbe6025e0adb69cba4a5905b"
+    },
+    {
+      "path": "source/eudemo/longleg/equilibria/rampup.npz",
+      "bytes": 208667,
+      "sha256": "bdefdbb0757039605615ae1181eba0a4407925394b07a034fa445cd3133e3b04"
+    },
+    {
+      "path": "source/eudemo/longleg/equilibria/reference.npz",
+      "bytes": 208436,
+      "sha256": "0619a12f5d50d3e7d740cbc0fad2847a2c3b99c75ffe04e512af9db3cd2be3b9"
+    },
+    {
+      "path": "source/eudemo/longleg/equilibria/sof.npz",
+      "bytes": 209041,
+      "sha256": "1d32ff901175dfb414a54c2dd9a00096d2fc1aa458e7d271ddcee7dcef3d6aad"
+    },
+    {
+      "path": "source/eudemo/longleg/equilibria/sof_legs.npz",
+      "bytes": 208464,
+      "sha256": "a13d45c6e873f24ffde21c85a0ced04849f131ad3c072fb063e9527294a71f2c"
+    },
+    {
+      "path": "source/eudemo/longleg/machine.json",
+      "bytes": 149536,
+      "sha256": "eecd410673ed9937c97c3f0a998372fda95d541f8c2e3fb36cc6ea5cbfd0bfc1"
+    },
+    {
+      "path": "source/eudemo/longleg/variant_args.txt",
+      "bytes": 32,
+      "sha256": "c0c126b2873c916492912fc6e704f03b4884a1b57c454e1a627f9ab221b9fc15"
+    }
+  ]
+}
