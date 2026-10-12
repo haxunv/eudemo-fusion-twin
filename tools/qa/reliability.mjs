@@ -7,6 +7,11 @@ import { randomUUID } from 'node:crypto';
 const base = process.env.FUSION_BASE_URL || 'http://127.0.0.1:8765';
 const output = fileURLToPath(new URL('../../runtime/qa/', import.meta.url));
 await mkdir(output, { recursive: true });
+async function toggleInput(page, selector, checked) {
+  const input = page.locator(selector);
+  if (await input.isChecked() !== checked) await input.locator('xpath=..').click();
+  assert.equal(await input.isChecked(), checked, selector);
+}
 async function api(route, body) {
   const response = await fetch(`${base}/api/${route}`, body === undefined ? {} : {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
@@ -39,11 +44,22 @@ async function complete(requestId) {
   throw new Error(`Action did not finish: ${requestId}`);
 }
 
+async function engineeringControl(page, selector) {
+  if (!await page.locator('#engineering-panel').isVisible()) {
+    await page.locator('[data-tab="engineering"]').click();
+    await applied({ tab: 'engineering' });
+  }
+  const section = page.locator('#engineering-panel details').filter({ has: page.locator(selector) });
+  if (await section.count() && !await section.evaluate(element => element.open)) await section.locator('summary').click();
+  await page.locator(selector).scrollIntoViewIfNeeded();
+}
+
 async function sustainedSliderInput(page) {
   await api('state', { scenario: 'nominal', power: 1200, flow: 1, inlet: 300, phase: 0.65,
-    mode: 'temperature', tab: 'explore', playing: false, orbit: false });
+    mode: 'temperature', tab: 'engineering', playing: false, orbit: false });
   await applied({ scenario: 'nominal', power: 1200, flow: 1, inlet: 300, phase: 0.65, mode: 'temperature' });
-  await page.waitForFunction(() => Number(document.querySelector('#power-range').value) === 1200);
+  await page.waitForFunction(() => Number(document.querySelector('#power-range').value) === 1200 && !document.querySelector('#engineering-panel').hidden);
+  await engineeringControl(page, '#power-range');
   try {
     await page.evaluate(async () => {
       const slider = document.querySelector('#power-range');
@@ -238,7 +254,7 @@ page.on('pageerror', error => errors.push(String(error)));
 const checks = [];
 const check = (name, evidence) => { checks.push({ name, evidence }); console.log(name); };
 try {
-  await api('state', { playing: false, orbit: false, design: 'conventional', equilibrium: 'reference', mode: 'assembly' });
+  await api('state', { playing: false, orbit: false, design: 'conventional', equilibrium: 'reference', mode: 'assembly', tab: 'explore', heating: 50, neon: false, heatScale: 'log', volumeStyle: 'plasma', lineMotion: false });
   await page.goto(base, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.querySelector('video').readyState === 4, {}, { timeout: 60000 });
   let s = await applied({ design: 'conventional', equilibrium: 'reference' });
@@ -263,7 +279,11 @@ try {
   await api('state', { opacity: 1, cutaway: 80, mode: 'heatflux', power: 2000, phase: 1 });
 
   for (const design of ['conventional', 'longleg']) {
-    await page.locator('#design-select').selectOption(design);
+    await page.locator('[data-tab="explore"]').click();
+    await applied({ tab: 'explore' });
+    await page.locator(`[data-design="${design}"]`).click();
+    await applied({ design });
+    await engineeringControl(page, '#equilibrium-select');
     for (const equilibrium of ['reference', 'rampup', 'sof', 'eof', 'rampdown']) {
       await page.locator('#equilibrium-select').selectOption(equilibrium);
       s = await applied({ design, equilibrium });
@@ -285,16 +305,23 @@ try {
     await page.screenshot({ path: `${output}/reliability-${design}-heatflux.png` });
   }
 
-  await page.locator('[data-tab="compare"]').click();
-  await api('state', { scenario: 'highload' });
+  await page.locator('[data-tab="explore"]').click();
+  await applied({ tab: 'explore' });
+  await toggleInput(page, '#neon-toggle', true);
+  await applied({ neon: true });
+  await engineeringControl(page, '#scenario-select');
+  await page.locator('#scenario-select').selectOption('highload');
+  await applied({ scenario: 'highload' });
+  await engineeringControl(page, '[data-mode="delta_temperature"]');
   await page.locator('[data-mode="delta_temperature"]').click();
-  s = await applied({ mode: 'delta_temperature', scenario: 'highload' });
-  assert.ok(s.result.comparison.delta.peak_temperature_C > 0);
+  s = await applied({ mode: 'delta_temperature', scenario: 'highload', neon: true });
+  assert.ok(s.result.comparison.delta.peak_divertor_heatflux_MW_m2 < 0);
   assert.ok(s.result.color_ranges.delta_temperature[0] < 0);
   assert.equal(s.result.color_ranges.delta_temperature[0], -s.result.color_ranges.delta_temperature[1]);
   await delay(2000);
   await page.screenshot({ path: `${output}/reliability-delta-temperature.png` });
   check('difference_field', s.result.color_ranges.delta_temperature);
+  await engineeringControl(page, '[data-i18n="powerBalance"]');
   await page.locator('[data-lang="en"]').click();
   assert.equal(await page.locator('[data-i18n="powerBalance"]').innerText(), 'POWER BALANCE');
   await page.locator('[data-lang="zh"]').click();

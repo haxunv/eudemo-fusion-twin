@@ -214,9 +214,10 @@ def execute(args):
             if args.with_kit:
                 report["kit_started"] = True
                 report["kit_pid"] = int((destination / "runtime/kit.pid").read_text().strip())
+                api(base, "/api/state", {"mode": "assembly"})
                 snapshot = wait(lambda: renderer_ready(base, "assembly"), 180)
                 assert snapshot["renderer"]["render_mode"] == "RealTimePathTracing"
-                assert snapshot["renderer"]["rtwt_control_count"] >= 15
+                assert snapshot["renderer"]["rtwt_control_count"] == 20
                 report["captures"] = [capture_native(base, evidence, "relocated-assembly.png")]
                 report["checks"].append("Relocated CAD and RTWT load with RT2 and a QHD capture")
                 api(base, "/api/state", {"mode": "volume"})
@@ -228,6 +229,7 @@ def execute(args):
                 assert renderer["index_depth_mode"] == 3
                 assert renderer["index_native_volume"] and renderer["index_composite"]
                 assert renderer["volume_roundtrip"] == "exact" and renderer["volume_units"] == "keV"
+                assert renderer["volume_grid"] == [128, 128, 112]
                 assert renderer["index_source_field"] == "Temperature" and "colors" in renderer["index_fields"]
                 report["volume"] = {key: renderer[key] for key in (
                     "rtwt_ready", "rtwt_control_count", "applied_volume_field_key", "applied_volume_key",

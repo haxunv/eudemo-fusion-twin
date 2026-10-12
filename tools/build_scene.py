@@ -12,7 +12,9 @@ import hashlib
 import json
 import math
 import shutil
+import struct
 import sys
+import zlib
 from pathlib import Path
 
 import numpy as np
@@ -53,13 +55,18 @@ MATERIALS = {
     "gold": ((0.58, 0.48, 0.26), 0.94, 0.26),
     "coil_blue": ((0.055, 0.16, 0.23), 0.62, 0.29),
     "insulation": ((0.038, 0.051, 0.064), 0.12, 0.52),
-    "concrete": ((0.24, 0.26, 0.28), 0.02, 0.78),
-    "plasma": ((0.13, 0.56, 0.73), 0.10, 0.25),
-    "floor": ((0.025, 0.031, 0.041), 0.26, 0.48),
+    "concrete": ((0.34, 0.35, 0.34), 0.0, 0.86),
+    "plasma": ((0.20, 0.32, 0.46), 0.0, 0.5),
+    "floor": ((0.19, 0.21, 0.22), 0.08, 0.72),
     "plinth": ((0.055, 0.069, 0.080), 0.72, 0.34),
     "trim": ((0.16, 0.20, 0.23), 0.83, 0.23),
     "green": ((0.24, 0.51, 0.015), 0.20, 0.28),
     "white": ((0.65, 0.71, 0.73), 0.28, 0.30),
+    "paint_blue": ((0.055, 0.13, 0.19), 0.22, 0.48),
+    "safety_yellow": ((0.72, 0.42, 0.055), 0.12, 0.5),
+    "rubber": ((0.026, 0.032, 0.036), 0.0, 0.87),
+    "workwear": ((0.10, 0.20, 0.31), 0.0, 0.85),
+    "skin": ((0.45, 0.30, 0.21), 0.0, 0.7),
 }
 
 
@@ -141,7 +148,50 @@ def xform(prim, position=None, rotation=None, scale=None):
         xf.AddScaleOp().Set(Gf.Vec3f(*map(float, scale)))
 
 
-def material_library(stage, root="/World/Looks"):
+def write_material_assets(scene_dir):
+    """Small deterministic surface data; no CAD edits or external image assets."""
+    directory = scene_dir / "materials"
+    directory.mkdir(parents=True, exist_ok=True)
+    rng = np.random.default_rng(1842)
+    for name, strength in (("concrete", .34), ("brushed", .08)):
+        height = rng.normal(0, 1, (256, 256))
+        if name == "brushed":
+            height = np.repeat(height[:, :1], 256, axis=1) + height * .08
+        dx, dy = np.gradient(height * strength)
+        normals = np.stack((-dx, -dy, np.ones_like(height)), axis=-1)
+        normals /= np.linalg.norm(normals, axis=-1, keepdims=True)
+        image = np.clip((normals * .5 + .5) * 255, 0, 255).astype(np.uint8)
+        def chunk(kind, data):
+            return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xffffffff)
+        raw = b"".join(b"\x00" + row.tobytes() for row in image)
+        png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 256, 256, 8, 2, 0, 0, 0))
+        (directory / f"{name}_normal.png").write_bytes(png + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
+    # OmniPBR is supplied with the installed Kit MDL library. The local wrapper
+    # gives USD a portable, resolvable material asset, with a PreviewSurface fallback.
+    (directory / "FusionPBR.mdl").write_text('''mdl 1.7;
+import ::OmniPBR::*;
+export material FusionPBR(
+    color base_color = color(0.3),
+    float metallic = 0.0,
+    float roughness = 0.5,
+    uniform texture_2d normal_map = texture_2d(),
+    uniform float normal_strength = 0.1,
+    uniform float repeat_per_meter = 1.0
+) = ::OmniPBR::OmniPBR(
+    diffuse_color_constant: base_color,
+    metallic_constant: metallic,
+    reflection_roughness_constant: roughness,
+    normalmap_texture: normal_map,
+    bump_factor: normal_strength,
+    project_uvw: true,
+    world_or_object: true,
+    texture_scale: float2(repeat_per_meter),
+    round_edges_radius: 0.002
+);
+''', encoding="utf-8")
+
+
+def material_library(stage, root="/World/Looks", material_assets="./materials"):
     for name, (color, metallic, roughness) in MATERIALS.items():
         mat = UsdShade.Material.Define(stage, f"{root}/{name}")
         shader = UsdShade.Shader.Define(stage, f"{root}/{name}/Surface")
@@ -152,11 +202,25 @@ def material_library(stage, root="/World/Looks"):
         if name == "green":
             shader.CreateInput("emissiveColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.11, 0.38, 0.005))
         elif name == "plasma":
-            shader.CreateInput("emissiveColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.075, 0.23, 0.33))
-            shader.CreateInput("opacity", Sdf.ValueTypeNames.Float).Set(0.22)
+            shader.CreateInput("emissiveColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.015, 0.025, 0.045))
+            shader.CreateInput("opacity", Sdf.ValueTypeNames.Float).Set(0.065)
             shader.CreateInput("ior", Sdf.ValueTypeNames.Float).Set(1.0)
         shader.CreateOutput("surface", Sdf.ValueTypeNames.Token)
         mat.CreateSurfaceOutput().ConnectToSource(shader.ConnectableAPI(), "surface")
+        if name not in ("plasma", "green"):
+            mdl = UsdShade.Shader.Define(stage, f"{root}/{name}/MDL")
+            mdl.SetSourceAsset(Sdf.AssetPath(f"{material_assets}/FusionPBR.mdl"), "mdl")
+            mdl.SetSourceAssetSubIdentifier("FusionPBR", "mdl")
+            mdl.CreateInput("base_color", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(*color))
+            mdl.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(metallic)
+            mdl.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(roughness)
+            concrete = name in ("concrete", "floor")
+            mdl.CreateInput("normal_map", Sdf.ValueTypeNames.Asset).Set(Sdf.AssetPath(f"{material_assets}/{'concrete' if concrete else 'brushed'}_normal.png"))
+            mdl.CreateInput("normal_strength", Sdf.ValueTypeNames.Float).Set(.20 if concrete else .12)
+            mdl.CreateInput("repeat_per_meter", Sdf.ValueTypeNames.Float).Set(1.0 if concrete else 16.)
+            mdl.CreateOutput("out", Sdf.ValueTypeNames.Token)
+            mat.CreateSurfaceOutput("mdl").ConnectToSource(mdl.ConnectableAPI(), "out")
+            mat.GetPrim().SetCustomDataByKey("textureRepeatMeters", 1.0 if concrete else .0625)
 
 
 def bind(prim, name, root="/World/Looks"):
@@ -249,7 +313,7 @@ def build_prototypes(variant, parts, scene_dir=SCENE):
     for component, items in parts.items():
         path = scene_dir / "geometry" / variant / f"{component}.usdc"
         stage = new_stage(path, "Component")
-        material_library(stage, "/Component/Looks")
+        material_library(stage, "/Component/Looks", "../../materials")
         Usd.ModelAPI(stage.GetDefaultPrim()).SetKind(Kind.Tokens.component)
         for part_id, info, points, triangles, source_path in items:
             part_path = f"/Component/{part_id}"
@@ -329,46 +393,169 @@ def cube(stage, path, position, size, material, angle=0):
     bind(obj.GetPrim(), material)
 
 
-def ring(stage, path, inner, outer, z, thickness, material, n=180):
+def ring(stage, path, inner, outer, z, thickness, material, n=180, start=0., sweep=360.):
     vertices = []
+    closed = abs(sweep - 360.) < 1e-6
+    count = n if closed else n + 1
     for height in (z, z - thickness):
         for radius in (inner, outer):
-            vertices.extend((radius * math.cos(i * math.tau / n), radius * math.sin(i * math.tau / n), height) for i in range(n))
+            vertices.extend((radius * math.cos(math.radians(start + sweep*i/n)),
+                             radius * math.sin(math.radians(start + sweep*i/n)), height) for i in range(count))
     triangles = []
     for i in range(n):
-        j = (i + 1) % n
-        for a, b, c, d in ((i, n+i, n+j, j), (2*n+j, 3*n+j, 3*n+i, 2*n+i),
-                           (n+i, 3*n+i, 3*n+j, n+j), (i, j, 2*n+j, 2*n+i)):
+        j = (i + 1) % count
+        for a, b, c, d in ((i, count+i, count+j, j), (2*count+j, 3*count+j, 3*count+i, 2*count+i),
+                           (count+i, 3*count+i, 3*count+j, count+j), (i, j, 2*count+j, 2*count+i)):
             triangles.extend(((a, b, c), (a, c, d)))
+    if not closed:
+        for i, reverse in ((0, True), (n, False)):
+            face = (i, i+count, i+3*count, i+2*count)
+            if reverse:
+                face = face[::-1]
+            triangles.extend(((face[0], face[1], face[2]), (face[0], face[2], face[3])))
     mesh(stage, path, vertices, triangles, material)
 
 
-def environment(stage):
-    UsdGeom.Xform.Define(stage, "/World/Environment")
-    # Exhibition support is clearly separate from reactor CAD and its engineering BOM.
-    cube(stage, "/World/Environment/Floor", (0, 0, -16.4), (180, 180, 0.6), "floor")
-    plinth = UsdGeom.Cylinder.Define(stage, "/World/Environment/Plinth")
-    plinth.CreateRadiusAttr(22.2)
-    plinth.CreateHeightAttr(0.8)
-    plinth.CreateAxisAttr("Z")
-    xform(plinth.GetPrim(), position=(0, 0, -15.65))
-    bind(plinth.GetPrim(), "plinth")
-    ring(stage, "/World/Environment/PlinthRim", 21.85, 22.3, -15.19, 0.15, "trim")
-    ring(stage, "/World/Environment/GreenTrace", 22.26, 22.31, -15.40, 0.04, "green")
-    ring(stage, "/World/Environment/ServiceWalk", 19.3, 21.6, -14.95, 0.12, "structure")
-    for i in range(36):
-        angle = 10 * i
+def bars(stage, path, items, material):
+    """Batch repeated facility bars into one mesh, keeping the USD scene light."""
+    points, triangles = [], []
+    corners = np.array([[-1,-1,-1], [1,-1,-1], [1,1,-1], [-1,1,-1],
+                        [-1,-1,1], [1,-1,1], [1,1,1], [-1,1,1]], dtype=float) / 2
+    faces = np.array([[0,2,1],[0,3,2],[4,5,6],[4,6,7],[0,1,5],[0,5,4],
+                      [1,2,6],[1,6,5],[2,3,7],[2,7,6],[3,0,4],[3,4,7]])
+    for centre, size, angle in items:
         a = math.radians(angle)
-        cube(stage, f"/World/Environment/RadialMark_{i:02d}", (21.9*math.cos(a), 21.9*math.sin(a), -15.10),
-             (0.23 if i % 3 else 0.48, 0.035, 0.013), "white", angle)
+        rotation = np.array([[math.cos(a), -math.sin(a), 0], [math.sin(a), math.cos(a), 0], [0,0,1]])
+        triangles.extend(faces + len(points))
+        points.extend((corners * size) @ rotation.T + centre)
+    if points:
+        return mesh(stage, path, points, triangles, material, smooth=False)
+
+
+def rod(stage, path, start, end, radius, material):
+    delta = Gf.Vec3d(*end) - Gf.Vec3d(*start)
+    obj = UsdGeom.Cylinder.Define(stage, path)
+    obj.CreateRadiusAttr(radius)
+    obj.CreateHeightAttr(delta.GetLength())
+    obj.CreateAxisAttr("Z")
+    obj.AddTranslateOp().Set((Gf.Vec3d(*start) + Gf.Vec3d(*end)) / 2)
+    rotation = Gf.Rotation(Gf.Vec3d(0, 0, 1), delta.GetNormalized()).GetQuat()
+    obj.AddOrientOp().Set(Gf.Quatf(rotation))
+    bind(obj.GetPrim(), material)
+
+
+def worker(stage, path, position, angle=0):
+    person = UsdGeom.Xform.Define(stage, path)
+    xform(person.GetPrim(), position=position, rotation=angle)
+    person.GetPrim().SetCustomDataByKey("referenceHeightMeters", 1.8)
+    cube(stage, path + "/Torso", (0, 0, 1.16), (.43, .23, .57), "workwear")
+    cube(stage, path + "/Vest", (0, -.13, 1.25), (.44, .025, .36), "safety_yellow")
+    for side in (-1, 1):
+        rod(stage, path + f"/Leg_{'L' if side<0 else 'R'}", (side*.11, 0, .13), (side*.11, 0, .9), .085, "workwear")
+        cube(stage, path + f"/Boot_{'L' if side<0 else 'R'}", (side*.11, -.035, .07), (.18, .29, .14), "rubber")
+        rod(stage, path + f"/Arm_{'L' if side<0 else 'R'}", (side*.29, 0, 1.39), (side*.31, -.03, .90), .065, "workwear")
+    for name, z, scale, material in (("Head", 1.61, (.13, .12, .15), "skin"),
+                                      ("Helmet", 1.735, (.155, .15, .065), "safety_yellow")):
+        obj = UsdGeom.Sphere.Define(stage, path + "/" + name)
+        obj.CreateRadiusAttr(1)
+        xform(obj.GetPrim(), position=(0, 0, z), scale=scale)
+        bind(obj.GetPrim(), material)
+
+
+def environment(stage):
+    root = "/World/Environment"
+    facility = UsdGeom.Xform.Define(stage, root).GetPrim()
+    facility.SetCustomDataByKey("visualizationOnly", True)
+    facility.SetCustomDataByKey("description", "Conceptual tokamak hall; illustrative civil works outside source CAD BOM")
+    cube(stage, root + "/Floor", (0, 0, -16.4), (108, 108, .6), "floor")
+    ring(stage, root + "/Pit/RetainingWall", 22.0, 23.4, -14.8, 1.3, "concrete")
+    ring(stage, root + "/Pit/InnerLiner", 21.92, 22.0, -15.0, 1.0, "steel")
+    # The observation quadrant has no tall walls or platform across the CAD cut.
+    cube(stage, root + "/Hall/BackWall", (0, 35.0, 4), (72, 1.5, 40), "concrete")
+    for side in (-1, 1):
+        centre_y, length = (3.5, 63.) if side < 0 else (15., 40.)
+        cube(stage, root + f"/Hall/SideWall_{side+1}", (side*35, centre_y, 4), (1.5, length, 40), "concrete")
+    joints, back_columns, side_columns, crane_rails = [], [], {-1: [], 1: []}, []
+    for x in np.arange(-32, 33, 8):
+        back_columns.append(((x, 33.9, 4), (.72, 1.0, 40), 0))
+        joints.append(((x, 34.22, 4), (.025, .03, 40), 0))
+    for z in np.arange(-12, 24, 4):
+        joints.append(((0, 34.22, z), (70, .03, .025), 0))
+    for side in (-1, 1):
+        for y in ((-27, -19, -11, -3, 5, 13, 21, 29) if side < 0 else (-3, 5, 13, 21, 29)):
+            side_columns[side].append(((side*33.8, y, 4), (1.0, .72, 40), 0))
+        crane_rails.append(((side*32.5, 13.5, 21.5), (.75, 43, 1.3), 0))
+        crane_rails.append(((side*32.5, 13.5, 22.22), (.12, 43, .14), 0))
+    bars(stage, root + "/Hall/BackColumns", back_columns, "paint_blue")
+    bars(stage, root + "/Hall/LeftColumns", side_columns[-1], "paint_blue")
+    bars(stage, root + "/Hall/RightColumns", side_columns[1], "paint_blue")
+    bars(stage, root + "/Hall/ConcretePanelJoints", joints, "structure")
+    # Only these illustrative hall pieces are camera-cut. The CAD assembly and
+    # its engineering visibility/selection never participate in this rule.
+    for name, axis, plane, tangent_range, sign, linked in (
+        ("BackWall", 1, 35., (-36., 36.), 1, ("BackColumns", "ConcretePanelJoints")),
+        ("SideWall_0", 0, -35., (-28., 35.), -1, ("LeftColumns",)),
+        ("SideWall_2", 0, 35., (-5., 35.), 1, ("RightColumns",)),
+    ):
+        stage.GetPrimAtPath(root + "/Hall/" + name).SetCustomDataByKey("cameraCutaway", {
+            "axis": axis, "plane": plane, "tangentMin": tangent_range[0], "tangentMax": tangent_range[1],
+            "zMin": -16., "zMax": 24., "outsideSign": sign,
+            "linkedPrims": Vt.StringArray([root + "/Hall/" + part for part in linked]),
+        })
+    bars(stage, root + "/Crane/RunwayRails", crane_rails, "steel")
+    for y in (9.5, 12.5):
+        cube(stage, root + f"/Crane/Bridge_{int(y)}", (0, y, 23.5), (65, .85, 1.6), "safety_yellow")
+    cube(stage, root + "/Crane/Trolley", (-21, 11, 24.3), (4, 4.2, .7), "structure")
+    cube(stage, root + "/Crane/Hoist", (-21, 11, 22), (1.2, 1.0, 1.0), "safety_yellow")
+    for dx in (-.35, .35):
+        rod(stage, root + f"/Crane/Cable_{'L' if dx<0 else 'R'}", (-21+dx, 11, 21.5), (-21+dx, 11, 9), .035, "steel")
+    cube(stage, root + "/Crane/HookBlock", (-21, 11, 8.6), (1.0, .7, .8), "safety_yellow")
+    rod(stage, root + "/Crane/Hook", (-21, 11, 8.2), (-20.8, 11, 7.7), .12, "steel")
+
+    # Elevated maintenance deck, 0.15 m grating pitch and 1.1 m fall protection.
+    ring(stage, root + "/Platform/InnerGirder", 22.8, 23.05, -8.0, .6, "structure", 120, 10, 225)
+    ring(stage, root + "/Platform/OuterGirder", 25.2, 25.45, -8.0, .6, "structure", 120, 10, 225)
+    grating, posts = [], []
+    for angle in np.arange(10, 235, .36):
+        a = math.radians(angle)
+        grating.append(((24.1*math.cos(a), 24.1*math.sin(a), -7.98), (2.6, .025, .05), angle))
+    for radius in np.arange(23.0, 25.31, .38):
+        ring(stage, root + f"/Platform/CrossBar_{int(radius*100)}", radius, radius+.015, -7.98, .04, "steel", 120, 10, 225)
+    for angle in np.arange(10, 236, 5):
+        a = math.radians(angle)
+        posts.append(((25.35*math.cos(a), 25.35*math.sin(a), -7.43), (.055,.055,1.1), angle))
+    for level in (-7.45, -6.9):
+        ring(stage, root + f"/Platform/Rail_{int(abs(level)*100)}", 25.32, 25.37, level, .05, "safety_yellow", 120, 10, 225)
+    bars(stage, root + "/Platform/Grating", grating, "steel")
+    bars(stage, root + "/Platform/RailPosts", posts, "safety_yellow")
+    supports = []
+    for angle in range(15, 236, 20):
+        a = math.radians(angle)
+        supports.append(((24.0*math.cos(a), 24.0*math.sin(a), -12.1), (.3,.3,7.9), angle))
+    bars(stage, root + "/Platform/Columns", supports, "structure")
+    stairs = []
+    for step in range(36):
+        stairs.append(((-27.6, -8.8+step*.29, -15.97+step*.225), (2.0,.31,.08), 0))
+    bars(stage, root + "/Maintenance/Stairs", stairs, "steel")
+    for x in (-28.6, -26.6):
+        rod(stage, root + f"/Maintenance/StairRail_{int(abs(x)*10)}", (x,-8.8,-14.9), (x,1.35,-7.0), .035, "safety_yellow")
+    for i in range(4):
+        cube(stage, root + f"/Maintenance/Cabinet_{i}", (28.8, 5+i*1.6, -14.7), (.85,1.3,2.8), "paint_blue")
+        cube(stage, root + f"/Maintenance/CabinetPanel_{i}", (28.35,5+i*1.6,-14.4), (.04,.95,1.6), "white")
+    cube(stage, root + "/Maintenance/Transporter", (-26,-12,-15.3), (3.6,5.5,1.1), "safety_yellow")
+    for x in (-27.7, -24.3):
+        for y in (-13.8,-10.2):
+            rod(stage, root + f"/Maintenance/Wheel_{int(abs(x)*10)}_{int(abs(y)*10)}", (x-.18,y,-15.7),(x+.18,y,-15.7),.42,"rubber")
+    cube(stage, root + "/Maintenance/ToolingCradle", (-26,-12,-14.4), (2.8,3.8,.7), "steel")
     for i in range(18):
         angle = math.radians(20 * i + 10)
-        cube(stage, f"/World/Environment/SupportShoe_{i:02d}", (16.6*math.cos(angle), 16.6*math.sin(angle), -15.10),
-             (2.5, 1.2, 0.3), "steel", math.degrees(angle))
-    # A restrained technical grid grounds the machine without interfering with selection.
-    for i in range(-9, 10):
-        cube(stage, f"/World/Environment/GridX_{i+9:02d}", (i*5, 0, -16.087), (0.013, 90, 0.006), "trim")
-        cube(stage, f"/World/Environment/GridY_{i+9:02d}", (0, i*5, -16.087), (90, 0.013, 0.006), "trim")
+        cube(stage, root + f"/Pit/SupportShoe_{i:02d}", (16.6*math.cos(angle),16.6*math.sin(angle),-15.45),
+             (2.5,1.2,1.3), "concrete", math.degrees(angle))
+    markings = [((x,0,-16.093),(.018,92,.008),0) for x in range(-45,46,5)]
+    markings += [((0,y,-16.093),(92,.018,.008),0) for y in range(-45,46,5)]
+    bars(stage, root + "/Hall/FloorExpansionJoints", markings, "structure")
+    for i, (position, angle) in enumerate((((21,-17,-16.1),-25),((22,-15.5,-16.1),20),((-23,-15,-16.1),-20),((24,7,-7.95),130))):
+        worker(stage, root + f"/ScaleReferences/Engineer_{i}", position, angle)
 
 
 def aim(prim, eye, target, up=(0, 0, 1)):
@@ -379,43 +566,55 @@ def aim(prim, eye, target, up=(0, 0, 1)):
 def lighting(stage):
     UsdGeom.Xform.Define(stage, "/World/Lighting")
     dome = UsdLux.DomeLight.Define(stage, "/World/Lighting/StudioFill")
-    dome.CreateIntensityAttr(230)
-    dome.CreateColorAttr(Gf.Vec3f(0.72, 0.81, 0.93))
-    # Large white studio sources produce broad readable reflections on the metal casing.
+    dome.CreateIntensityAttr(290)
+    dome.CreateColorAttr(Gf.Vec3f(0.85, 0.89, 0.95))
+    # Broad practical hall lighting preserves metal reflections and engineering colours.
     for name, eye, size, intensity, color in (
-        ("Key", (18, -29, 29), (20, 14), 2000, (1.0, 0.96, 0.89)),
-        ("Left", (-27, -13, 14), (12, 24), 1600, (0.78, 0.88, 1.0)),
-        ("Back", (4, 25, 24), (18, 11), 2300, (0.86, 0.93, 1.0)),
-        ("Section", (27, -24, 3), (12, 18), 850, (1.0, 0.95, 0.86)),
+        ("Key", (18, -26, 28), (20, 14), 2900, (1.0, 0.95, 0.87)),
+        ("Left", (-27, -13, 14), (12, 24), 1900, (0.79, 0.87, 1.0)),
+        ("Back", (4, 25, 22), (18, 11), 2400, (0.85, 0.92, 1.0)),
+        ("Section", (27, -24, 3), (12, 18), 1400, (1.0, 0.96, 0.9)),
+        ("PitFill", (10, -26, -5), (14, 6), 280, (0.94, 0.96, 1.0)),
     ):
         light = UsdLux.RectLight.Define(stage, "/World/Lighting/" + name)
         light.CreateWidthAttr(size[0])
         light.CreateHeightAttr(size[1])
         light.CreateIntensityAttr(intensity)
         light.CreateColorAttr(Gf.Vec3f(*color))
-        aim(light.GetPrim(), eye, (0, 0, 0))
+        aim(light.GetPrim(), eye, (0, 0, -13) if name == "PitFill" else (0, 0, 0))
+    for side in (-1, 1):
+        light = UsdLux.RectLight.Define(stage, f"/World/Lighting/Hall_{side+1}")
+        light.CreateWidthAttr(4)
+        light.CreateHeightAttr(22)
+        light.CreateIntensityAttr(1100)
+        light.CreateColorAttr(Gf.Vec3f(1.0, .96, .89))
+        aim(light.GetPrim(), (side*27, 14, 23.5), (side*24, 10, -15))
+        cube(stage, f"/World/Environment/Hall/Luminaire_{side+1}", (side*27,14,23.8), (4,22,.12), "white")
 
 
 def cameras(stage):
     UsdGeom.Xform.Define(stage, "/World/Cameras")
     views = {
-        "overview": ((43, -44, 27), (0, 0, -1.8), 39, (0, 0, 1)),
-        "front": ((38, -45, 2), (0, 0, -1.5), 43, (0, 0, 1)),
-        "top": ((0, 0, 64), (0, 0, 0), 43, (0, 1, 0)),
-        "section": ((28, -30, 7), (2, -1, -0.4), 36, (0, 0, 1)),
-        "divertor": ((18, -19, -2), (6, -4, -6.2), 34, (0, 0, 1)),
+        "overview": ((62.64, -69.12, 17), (0, 0, 0), 36, (0, 0, 1)),
+        "front": ((55, -58, -.5), (0, 0, -1.5), 43, (0, 0, 1)),
+        "top": ((0, 0, 86), (0, 0, -1), 40, (0, 1, 0)),
+        "section": ((32, -36, 4), (2, -1, -1.8), 40, (0, 0, 1)),
+        "divertor": ((18, -24, -4), (7, -4.5, -8.1), 45, (0, 0, 1)),
     }
     result = {}
     for name, (eye, target, focal, up) in views.items():
         path = f"/World/Cameras/{name}"
         camera = UsdGeom.Camera.Define(stage, path)
         camera.CreateHorizontalApertureAttr(36.0)
-        camera.CreateVerticalApertureAttr(22.5)
+        camera.CreateVerticalApertureAttr(20.25)
+        camera.CreateHorizontalApertureOffsetAttr(2.8 if name == "overview" else 0.)
         camera.CreateFocalLengthAttr(focal)
+        camera.CreateFStopAttr(0.0)
         camera.CreateClippingRangeAttr(Gf.Vec2f(0.05, 2000))
         camera.CreateFocusDistanceAttr(float(np.linalg.norm(np.subtract(eye, target))))
         aim(camera.GetPrim(), eye, target, up)
-        result[name] = {"usd_path": path, "eye_m": list(eye), "target_m": list(target)}
+        result[name] = {"usd_path": path, "eye_m": list(eye), "target_m": list(target),
+                        "focal_length_mm": focal, "f_stop": 0.0}
     return result
 
 
@@ -425,6 +624,7 @@ def build(legacy: Path | None = None, copy=True, output_assets: Path | None = No
     scene_dir = output_assets / "scene"
     if copy and legacy is not None:
         copy_sources(legacy, provenance_root=provenance_root)
+    write_material_assets(scene_dir)
     all_parts = {variant: component_parts(variant) for variant in VARIANTS}
     for variant, parts in all_parts.items():
         build_prototypes(variant, parts, scene_dir)
@@ -473,12 +673,15 @@ def build(legacy: Path | None = None, copy=True, output_assets: Path | None = No
         "cameras": camera_data,
         "default_camera": "/World/Cameras/overview",
         "design_variants": list(VARIANTS), "design_variant_set": "design",
+        "environment": {"kind": "illustrative_tokamak_hall", "usd_path": "/World/Environment",
+                        "hall_width_m": 72., "wall_height_m": 40., "person_height_m": 1.8,
+                        "railing_height_m": 1.1, "included_in_cad_bom": False},
         "cutaway": {"start_deg": 280, "end_deg": 360, "sector_indices": list(CUT_SECTORS),
                     "description": "80 degree opening follows four exact 20 degree CAD sectors."},
         "geometry_notes": ["Full named component hierarchy from source CAD; no reactor components replaced by display primitives.",
                            "PF/CS and plasma are revolved from source RZ end-cap sections; artificial radial caps are separately controlled.",
                            "PF/CS classification uses source equilibrium coil names/types, verified against CAD section centres.",
-                           "Studio plinth, floor and supports are visualization-only environment geometry.",
+                           "Tokamak hall, civil shielding pit, crane, maintenance platforms and 1.8m personnel are illustrative environment geometry, outside the CAD BOM.",
                            "Manufacturing tolerances, watertight B-rep quality and collision clearance have not been certified."],
     }
     write_json(output_assets / "manifest.json", manifest)

@@ -85,7 +85,8 @@ async function saveImages(images, prefix) {
 
 try {
   await post('state', { design: 'conventional', equilibrium: 'reference', scenario: 'nominal',
-    mode: 'temperature', tab: 'explore', view: 'section', power: 1500, flow: 1, inlet: settings.low,
+    mode: 'temperature', tab: 'engineering', view: 'section', power: 1500, flow: 1, inlet: settings.low,
+    heating: 50, neon: false, heatScale: 'log', volumeStyle: 'plasma', lineMotion: false,
     phase: 1, cutaway: 80, explode: 0, opacity: 1, visible: { plasma: false },
     selected: '', fieldLines: false, orbit: false, playing: false });
   await applied({ mode: 'temperature', inlet: settings.low });
@@ -93,6 +94,11 @@ try {
   await page.goto(base, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.querySelector('#remote-video')?.readyState === 4 &&
     window.FusionStreamer?.connected && document.querySelector('#viewport').classList.contains('live'), {}, { timeout: 60000 });
+  await page.locator('#engineering-panel').waitFor({ state: 'visible' });
+  const thermalControls = page.locator('#engineering-panel details').filter({ has: page.locator(settings.input) });
+  if (!await thermalControls.evaluate(element => element.open)) await thermalControls.locator('summary').click();
+  await page.locator(settings.input).scrollIntoViewIfNeeded();
+  assert.ok(await page.locator(settings.input).isVisible(), 'Latency input must be a visible engineering control');
   report.browser = await browser.version();
   report.initial = await applied({ mode: 'temperature', inlet: settings.low });
   await page.waitForTimeout(8000);
@@ -357,12 +363,15 @@ try {
   assert.notEqual(calibration.low.fieldReference.key, calibration.high.fieldReference.key,
     'High calibration must use a different field packet');
   assert.ok(prepared.passed, `Thermal calibration failed: ${prepared.failures.join(', ')}`);
-  let previous = settings.low;
+  let previous = settings.low, savedLateTrial = false;
   for (let index = -2; index < sampleCount; index++) {
     const target = index < 0 ? (index === -2 ? settings.high : settings.low) :
       (index % 2 === 0 ? settings.high - 5 * (Math.floor(index / 2) + 1) : settings.low + 5 * (Math.floor(index / 2) + 1));
     const result = await page.evaluate(args => window.__latency.run(args), { target, previous, index });
-    const images = await saveImages(result.images, index < 0 ? `warmup-${index + 2}` : `trial-${String(index + 1).padStart(2, '0')}`);
+    const late = result.videoOnsetMs > targetMs;
+    const retainImages = !result.complete || index === -2 || index === 0 || index === sampleCount - 1 || (late && !savedLateTrial);
+    const images = retainImages ? await saveImages(result.images, index < 0 ? `warmup-${index + 2}` : `trial-${String(index + 1).padStart(2, '0')}`) : { omitted: 'All numeric evidence retained; images limited to calibration, first/last and first late or incomplete trial.' };
+    if (late && index >= 0) savedLateTrial = true;
     delete result.images;
     result.images = images;
     (index >= 0 ? report.trials : report.warmupTrials).push(result);

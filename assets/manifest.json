@@ -988,67 +988,77 @@
     "overview": {
       "usd_path": "/World/Cameras/overview",
       "eye_m": [
-        43,
-        -44,
-        27
+        62.64,
+        -69.12,
+        17
       ],
       "target_m": [
         0,
         0,
-        -1.8
-      ]
+        0
+      ],
+      "focal_length_mm": 36,
+      "f_stop": 0.0
     },
     "front": {
       "usd_path": "/World/Cameras/front",
       "eye_m": [
-        38,
-        -45,
-        2
+        55,
+        -58,
+        -0.5
       ],
       "target_m": [
         0,
         0,
         -1.5
-      ]
+      ],
+      "focal_length_mm": 43,
+      "f_stop": 0.0
     },
     "top": {
       "usd_path": "/World/Cameras/top",
       "eye_m": [
         0,
         0,
-        64
+        86
       ],
       "target_m": [
         0,
         0,
-        0
-      ]
+        -1
+      ],
+      "focal_length_mm": 40,
+      "f_stop": 0.0
     },
     "section": {
       "usd_path": "/World/Cameras/section",
       "eye_m": [
-        28,
-        -30,
-        7
+        32,
+        -36,
+        4
       ],
       "target_m": [
         2,
         -1,
-        -0.4
-      ]
+        -1.8
+      ],
+      "focal_length_mm": 40,
+      "f_stop": 0.0
     },
     "divertor": {
       "usd_path": "/World/Cameras/divertor",
       "eye_m": [
         18,
-        -19,
-        -2
+        -24,
+        -4
       ],
       "target_m": [
-        6,
-        -4,
-        -6.2
-      ]
+        7,
+        -4.5,
+        -8.1
+      ],
+      "focal_length_mm": 45,
+      "f_stop": 0.0
     }
   },
   "default_camera": "/World/Cameras/overview",
@@ -1057,6 +1067,15 @@
     "longleg"
   ],
   "design_variant_set": "design",
+  "environment": {
+    "kind": "illustrative_tokamak_hall",
+    "usd_path": "/World/Environment",
+    "hall_width_m": 72.0,
+    "wall_height_m": 40.0,
+    "person_height_m": 1.8,
+    "railing_height_m": 1.1,
+    "included_in_cad_bom": false
+  },
   "cutaway": {
     "start_deg": 280,
     "end_deg": 360,
@@ -1072,7 +1091,7 @@
     "Full named component hierarchy from source CAD; no reactor components replaced by display primitives.",
     "PF/CS and plasma are revolved from source RZ end-cap sections; artificial radial caps are separately controlled.",
     "PF/CS classification uses source equilibrium coil names/types, verified against CAD section centres.",
-    "Studio plinth, floor and supports are visualization-only environment geometry.",
+    "Tokamak hall, civil shielding pit, crane, maintenance platforms and 1.8m personnel are illustrative environment geometry, outside the CAD BOM.",
     "Manufacturing tolerances, watertight B-rep quality and collision clearance have not been certified."
   ]
 }

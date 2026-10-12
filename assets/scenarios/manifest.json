@@ -1,606 +1,1232 @@
 {
   "schema_version": 2,
+  "model_version": "pfc-aux-neon-budget-v3.0",
+  "data_class": "synthetic_demo",
   "generator": "tools/bake_scenarios.py",
+  "axes": {
+    "design": [
+      "conventional",
+      "longleg"
+    ],
+    "equilibrium": [
+      "reference",
+      "rampup",
+      "sof",
+      "eof",
+      "rampdown"
+    ],
+    "heating": [
+      20,
+      35,
+      50,
+      65
+    ],
+    "neon": [
+      false,
+      true
+    ]
+  },
+  "phase": 1.0,
   "cases": [
     {
-      "id": "conventional/reference/nominal",
-      "path": "cases/conventional/reference/nominal.json",
-      "fields": "fields/efa9ac650660e6399a0cc521d3dedf74.npz",
+      "id": "conventional/reference/h20/ne_off",
+      "path": "cases/conventional/reference/h20/ne_off.json",
+      "fields": "fields/63e579d3f0376c0885c10cdb1ec5aa37.npz",
       "field_ref": {
-        "path": "fields/efa9ac650660e6399a0cc521d3dedf74.npz",
-        "key": "efa9ac650660e6399a0cc521d3dedf74",
+        "path": "fields/63e579d3f0376c0885c10cdb1ec5aa37.npz",
+        "key": "63e579d3f0376c0885c10cdb1ec5aa37",
         "revision": 1,
         "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
         "equilibrium_key": "conventional/reference:85cb41c125e0d344",
         "schema_version": 2
       },
-      "peak_temperature_C": 514.0,
-      "peak_heatflux_MW_m2": 4.368
+      "peak_temperature_C": 1045.57,
+      "peak_heatflux_MW_m2": 15.437
     },
     {
-      "id": "conventional/reference/ramp",
-      "path": "cases/conventional/reference/ramp.json",
-      "fields": "fields/24eabc903f8cf552d534356a2913c389.npz",
+      "id": "conventional/reference/h20/ne_on",
+      "path": "cases/conventional/reference/h20/ne_on.json",
+      "fields": "fields/3bb950f480f7cb7ea5de257c65b23ae8.npz",
       "field_ref": {
-        "path": "fields/24eabc903f8cf552d534356a2913c389.npz",
-        "key": "24eabc903f8cf552d534356a2913c389",
+        "path": "fields/3bb950f480f7cb7ea5de257c65b23ae8.npz",
+        "key": "3bb950f480f7cb7ea5de257c65b23ae8",
         "revision": 2,
         "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
         "equilibrium_key": "conventional/reference:85cb41c125e0d344",
         "schema_version": 2
       },
-      "peak_temperature_C": 413.24,
-      "peak_heatflux_MW_m2": 2.621
+      "peak_temperature_C": 429.07,
+      "peak_heatflux_MW_m2": 2.51
     },
     {
-      "id": "conventional/reference/lowflow",
-      "path": "cases/conventional/reference/lowflow.json",
-      "fields": "fields/3fcb9deca882efb75431f745d5e0bb7a.npz",
+      "id": "conventional/reference/h35/ne_off",
+      "path": "cases/conventional/reference/h35/ne_off.json",
+      "fields": "fields/cbc744e8399bcf6ce7763fce90deceff.npz",
       "field_ref": {
-        "path": "fields/3fcb9deca882efb75431f745d5e0bb7a.npz",
-        "key": "3fcb9deca882efb75431f745d5e0bb7a",
+        "path": "fields/cbc744e8399bcf6ce7763fce90deceff.npz",
+        "key": "cbc744e8399bcf6ce7763fce90deceff",
         "revision": 3,
         "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
         "equilibrium_key": "conventional/reference:85cb41c125e0d344",
         "schema_version": 2
       },
-      "peak_temperature_C": 570.71,
-      "peak_heatflux_MW_m2": 4.368
+      "peak_temperature_C": 1072.19,
+      "peak_heatflux_MW_m2": 15.988
     },
     {
-      "id": "conventional/reference/highload",
-      "path": "cases/conventional/reference/highload.json",
-      "fields": "fields/c739fd5f287e8a3921fad584596b377c.npz",
+      "id": "conventional/reference/h35/ne_on",
+      "path": "cases/conventional/reference/h35/ne_on.json",
+      "fields": "fields/f8a9fa8220acaa21178a62a491f16ea5.npz",
       "field_ref": {
-        "path": "fields/c739fd5f287e8a3921fad584596b377c.npz",
-        "key": "c739fd5f287e8a3921fad584596b377c",
+        "path": "fields/f8a9fa8220acaa21178a62a491f16ea5.npz",
+        "key": "f8a9fa8220acaa21178a62a491f16ea5",
         "revision": 4,
         "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
         "equilibrium_key": "conventional/reference:85cb41c125e0d344",
         "schema_version": 2
       },
-      "peak_temperature_C": 674.93,
-      "peak_heatflux_MW_m2": 6.922
+      "peak_temperature_C": 433.68,
+      "peak_heatflux_MW_m2": 2.599
     },
     {
-      "id": "conventional/rampup/nominal",
-      "path": "cases/conventional/rampup/nominal.json",
-      "fields": "fields/68c684d984cb7c2e63fb4d9e1425e05f.npz",
+      "id": "conventional/reference/h50/ne_off",
+      "path": "cases/conventional/reference/h50/ne_off.json",
+      "fields": "fields/d97ab78c24b6ecef64ad7ec25cc27ced.npz",
       "field_ref": {
-        "path": "fields/68c684d984cb7c2e63fb4d9e1425e05f.npz",
-        "key": "68c684d984cb7c2e63fb4d9e1425e05f",
+        "path": "fields/d97ab78c24b6ecef64ad7ec25cc27ced.npz",
+        "key": "d97ab78c24b6ecef64ad7ec25cc27ced",
         "revision": 5,
         "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "equilibrium_key": "conventional/reference:85cb41c125e0d344",
         "schema_version": 2
       },
-      "peak_temperature_C": 994.25,
-      "peak_heatflux_MW_m2": 14.672
+      "peak_temperature_C": 1098.82,
+      "peak_heatflux_MW_m2": 16.539
     },
     {
-      "id": "conventional/rampup/ramp",
-      "path": "cases/conventional/rampup/ramp.json",
-      "fields": "fields/ad18b3c79242863830278f68aa564bac.npz",
+      "id": "conventional/reference/h50/ne_on",
+      "path": "cases/conventional/reference/h50/ne_on.json",
+      "fields": "fields/c2f3c557aa7eea62c3b765eccd474c50.npz",
       "field_ref": {
-        "path": "fields/ad18b3c79242863830278f68aa564bac.npz",
-        "key": "ad18b3c79242863830278f68aa564bac",
+        "path": "fields/c2f3c557aa7eea62c3b765eccd474c50.npz",
+        "key": "c2f3c557aa7eea62c3b765eccd474c50",
         "revision": 6,
         "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "equilibrium_key": "conventional/reference:85cb41c125e0d344",
         "schema_version": 2
       },
-      "peak_temperature_C": 711.18,
-      "peak_heatflux_MW_m2": 8.803
+      "peak_temperature_C": 438.29,
+      "peak_heatflux_MW_m2": 2.689
     },
     {
-      "id": "conventional/rampup/lowflow",
-      "path": "cases/conventional/rampup/lowflow.json",
-      "fields": "fields/ebc3d569053df7fffaffd10501c7427f.npz",
+      "id": "conventional/reference/h65/ne_off",
+      "path": "cases/conventional/reference/h65/ne_off.json",
+      "fields": "fields/bb61806503bba337a3a9ab795dcdbac4.npz",
       "field_ref": {
-        "path": "fields/ebc3d569053df7fffaffd10501c7427f.npz",
-        "key": "ebc3d569053df7fffaffd10501c7427f",
+        "path": "fields/bb61806503bba337a3a9ab795dcdbac4.npz",
+        "key": "bb61806503bba337a3a9ab795dcdbac4",
         "revision": 7,
         "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "equilibrium_key": "conventional/reference:85cb41c125e0d344",
         "schema_version": 2
       },
-      "peak_temperature_C": 1164.63,
-      "peak_heatflux_MW_m2": 14.672
+      "peak_temperature_C": 1125.45,
+      "peak_heatflux_MW_m2": 17.091
     },
     {
-      "id": "conventional/rampup/highload",
-      "path": "cases/conventional/rampup/highload.json",
-      "fields": "fields/3981010bfd90c8638b65cc18f29369b5.npz",
+      "id": "conventional/reference/h65/ne_on",
+      "path": "cases/conventional/reference/h65/ne_on.json",
+      "fields": "fields/de1ba3268f4cc7771335fe5cf125efe6.npz",
       "field_ref": {
-        "path": "fields/3981010bfd90c8638b65cc18f29369b5.npz",
-        "key": "3981010bfd90c8638b65cc18f29369b5",
+        "path": "fields/de1ba3268f4cc7771335fe5cf125efe6.npz",
+        "key": "de1ba3268f4cc7771335fe5cf125efe6",
         "revision": 8,
         "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/reference:85cb41c125e0d344",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 442.9,
+      "peak_heatflux_MW_m2": 2.779
+    },
+    {
+      "id": "conventional/rampup/h20/ne_off",
+      "path": "cases/conventional/rampup/h20/ne_off.json",
+      "fields": "fields/abfd00a38b5961a8661c1996329c76e0.npz",
+      "field_ref": {
+        "path": "fields/abfd00a38b5961a8661c1996329c76e0.npz",
+        "key": "abfd00a38b5961a8661c1996329c76e0",
+        "revision": 9,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
         "equilibrium_key": "conventional/rampup:4b78a785517f595f",
         "schema_version": 2
       },
-      "peak_temperature_C": 1504.32,
-      "peak_heatflux_MW_m2": 23.796
+      "peak_temperature_C": 2766.77,
+      "peak_heatflux_MW_m2": 52.367
     },
     {
-      "id": "conventional/sof/nominal",
-      "path": "cases/conventional/sof/nominal.json",
-      "fields": "fields/e895c60c837c43123c20cf598cf89101.npz",
+      "id": "conventional/rampup/h20/ne_on",
+      "path": "cases/conventional/rampup/h20/ne_on.json",
+      "fields": "fields/ebeada2fb35108474f6417602eb21e05.npz",
       "field_ref": {
-        "path": "fields/e895c60c837c43123c20cf598cf89101.npz",
-        "key": "e895c60c837c43123c20cf598cf89101",
-        "revision": 9,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/sof:5d585249a4445973",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 554.81,
-      "peak_heatflux_MW_m2": 5.24
-    },
-    {
-      "id": "conventional/sof/ramp",
-      "path": "cases/conventional/sof/ramp.json",
-      "fields": "fields/b69885e591a2111a28e0f12181fd715a.npz",
-      "field_ref": {
-        "path": "fields/b69885e591a2111a28e0f12181fd715a.npz",
-        "key": "b69885e591a2111a28e0f12181fd715a",
+        "path": "fields/ebeada2fb35108474f6417602eb21e05.npz",
+        "key": "ebeada2fb35108474f6417602eb21e05",
         "revision": 10,
         "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 684.07,
+      "peak_heatflux_MW_m2": 7.993
+    },
+    {
+      "id": "conventional/rampup/h35/ne_off",
+      "path": "cases/conventional/rampup/h35/ne_off.json",
+      "fields": "fields/0e9c53b83b60be667136f3ebbb208cae.npz",
+      "field_ref": {
+        "path": "fields/0e9c53b83b60be667136f3ebbb208cae.npz",
+        "key": "0e9c53b83b60be667136f3ebbb208cae",
+        "revision": 11,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 2854.87,
+      "peak_heatflux_MW_m2": 54.238
+    },
+    {
+      "id": "conventional/rampup/h35/ne_on",
+      "path": "cases/conventional/rampup/h35/ne_on.json",
+      "fields": "fields/7ec702eec188a6df1b72941b5e9eb7d7.npz",
+      "field_ref": {
+        "path": "fields/7ec702eec188a6df1b72941b5e9eb7d7.npz",
+        "key": "7ec702eec188a6df1b72941b5e9eb7d7",
+        "revision": 12,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 697.79,
+      "peak_heatflux_MW_m2": 8.279
+    },
+    {
+      "id": "conventional/rampup/h50/ne_off",
+      "path": "cases/conventional/rampup/h50/ne_off.json",
+      "fields": "fields/19879cdd6c5e9919d5dc02ab2bf10034.npz",
+      "field_ref": {
+        "path": "fields/19879cdd6c5e9919d5dc02ab2bf10034.npz",
+        "key": "19879cdd6c5e9919d5dc02ab2bf10034",
+        "revision": 13,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 2942.97,
+      "peak_heatflux_MW_m2": 56.108
+    },
+    {
+      "id": "conventional/rampup/h50/ne_on",
+      "path": "cases/conventional/rampup/h50/ne_on.json",
+      "fields": "fields/6e3b997a909805ce197944a5d9def410.npz",
+      "field_ref": {
+        "path": "fields/6e3b997a909805ce197944a5d9def410.npz",
+        "key": "6e3b997a909805ce197944a5d9def410",
+        "revision": 14,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 711.51,
+      "peak_heatflux_MW_m2": 8.564
+    },
+    {
+      "id": "conventional/rampup/h65/ne_off",
+      "path": "cases/conventional/rampup/h65/ne_off.json",
+      "fields": "fields/75d53838095ecb0386a875482730c08d.npz",
+      "field_ref": {
+        "path": "fields/75d53838095ecb0386a875482730c08d.npz",
+        "key": "75d53838095ecb0386a875482730c08d",
+        "revision": 15,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 3031.07,
+      "peak_heatflux_MW_m2": 57.978
+    },
+    {
+      "id": "conventional/rampup/h65/ne_on",
+      "path": "cases/conventional/rampup/h65/ne_on.json",
+      "fields": "fields/a1f501f3ec693e33e3eb456605123a4f.npz",
+      "field_ref": {
+        "path": "fields/a1f501f3ec693e33e3eb456605123a4f.npz",
+        "key": "a1f501f3ec693e33e3eb456605123a4f",
+        "revision": 16,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampup:4b78a785517f595f",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 725.22,
+      "peak_heatflux_MW_m2": 8.85
+    },
+    {
+      "id": "conventional/sof/h20/ne_off",
+      "path": "cases/conventional/sof/h20/ne_off.json",
+      "fields": "fields/ad65119f89795a7b2eef832e0b94bb9e.npz",
+      "field_ref": {
+        "path": "fields/ad65119f89795a7b2eef832e0b94bb9e.npz",
+        "key": "ad65119f89795a7b2eef832e0b94bb9e",
+        "revision": 17,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
         "equilibrium_key": "conventional/sof:5d585249a4445973",
         "schema_version": 2
       },
-      "peak_temperature_C": 438.57,
+      "peak_temperature_C": 1191.84,
+      "peak_heatflux_MW_m2": 18.566
+    },
+    {
+      "id": "conventional/sof/h20/ne_on",
+      "path": "cases/conventional/sof/h20/ne_on.json",
+      "fields": "fields/63420c4db7d362e12057897fd1940148.npz",
+      "field_ref": {
+        "path": "fields/63420c4db7d362e12057897fd1940148.npz",
+        "key": "63420c4db7d362e12057897fd1940148",
+        "revision": 18,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/sof:5d585249a4445973",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 448.9,
+      "peak_heatflux_MW_m2": 2.934
+    },
+    {
+      "id": "conventional/sof/h35/ne_off",
+      "path": "cases/conventional/sof/h35/ne_off.json",
+      "fields": "fields/50d7d7953064ca93023cbd3288fe56b9.npz",
+      "field_ref": {
+        "path": "fields/50d7d7953064ca93023cbd3288fe56b9.npz",
+        "key": "50d7d7953064ca93023cbd3288fe56b9",
+        "revision": 19,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/sof:5d585249a4445973",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1223.7,
+      "peak_heatflux_MW_m2": 19.229
+    },
+    {
+      "id": "conventional/sof/h35/ne_on",
+      "path": "cases/conventional/sof/h35/ne_on.json",
+      "fields": "fields/f725bda834e00a2f05715c5a1c23783a.npz",
+      "field_ref": {
+        "path": "fields/f725bda834e00a2f05715c5a1c23783a.npz",
+        "key": "f725bda834e00a2f05715c5a1c23783a",
+        "revision": 20,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/sof:5d585249a4445973",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 454.22,
+      "peak_heatflux_MW_m2": 3.039
+    },
+    {
+      "id": "conventional/sof/h50/ne_off",
+      "path": "cases/conventional/sof/h50/ne_off.json",
+      "fields": "fields/9b1b0fcb230f13b1ad6f8527cc9091de.npz",
+      "field_ref": {
+        "path": "fields/9b1b0fcb230f13b1ad6f8527cc9091de.npz",
+        "key": "9b1b0fcb230f13b1ad6f8527cc9091de",
+        "revision": 21,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/sof:5d585249a4445973",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1255.55,
+      "peak_heatflux_MW_m2": 19.892
+    },
+    {
+      "id": "conventional/sof/h50/ne_on",
+      "path": "cases/conventional/sof/h50/ne_on.json",
+      "fields": "fields/a14c3a4ee732d5ceba9723ef66db1e86.npz",
+      "field_ref": {
+        "path": "fields/a14c3a4ee732d5ceba9723ef66db1e86.npz",
+        "key": "a14c3a4ee732d5ceba9723ef66db1e86",
+        "revision": 22,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/sof:5d585249a4445973",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 459.54,
       "peak_heatflux_MW_m2": 3.144
     },
     {
-      "id": "conventional/sof/lowflow",
-      "path": "cases/conventional/sof/lowflow.json",
-      "fields": "fields/fa5c12b6c9bf51b1072cb136173f5b49.npz",
+      "id": "conventional/sof/h65/ne_off",
+      "path": "cases/conventional/sof/h65/ne_off.json",
+      "fields": "fields/b3dcf7a25a7ae9b7c74384d33196b512.npz",
       "field_ref": {
-        "path": "fields/fa5c12b6c9bf51b1072cb136173f5b49.npz",
-        "key": "fa5c12b6c9bf51b1072cb136173f5b49",
-        "revision": 11,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/sof:5d585249a4445973",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 621.26,
-      "peak_heatflux_MW_m2": 5.24
-    },
-    {
-      "id": "conventional/sof/highload",
-      "path": "cases/conventional/sof/highload.json",
-      "fields": "fields/ada924144f56573bd3b3dbd117ba1c59.npz",
-      "field_ref": {
-        "path": "fields/ada924144f56573bd3b3dbd117ba1c59.npz",
-        "key": "ada924144f56573bd3b3dbd117ba1c59",
-        "revision": 12,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/sof:5d585249a4445973",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 752.97,
-      "peak_heatflux_MW_m2": 8.506
-    },
-    {
-      "id": "conventional/eof/nominal",
-      "path": "cases/conventional/eof/nominal.json",
-      "fields": "fields/354010d47992bfb83c5c9517d17d4757.npz",
-      "field_ref": {
-        "path": "fields/354010d47992bfb83c5c9517d17d4757.npz",
-        "key": "354010d47992bfb83c5c9517d17d4757",
-        "revision": 13,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/eof:6533b805d698c671",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 666.24,
-      "peak_heatflux_MW_m2": 7.624
-    },
-    {
-      "id": "conventional/eof/ramp",
-      "path": "cases/conventional/eof/ramp.json",
-      "fields": "fields/6d49ecc15dbb823051ff8986784c457d.npz",
-      "field_ref": {
-        "path": "fields/6d49ecc15dbb823051ff8986784c457d.npz",
-        "key": "6d49ecc15dbb823051ff8986784c457d",
-        "revision": 14,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/eof:6533b805d698c671",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 507.71,
-      "peak_heatflux_MW_m2": 4.574
-    },
-    {
-      "id": "conventional/eof/lowflow",
-      "path": "cases/conventional/eof/lowflow.json",
-      "fields": "fields/7de4b6a8ae78a239af636c33cf130753.npz",
-      "field_ref": {
-        "path": "fields/7de4b6a8ae78a239af636c33cf130753.npz",
-        "key": "7de4b6a8ae78a239af636c33cf130753",
-        "revision": 15,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/eof:6533b805d698c671",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 759.27,
-      "peak_heatflux_MW_m2": 7.624
-    },
-    {
-      "id": "conventional/eof/highload",
-      "path": "cases/conventional/eof/highload.json",
-      "fields": "fields/c19a171bc43e3186d745b0b198486c39.npz",
-      "field_ref": {
-        "path": "fields/c19a171bc43e3186d745b0b198486c39.npz",
-        "key": "c19a171bc43e3186d745b0b198486c39",
-        "revision": 16,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/eof:6533b805d698c671",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 941.92,
-      "peak_heatflux_MW_m2": 12.34
-    },
-    {
-      "id": "conventional/rampdown/nominal",
-      "path": "cases/conventional/rampdown/nominal.json",
-      "fields": "fields/facd274028322b1e8d4f03dbbf4557a9.npz",
-      "field_ref": {
-        "path": "fields/facd274028322b1e8d4f03dbbf4557a9.npz",
-        "key": "facd274028322b1e8d4f03dbbf4557a9",
-        "revision": 17,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 447.1,
-      "peak_heatflux_MW_m2": 2.969
-    },
-    {
-      "id": "conventional/rampdown/ramp",
-      "path": "cases/conventional/rampdown/ramp.json",
-      "fields": "fields/34d16a951d8d8a2ebfb9db57ece9927b.npz",
-      "field_ref": {
-        "path": "fields/34d16a951d8d8a2ebfb9db57ece9927b.npz",
-        "key": "34d16a951d8d8a2ebfb9db57ece9927b",
-        "revision": 18,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 371.66,
-      "peak_heatflux_MW_m2": 1.781
-    },
-    {
-      "id": "conventional/rampdown/lowflow",
-      "path": "cases/conventional/rampdown/lowflow.json",
-      "fields": "fields/d6ae9fcbe05ae2af7d92cbde7092f9da.npz",
-      "field_ref": {
-        "path": "fields/d6ae9fcbe05ae2af7d92cbde7092f9da.npz",
-        "key": "d6ae9fcbe05ae2af7d92cbde7092f9da",
-        "revision": 19,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 486.99,
-      "peak_heatflux_MW_m2": 2.969
-    },
-    {
-      "id": "conventional/rampdown/highload",
-      "path": "cases/conventional/rampdown/highload.json",
-      "fields": "fields/3ecbcf2f4c2d1c62b931c3f1bb9fdecf.npz",
-      "field_ref": {
-        "path": "fields/3ecbcf2f4c2d1c62b931c3f1bb9fdecf.npz",
-        "key": "3ecbcf2f4c2d1c62b931c3f1bb9fdecf",
-        "revision": 20,
-        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
-        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 565.37,
-      "peak_heatflux_MW_m2": 4.742
-    },
-    {
-      "id": "longleg/reference/nominal",
-      "path": "cases/longleg/reference/nominal.json",
-      "fields": "fields/3b3c10951405f912485a8a69f31ff345.npz",
-      "field_ref": {
-        "path": "fields/3b3c10951405f912485a8a69f31ff345.npz",
-        "key": "3b3c10951405f912485a8a69f31ff345",
-        "revision": 21,
-        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
-        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 558.42,
-      "peak_heatflux_MW_m2": 5.318
-    },
-    {
-      "id": "longleg/reference/ramp",
-      "path": "cases/longleg/reference/ramp.json",
-      "fields": "fields/ee2b1a76cb4c66cb8c20893592c33712.npz",
-      "field_ref": {
-        "path": "fields/ee2b1a76cb4c66cb8c20893592c33712.npz",
-        "key": "ee2b1a76cb4c66cb8c20893592c33712",
-        "revision": 22,
-        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
-        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
-        "schema_version": 2
-      },
-      "peak_temperature_C": 440.81,
-      "peak_heatflux_MW_m2": 3.191
-    },
-    {
-      "id": "longleg/reference/lowflow",
-      "path": "cases/longleg/reference/lowflow.json",
-      "fields": "fields/df90b97bf1559dd400441966d3e29191.npz",
-      "field_ref": {
-        "path": "fields/df90b97bf1559dd400441966d3e29191.npz",
-        "key": "df90b97bf1559dd400441966d3e29191",
+        "path": "fields/b3dcf7a25a7ae9b7c74384d33196b512.npz",
+        "key": "b3dcf7a25a7ae9b7c74384d33196b512",
         "revision": 23,
-        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
-        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/sof:5d585249a4445973",
         "schema_version": 2
       },
-      "peak_temperature_C": 625.74,
-      "peak_heatflux_MW_m2": 5.318
+      "peak_temperature_C": 1287.4,
+      "peak_heatflux_MW_m2": 20.555
     },
     {
-      "id": "longleg/reference/highload",
-      "path": "cases/longleg/reference/highload.json",
-      "fields": "fields/45b9d75979e1a5366c417ea0727c632e.npz",
+      "id": "conventional/sof/h65/ne_on",
+      "path": "cases/conventional/sof/h65/ne_on.json",
+      "fields": "fields/61161e21ff82a86285476802548e129a.npz",
       "field_ref": {
-        "path": "fields/45b9d75979e1a5366c417ea0727c632e.npz",
-        "key": "45b9d75979e1a5366c417ea0727c632e",
+        "path": "fields/61161e21ff82a86285476802548e129a.npz",
+        "key": "61161e21ff82a86285476802548e129a",
         "revision": 24,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/sof:5d585249a4445973",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 464.86,
+      "peak_heatflux_MW_m2": 3.248
+    },
+    {
+      "id": "conventional/eof/h20/ne_off",
+      "path": "cases/conventional/eof/h20/ne_off.json",
+      "fields": "fields/5a3d536628cb6b14403e8d7d242a262a.npz",
+      "field_ref": {
+        "path": "fields/5a3d536628cb6b14403e8d7d242a262a.npz",
+        "key": "5a3d536628cb6b14403e8d7d242a262a",
+        "revision": 25,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/eof:6533b805d698c671",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1591.22,
+      "peak_heatflux_MW_m2": 27.108
+    },
+    {
+      "id": "conventional/eof/h20/ne_on",
+      "path": "cases/conventional/eof/h20/ne_on.json",
+      "fields": "fields/a7e6c3ec543f2e00908bd17e5d93e507.npz",
+      "field_ref": {
+        "path": "fields/a7e6c3ec543f2e00908bd17e5d93e507.npz",
+        "key": "a7e6c3ec543f2e00908bd17e5d93e507",
+        "revision": 26,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/eof:6533b805d698c671",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 508.6,
+      "peak_heatflux_MW_m2": 4.211
+    },
+    {
+      "id": "conventional/eof/h35/ne_off",
+      "path": "cases/conventional/eof/h35/ne_off.json",
+      "fields": "fields/9bb76ea64477f09f6dbb1756d6fafeb3.npz",
+      "field_ref": {
+        "path": "fields/9bb76ea64477f09f6dbb1756d6fafeb3.npz",
+        "key": "9bb76ea64477f09f6dbb1756d6fafeb3",
+        "revision": 27,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/eof:6533b805d698c671",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1637.34,
+      "peak_heatflux_MW_m2": 28.076
+    },
+    {
+      "id": "conventional/eof/h35/ne_on",
+      "path": "cases/conventional/eof/h35/ne_on.json",
+      "fields": "fields/3ef0b1f858d9454af35f7bc642c8eda5.npz",
+      "field_ref": {
+        "path": "fields/3ef0b1f858d9454af35f7bc642c8eda5.npz",
+        "key": "3ef0b1f858d9454af35f7bc642c8eda5",
+        "revision": 28,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/eof:6533b805d698c671",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 516.05,
+      "peak_heatflux_MW_m2": 4.361
+    },
+    {
+      "id": "conventional/eof/h50/ne_off",
+      "path": "cases/conventional/eof/h50/ne_off.json",
+      "fields": "fields/7ec64920e2df5d913a996f5a491ede3c.npz",
+      "field_ref": {
+        "path": "fields/7ec64920e2df5d913a996f5a491ede3c.npz",
+        "key": "7ec64920e2df5d913a996f5a491ede3c",
+        "revision": 29,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/eof:6533b805d698c671",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1683.45,
+      "peak_heatflux_MW_m2": 29.044
+    },
+    {
+      "id": "conventional/eof/h50/ne_on",
+      "path": "cases/conventional/eof/h50/ne_on.json",
+      "fields": "fields/df548d044e33affa0ec512b3227b994c.npz",
+      "field_ref": {
+        "path": "fields/df548d044e33affa0ec512b3227b994c.npz",
+        "key": "df548d044e33affa0ec512b3227b994c",
+        "revision": 30,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/eof:6533b805d698c671",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 523.5,
+      "peak_heatflux_MW_m2": 4.512
+    },
+    {
+      "id": "conventional/eof/h65/ne_off",
+      "path": "cases/conventional/eof/h65/ne_off.json",
+      "fields": "fields/076f8c9573b396a9c24410fc68e8cc30.npz",
+      "field_ref": {
+        "path": "fields/076f8c9573b396a9c24410fc68e8cc30.npz",
+        "key": "076f8c9573b396a9c24410fc68e8cc30",
+        "revision": 31,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/eof:6533b805d698c671",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1729.57,
+      "peak_heatflux_MW_m2": 30.012
+    },
+    {
+      "id": "conventional/eof/h65/ne_on",
+      "path": "cases/conventional/eof/h65/ne_on.json",
+      "fields": "fields/8adfbf73cff295e1f6d4fc04966919a6.npz",
+      "field_ref": {
+        "path": "fields/8adfbf73cff295e1f6d4fc04966919a6.npz",
+        "key": "8adfbf73cff295e1f6d4fc04966919a6",
+        "revision": 32,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/eof:6533b805d698c671",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 530.95,
+      "peak_heatflux_MW_m2": 4.662
+    },
+    {
+      "id": "conventional/rampdown/h20/ne_off",
+      "path": "cases/conventional/rampdown/h20/ne_off.json",
+      "fields": "fields/ea56bf79cea4bbe48877e884e470a0c5.npz",
+      "field_ref": {
+        "path": "fields/ea56bf79cea4bbe48877e884e470a0c5.npz",
+        "key": "ea56bf79cea4bbe48877e884e470a0c5",
+        "revision": 33,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 805.82,
+      "peak_heatflux_MW_m2": 10.425
+    },
+    {
+      "id": "conventional/rampdown/h20/ne_on",
+      "path": "cases/conventional/rampdown/h20/ne_on.json",
+      "fields": "fields/a181569aed3d1e7cc53297ae2d9ef7b0.npz",
+      "field_ref": {
+        "path": "fields/a181569aed3d1e7cc53297ae2d9ef7b0.npz",
+        "key": "a181569aed3d1e7cc53297ae2d9ef7b0",
+        "revision": 34,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 400.94,
+      "peak_heatflux_MW_m2": 1.732
+    },
+    {
+      "id": "conventional/rampdown/h35/ne_off",
+      "path": "cases/conventional/rampdown/h35/ne_off.json",
+      "fields": "fields/714b159ee422059e8cc49724e9ea651d.npz",
+      "field_ref": {
+        "path": "fields/714b159ee422059e8cc49724e9ea651d.npz",
+        "key": "714b159ee422059e8cc49724e9ea651d",
+        "revision": 35,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 823.88,
+      "peak_heatflux_MW_m2": 10.797
+    },
+    {
+      "id": "conventional/rampdown/h35/ne_on",
+      "path": "cases/conventional/rampdown/h35/ne_on.json",
+      "fields": "fields/993a87e3f08cd962fdffddaa9fc07e03.npz",
+      "field_ref": {
+        "path": "fields/993a87e3f08cd962fdffddaa9fc07e03.npz",
+        "key": "993a87e3f08cd962fdffddaa9fc07e03",
+        "revision": 36,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 402.7,
+      "peak_heatflux_MW_m2": 1.794
+    },
+    {
+      "id": "conventional/rampdown/h50/ne_off",
+      "path": "cases/conventional/rampdown/h50/ne_off.json",
+      "fields": "fields/94bf706c61cdd2c3c2a2585c5a98dc58.npz",
+      "field_ref": {
+        "path": "fields/94bf706c61cdd2c3c2a2585c5a98dc58.npz",
+        "key": "94bf706c61cdd2c3c2a2585c5a98dc58",
+        "revision": 37,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 841.95,
+      "peak_heatflux_MW_m2": 11.169
+    },
+    {
+      "id": "conventional/rampdown/h50/ne_on",
+      "path": "cases/conventional/rampdown/h50/ne_on.json",
+      "fields": "fields/a7c43fd61ddb1d0a5376afdc2a8d80fd.npz",
+      "field_ref": {
+        "path": "fields/a7c43fd61ddb1d0a5376afdc2a8d80fd.npz",
+        "key": "a7c43fd61ddb1d0a5376afdc2a8d80fd",
+        "revision": 38,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 404.46,
+      "peak_heatflux_MW_m2": 1.856
+    },
+    {
+      "id": "conventional/rampdown/h65/ne_off",
+      "path": "cases/conventional/rampdown/h65/ne_off.json",
+      "fields": "fields/af25cfe8f58cada5170493484758a43e.npz",
+      "field_ref": {
+        "path": "fields/af25cfe8f58cada5170493484758a43e.npz",
+        "key": "af25cfe8f58cada5170493484758a43e",
+        "revision": 39,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 860.01,
+      "peak_heatflux_MW_m2": 11.542
+    },
+    {
+      "id": "conventional/rampdown/h65/ne_on",
+      "path": "cases/conventional/rampdown/h65/ne_on.json",
+      "fields": "fields/43d0f0ae2ca4d07cc21f2d25ca458e74.npz",
+      "field_ref": {
+        "path": "fields/43d0f0ae2ca4d07cc21f2d25ca458e74.npz",
+        "key": "43d0f0ae2ca4d07cc21f2d25ca458e74",
+        "revision": 40,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 406.22,
+      "peak_heatflux_MW_m2": 1.917
+    },
+    {
+      "id": "longleg/reference/h20/ne_off",
+      "path": "cases/longleg/reference/h20/ne_off.json",
+      "fields": "fields/65cd5d50b1b51ba4f44ce2915918efca.npz",
+      "field_ref": {
+        "path": "fields/65cd5d50b1b51ba4f44ce2915918efca.npz",
+        "key": "65cd5d50b1b51ba4f44ce2915918efca",
+        "revision": 41,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
         "schema_version": 2
       },
-      "peak_temperature_C": 755.68,
-      "peak_heatflux_MW_m2": 8.561
+      "peak_temperature_C": 1120.22,
+      "peak_heatflux_MW_m2": 17.034
     },
     {
-      "id": "longleg/rampup/nominal",
-      "path": "cases/longleg/rampup/nominal.json",
-      "fields": "fields/d3b48b2424bbb9596b7a76339c93f911.npz",
+      "id": "longleg/reference/h20/ne_on",
+      "path": "cases/longleg/reference/h20/ne_on.json",
+      "fields": "fields/2497b39e49e4ce5cf76e30f7dc5530d1.npz",
       "field_ref": {
-        "path": "fields/d3b48b2424bbb9596b7a76339c93f911.npz",
-        "key": "d3b48b2424bbb9596b7a76339c93f911",
-        "revision": 25,
+        "path": "fields/2497b39e49e4ce5cf76e30f7dc5530d1.npz",
+        "key": "2497b39e49e4ce5cf76e30f7dc5530d1",
+        "revision": 42,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 432.5,
+      "peak_heatflux_MW_m2": 2.583
+    },
+    {
+      "id": "longleg/reference/h35/ne_off",
+      "path": "cases/longleg/reference/h35/ne_off.json",
+      "fields": "fields/889d30cbb2bcf6e4cae677bbbe1bd14c.npz",
+      "field_ref": {
+        "path": "fields/889d30cbb2bcf6e4cae677bbbe1bd14c.npz",
+        "key": "889d30cbb2bcf6e4cae677bbbe1bd14c",
+        "revision": 43,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1149.51,
+      "peak_heatflux_MW_m2": 17.642
+    },
+    {
+      "id": "longleg/reference/h35/ne_on",
+      "path": "cases/longleg/reference/h35/ne_on.json",
+      "fields": "fields/4f20faadce2cb3be04a1e0970b0d6e45.npz",
+      "field_ref": {
+        "path": "fields/4f20faadce2cb3be04a1e0970b0d6e45.npz",
+        "key": "4f20faadce2cb3be04a1e0970b0d6e45",
+        "revision": 44,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 437.23,
+      "peak_heatflux_MW_m2": 2.675
+    },
+    {
+      "id": "longleg/reference/h50/ne_off",
+      "path": "cases/longleg/reference/h50/ne_off.json",
+      "fields": "fields/63dfb2a3d7dcf8ccb6df984977f14c57.npz",
+      "field_ref": {
+        "path": "fields/63dfb2a3d7dcf8ccb6df984977f14c57.npz",
+        "key": "63dfb2a3d7dcf8ccb6df984977f14c57",
+        "revision": 45,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1178.81,
+      "peak_heatflux_MW_m2": 18.25
+    },
+    {
+      "id": "longleg/reference/h50/ne_on",
+      "path": "cases/longleg/reference/h50/ne_on.json",
+      "fields": "fields/3a39c959424be46419ba2a31aeb5f355.npz",
+      "field_ref": {
+        "path": "fields/3a39c959424be46419ba2a31aeb5f355.npz",
+        "key": "3a39c959424be46419ba2a31aeb5f355",
+        "revision": 46,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 441.96,
+      "peak_heatflux_MW_m2": 2.768
+    },
+    {
+      "id": "longleg/reference/h65/ne_off",
+      "path": "cases/longleg/reference/h65/ne_off.json",
+      "fields": "fields/bcc2ba8e0d31b71e824462143f38ce98.npz",
+      "field_ref": {
+        "path": "fields/bcc2ba8e0d31b71e824462143f38ce98.npz",
+        "key": "bcc2ba8e0d31b71e824462143f38ce98",
+        "revision": 47,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1208.1,
+      "peak_heatflux_MW_m2": 18.859
+    },
+    {
+      "id": "longleg/reference/h65/ne_on",
+      "path": "cases/longleg/reference/h65/ne_on.json",
+      "fields": "fields/8a1226add6287dbf0a53f0e324bff7f5.npz",
+      "field_ref": {
+        "path": "fields/8a1226add6287dbf0a53f0e324bff7f5.npz",
+        "key": "8a1226add6287dbf0a53f0e324bff7f5",
+        "revision": 48,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 446.7,
+      "peak_heatflux_MW_m2": 2.86
+    },
+    {
+      "id": "longleg/rampup/h20/ne_off",
+      "path": "cases/longleg/rampup/h20/ne_off.json",
+      "fields": "fields/f85576b12c8318aabcf5cf20973bf55c.npz",
+      "field_ref": {
+        "path": "fields/f85576b12c8318aabcf5cf20973bf55c.npz",
+        "key": "f85576b12c8318aabcf5cf20973bf55c",
+        "revision": 49,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/rampup:bdefdbb075703960",
         "schema_version": 2
       },
-      "peak_temperature_C": 629.26,
-      "peak_heatflux_MW_m2": 6.865
+      "peak_temperature_C": 1337.54,
+      "peak_heatflux_MW_m2": 21.798
     },
     {
-      "id": "longleg/rampup/ramp",
-      "path": "cases/longleg/rampup/ramp.json",
-      "fields": "fields/59ba3c221de7579d63208eafee5f8fb1.npz",
+      "id": "longleg/rampup/h20/ne_on",
+      "path": "cases/longleg/rampup/h20/ne_on.json",
+      "fields": "fields/b1fd08008faf26100d8e1d827bb48690.npz",
       "field_ref": {
-        "path": "fields/59ba3c221de7579d63208eafee5f8fb1.npz",
-        "key": "59ba3c221de7579d63208eafee5f8fb1",
-        "revision": 26,
+        "path": "fields/b1fd08008faf26100d8e1d827bb48690.npz",
+        "key": "b1fd08008faf26100d8e1d827bb48690",
+        "revision": 50,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/rampup:bdefdbb075703960",
         "schema_version": 2
       },
-      "peak_temperature_C": 484.69,
-      "peak_heatflux_MW_m2": 4.119
+      "peak_temperature_C": 468.02,
+      "peak_heatflux_MW_m2": 3.372
     },
     {
-      "id": "longleg/rampup/lowflow",
-      "path": "cases/longleg/rampup/lowflow.json",
-      "fields": "fields/8411704bea1d9ed2f937377a20726828.npz",
+      "id": "longleg/rampup/h35/ne_off",
+      "path": "cases/longleg/rampup/h35/ne_off.json",
+      "fields": "fields/a19357e7311d021a116e0cf1adfd9412.npz",
       "field_ref": {
-        "path": "fields/8411704bea1d9ed2f937377a20726828.npz",
-        "key": "8411704bea1d9ed2f937377a20726828",
-        "revision": 27,
+        "path": "fields/a19357e7311d021a116e0cf1adfd9412.npz",
+        "key": "a19357e7311d021a116e0cf1adfd9412",
+        "revision": 51,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/rampup:bdefdbb075703960",
         "schema_version": 2
       },
-      "peak_temperature_C": 712.59,
-      "peak_heatflux_MW_m2": 6.865
+      "peak_temperature_C": 1374.6,
+      "peak_heatflux_MW_m2": 22.576
     },
     {
-      "id": "longleg/rampup/highload",
-      "path": "cases/longleg/rampup/highload.json",
-      "fields": "fields/55a6b0e2a0065d2915be180a7996a4ab.npz",
+      "id": "longleg/rampup/h35/ne_on",
+      "path": "cases/longleg/rampup/h35/ne_on.json",
+      "fields": "fields/1d802626b2e0c22af692fd9c8f2e826e.npz",
       "field_ref": {
-        "path": "fields/55a6b0e2a0065d2915be180a7996a4ab.npz",
-        "key": "55a6b0e2a0065d2915be180a7996a4ab",
-        "revision": 28,
+        "path": "fields/1d802626b2e0c22af692fd9c8f2e826e.npz",
+        "key": "1d802626b2e0c22af692fd9c8f2e826e",
+        "revision": 52,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/rampup:bdefdbb075703960",
         "schema_version": 2
       },
-      "peak_temperature_C": 869.96,
-      "peak_heatflux_MW_m2": 10.923
+      "peak_temperature_C": 474.02,
+      "peak_heatflux_MW_m2": 3.493
     },
     {
-      "id": "longleg/sof/nominal",
-      "path": "cases/longleg/sof/nominal.json",
-      "fields": "fields/c6307b3dafe37453e0b9d287d36fbbd9.npz",
+      "id": "longleg/rampup/h50/ne_off",
+      "path": "cases/longleg/rampup/h50/ne_off.json",
+      "fields": "fields/c04de201112d9574adf5019df9cf77ca.npz",
       "field_ref": {
-        "path": "fields/c6307b3dafe37453e0b9d287d36fbbd9.npz",
-        "key": "c6307b3dafe37453e0b9d287d36fbbd9",
-        "revision": 29,
+        "path": "fields/c04de201112d9574adf5019df9cf77ca.npz",
+        "key": "c04de201112d9574adf5019df9cf77ca",
+        "revision": 53,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/rampup:bdefdbb075703960",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1411.65,
+      "peak_heatflux_MW_m2": 23.355
+    },
+    {
+      "id": "longleg/rampup/h50/ne_on",
+      "path": "cases/longleg/rampup/h50/ne_on.json",
+      "fields": "fields/4980a3474b534e5ad8304f6f3d647666.npz",
+      "field_ref": {
+        "path": "fields/4980a3474b534e5ad8304f6f3d647666.npz",
+        "key": "4980a3474b534e5ad8304f6f3d647666",
+        "revision": 54,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/rampup:bdefdbb075703960",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 480.02,
+      "peak_heatflux_MW_m2": 3.613
+    },
+    {
+      "id": "longleg/rampup/h65/ne_off",
+      "path": "cases/longleg/rampup/h65/ne_off.json",
+      "fields": "fields/0cdd88a20b8ceaca5288dacda45070d2.npz",
+      "field_ref": {
+        "path": "fields/0cdd88a20b8ceaca5288dacda45070d2.npz",
+        "key": "0cdd88a20b8ceaca5288dacda45070d2",
+        "revision": 55,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/rampup:bdefdbb075703960",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1448.71,
+      "peak_heatflux_MW_m2": 24.133
+    },
+    {
+      "id": "longleg/rampup/h65/ne_on",
+      "path": "cases/longleg/rampup/h65/ne_on.json",
+      "fields": "fields/194608b456ad007bbd529b01f45eb7e5.npz",
+      "field_ref": {
+        "path": "fields/194608b456ad007bbd529b01f45eb7e5.npz",
+        "key": "194608b456ad007bbd529b01f45eb7e5",
+        "revision": 56,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/rampup:bdefdbb075703960",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 486.02,
+      "peak_heatflux_MW_m2": 3.733
+    },
+    {
+      "id": "longleg/sof/h20/ne_off",
+      "path": "cases/longleg/sof/h20/ne_off.json",
+      "fields": "fields/303aa0e07d1c412e9e3f5507764f79e1.npz",
+      "field_ref": {
+        "path": "fields/303aa0e07d1c412e9e3f5507764f79e1.npz",
+        "key": "303aa0e07d1c412e9e3f5507764f79e1",
+        "revision": 57,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
         "schema_version": 2
       },
-      "peak_temperature_C": 531.08,
-      "peak_heatflux_MW_m2": 4.733
+      "peak_temperature_C": 1029.85,
+      "peak_heatflux_MW_m2": 15.101
     },
     {
-      "id": "longleg/sof/ramp",
-      "path": "cases/longleg/sof/ramp.json",
-      "fields": "fields/2a9e0bf053e26d6a843a23c6dbdb96bf.npz",
+      "id": "longleg/sof/h20/ne_on",
+      "path": "cases/longleg/sof/h20/ne_on.json",
+      "fields": "fields/b802b189f0637cdd4ce9ab3388cfd8d5.npz",
       "field_ref": {
-        "path": "fields/2a9e0bf053e26d6a843a23c6dbdb96bf.npz",
-        "key": "2a9e0bf053e26d6a843a23c6dbdb96bf",
-        "revision": 30,
+        "path": "fields/b802b189f0637cdd4ce9ab3388cfd8d5.npz",
+        "key": "b802b189f0637cdd4ce9ab3388cfd8d5",
+        "revision": 58,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
         "schema_version": 2
       },
-      "peak_temperature_C": 423.84,
-      "peak_heatflux_MW_m2": 2.84
+      "peak_temperature_C": 424.06,
+      "peak_heatflux_MW_m2": 2.402
     },
     {
-      "id": "longleg/sof/lowflow",
-      "path": "cases/longleg/sof/lowflow.json",
-      "fields": "fields/5511dbbcbd98d1a3b68280af7ee5159a.npz",
+      "id": "longleg/sof/h35/ne_off",
+      "path": "cases/longleg/sof/h35/ne_off.json",
+      "fields": "fields/64d321dbabf11fc4d4ee4cbf618bd3c1.npz",
       "field_ref": {
-        "path": "fields/5511dbbcbd98d1a3b68280af7ee5159a.npz",
-        "key": "5511dbbcbd98d1a3b68280af7ee5159a",
-        "revision": 31,
+        "path": "fields/64d321dbabf11fc4d4ee4cbf618bd3c1.npz",
+        "key": "64d321dbabf11fc4d4ee4cbf618bd3c1",
+        "revision": 59,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
         "schema_version": 2
       },
-      "peak_temperature_C": 591.87,
-      "peak_heatflux_MW_m2": 4.733
+      "peak_temperature_C": 1055.92,
+      "peak_heatflux_MW_m2": 15.64
     },
     {
-      "id": "longleg/sof/highload",
-      "path": "cases/longleg/sof/highload.json",
-      "fields": "fields/ddb2ac608d40c59c3b01ea9de2204d21.npz",
+      "id": "longleg/sof/h35/ne_on",
+      "path": "cases/longleg/sof/h35/ne_on.json",
+      "fields": "fields/881c18407801d974e4855a67c08d151d.npz",
       "field_ref": {
-        "path": "fields/ddb2ac608d40c59c3b01ea9de2204d21.npz",
-        "key": "ddb2ac608d40c59c3b01ea9de2204d21",
-        "revision": 32,
+        "path": "fields/881c18407801d974e4855a67c08d151d.npz",
+        "key": "881c18407801d974e4855a67c08d151d",
+        "revision": 60,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
         "schema_version": 2
       },
-      "peak_temperature_C": 714.23,
-      "peak_heatflux_MW_m2": 7.719
+      "peak_temperature_C": 428.49,
+      "peak_heatflux_MW_m2": 2.488
     },
     {
-      "id": "longleg/eof/nominal",
-      "path": "cases/longleg/eof/nominal.json",
-      "fields": "fields/cb171435db1296727eb66bb2bc073775.npz",
+      "id": "longleg/sof/h50/ne_off",
+      "path": "cases/longleg/sof/h50/ne_off.json",
+      "fields": "fields/8f3607ab3be18e546953e78b01f1394d.npz",
       "field_ref": {
-        "path": "fields/cb171435db1296727eb66bb2bc073775.npz",
-        "key": "cb171435db1296727eb66bb2bc073775",
-        "revision": 33,
+        "path": "fields/8f3607ab3be18e546953e78b01f1394d.npz",
+        "key": "8f3607ab3be18e546953e78b01f1394d",
+        "revision": 61,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1081.99,
+      "peak_heatflux_MW_m2": 16.179
+    },
+    {
+      "id": "longleg/sof/h50/ne_on",
+      "path": "cases/longleg/sof/h50/ne_on.json",
+      "fields": "fields/15629e74ab550dfe361e89d0c56e4353.npz",
+      "field_ref": {
+        "path": "fields/15629e74ab550dfe361e89d0c56e4353.npz",
+        "key": "15629e74ab550dfe361e89d0c56e4353",
+        "revision": 62,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 432.92,
+      "peak_heatflux_MW_m2": 2.574
+    },
+    {
+      "id": "longleg/sof/h65/ne_off",
+      "path": "cases/longleg/sof/h65/ne_off.json",
+      "fields": "fields/097ebba151f89cd00381f209d5a30e5c.npz",
+      "field_ref": {
+        "path": "fields/097ebba151f89cd00381f209d5a30e5c.npz",
+        "key": "097ebba151f89cd00381f209d5a30e5c",
+        "revision": 63,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1108.05,
+      "peak_heatflux_MW_m2": 16.719
+    },
+    {
+      "id": "longleg/sof/h65/ne_on",
+      "path": "cases/longleg/sof/h65/ne_on.json",
+      "fields": "fields/933ba7dcb5a551306f39bf9da517a73b.npz",
+      "field_ref": {
+        "path": "fields/933ba7dcb5a551306f39bf9da517a73b.npz",
+        "key": "933ba7dcb5a551306f39bf9da517a73b",
+        "revision": 64,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 437.35,
+      "peak_heatflux_MW_m2": 2.66
+    },
+    {
+      "id": "longleg/eof/h20/ne_off",
+      "path": "cases/longleg/eof/h20/ne_off.json",
+      "fields": "fields/6ce8a9c4fa372015ab485192c91d2dc3.npz",
+      "field_ref": {
+        "path": "fields/6ce8a9c4fa372015ab485192c91d2dc3.npz",
+        "key": "6ce8a9c4fa372015ab485192c91d2dc3",
+        "revision": 65,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/eof:aca4b0c5d1926401",
         "schema_version": 2
       },
-      "peak_temperature_C": 648.51,
-      "peak_heatflux_MW_m2": 7.245
+      "peak_temperature_C": 1398.02,
+      "peak_heatflux_MW_m2": 22.975
     },
     {
-      "id": "longleg/eof/ramp",
-      "path": "cases/longleg/eof/ramp.json",
-      "fields": "fields/196818881acfcce8128d1edc8a6cdbd0.npz",
+      "id": "longleg/eof/h20/ne_on",
+      "path": "cases/longleg/eof/h20/ne_on.json",
+      "fields": "fields/4b92fe018e8e88eb921bedbdf269f34c.npz",
       "field_ref": {
-        "path": "fields/196818881acfcce8128d1edc8a6cdbd0.npz",
-        "key": "196818881acfcce8128d1edc8a6cdbd0",
-        "revision": 34,
+        "path": "fields/4b92fe018e8e88eb921bedbdf269f34c.npz",
+        "key": "4b92fe018e8e88eb921bedbdf269f34c",
+        "revision": 66,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/eof:aca4b0c5d1926401",
         "schema_version": 2
       },
-      "peak_temperature_C": 496.71,
-      "peak_heatflux_MW_m2": 4.347
+      "peak_temperature_C": 476.64,
+      "peak_heatflux_MW_m2": 3.527
     },
     {
-      "id": "longleg/eof/lowflow",
-      "path": "cases/longleg/eof/lowflow.json",
-      "fields": "fields/be486fea5d478871db9dcc2f44bfcda4.npz",
+      "id": "longleg/eof/h35/ne_off",
+      "path": "cases/longleg/eof/h35/ne_off.json",
+      "fields": "fields/16c6d7e2d87da1dc55fa987cb0e5e2b9.npz",
       "field_ref": {
-        "path": "fields/be486fea5d478871db9dcc2f44bfcda4.npz",
-        "key": "be486fea5d478871db9dcc2f44bfcda4",
-        "revision": 35,
+        "path": "fields/16c6d7e2d87da1dc55fa987cb0e5e2b9.npz",
+        "key": "16c6d7e2d87da1dc55fa987cb0e5e2b9",
+        "revision": 67,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/eof:aca4b0c5d1926401",
         "schema_version": 2
       },
-      "peak_temperature_C": 737.31,
-      "peak_heatflux_MW_m2": 7.245
+      "peak_temperature_C": 1437.24,
+      "peak_heatflux_MW_m2": 23.796
     },
     {
-      "id": "longleg/eof/highload",
-      "path": "cases/longleg/eof/highload.json",
-      "fields": "fields/5d359e7f7a243fe80ed3ecb77d8078ca.npz",
+      "id": "longleg/eof/h35/ne_on",
+      "path": "cases/longleg/eof/h35/ne_on.json",
+      "fields": "fields/49aa8186d35af8eaadf3966e82a6f277.npz",
       "field_ref": {
-        "path": "fields/5d359e7f7a243fe80ed3ecb77d8078ca.npz",
-        "key": "5d359e7f7a243fe80ed3ecb77d8078ca",
-        "revision": 36,
+        "path": "fields/49aa8186d35af8eaadf3966e82a6f277.npz",
+        "key": "49aa8186d35af8eaadf3966e82a6f277",
+        "revision": 68,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/eof:aca4b0c5d1926401",
         "schema_version": 2
       },
-      "peak_temperature_C": 898.53,
-      "peak_heatflux_MW_m2": 11.459
+      "peak_temperature_C": 482.95,
+      "peak_heatflux_MW_m2": 3.653
     },
     {
-      "id": "longleg/rampdown/nominal",
-      "path": "cases/longleg/rampdown/nominal.json",
-      "fields": "fields/6cd8cc73095dc1e9e31831e6a1a336a3.npz",
+      "id": "longleg/eof/h50/ne_off",
+      "path": "cases/longleg/eof/h50/ne_off.json",
+      "fields": "fields/6bc937449f0f1353cbec44f7bed4a678.npz",
       "field_ref": {
-        "path": "fields/6cd8cc73095dc1e9e31831e6a1a336a3.npz",
-        "key": "6cd8cc73095dc1e9e31831e6a1a336a3",
-        "revision": 37,
+        "path": "fields/6bc937449f0f1353cbec44f7bed4a678.npz",
+        "key": "6bc937449f0f1353cbec44f7bed4a678",
+        "revision": 69,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/eof:aca4b0c5d1926401",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1476.45,
+      "peak_heatflux_MW_m2": 24.617
+    },
+    {
+      "id": "longleg/eof/h50/ne_on",
+      "path": "cases/longleg/eof/h50/ne_on.json",
+      "fields": "fields/2f0803642d0ee09200a0517419abfae1.npz",
+      "field_ref": {
+        "path": "fields/2f0803642d0ee09200a0517419abfae1.npz",
+        "key": "2f0803642d0ee09200a0517419abfae1",
+        "revision": 70,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/eof:aca4b0c5d1926401",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 489.26,
+      "peak_heatflux_MW_m2": 3.779
+    },
+    {
+      "id": "longleg/eof/h65/ne_off",
+      "path": "cases/longleg/eof/h65/ne_off.json",
+      "fields": "fields/eee9bda5b01de37cdaac44a68786d258.npz",
+      "field_ref": {
+        "path": "fields/eee9bda5b01de37cdaac44a68786d258.npz",
+        "key": "eee9bda5b01de37cdaac44a68786d258",
+        "revision": 71,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/eof:aca4b0c5d1926401",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1515.67,
+      "peak_heatflux_MW_m2": 25.437
+    },
+    {
+      "id": "longleg/eof/h65/ne_on",
+      "path": "cases/longleg/eof/h65/ne_on.json",
+      "fields": "fields/f5cbf3c2c652422e2527e4d605ae6586.npz",
+      "field_ref": {
+        "path": "fields/f5cbf3c2c652422e2527e4d605ae6586.npz",
+        "key": "f5cbf3c2c652422e2527e4d605ae6586",
+        "revision": 72,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/eof:aca4b0c5d1926401",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 495.57,
+      "peak_heatflux_MW_m2": 3.905
+    },
+    {
+      "id": "longleg/rampdown/h20/ne_off",
+      "path": "cases/longleg/rampdown/h20/ne_off.json",
+      "fields": "fields/2a2696916cd3ba957455e2eb1796a82f.npz",
+      "field_ref": {
+        "path": "fields/2a2696916cd3ba957455e2eb1796a82f.npz",
+        "key": "2a2696916cd3ba957455e2eb1796a82f",
+        "revision": 73,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
         "schema_version": 2
       },
-      "peak_temperature_C": 560.75,
-      "peak_heatflux_MW_m2": 5.4
+      "peak_temperature_C": 1128.61,
+      "peak_heatflux_MW_m2": 17.329
     },
     {
-      "id": "longleg/rampdown/ramp",
-      "path": "cases/longleg/rampdown/ramp.json",
-      "fields": "fields/64e92f5425b286d976b5476bb2f330e3.npz",
+      "id": "longleg/rampdown/h20/ne_on",
+      "path": "cases/longleg/rampdown/h20/ne_on.json",
+      "fields": "fields/8c2c6572fc8e73dd88815b7cfaddbbc6.npz",
       "field_ref": {
-        "path": "fields/64e92f5425b286d976b5476bb2f330e3.npz",
-        "key": "64e92f5425b286d976b5476bb2f330e3",
-        "revision": 38,
+        "path": "fields/8c2c6572fc8e73dd88815b7cfaddbbc6.npz",
+        "key": "8c2c6572fc8e73dd88815b7cfaddbbc6",
+        "revision": 74,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
         "schema_version": 2
       },
-      "peak_temperature_C": 442.19,
-      "peak_heatflux_MW_m2": 3.24
+      "peak_temperature_C": 437.19,
+      "peak_heatflux_MW_m2": 2.713
     },
     {
-      "id": "longleg/rampdown/lowflow",
-      "path": "cases/longleg/rampdown/lowflow.json",
-      "fields": "fields/70d26b53cff112876f68c44897710b6e.npz",
+      "id": "longleg/rampdown/h35/ne_off",
+      "path": "cases/longleg/rampdown/h35/ne_off.json",
+      "fields": "fields/5fc56cafbfacc95d0c66b414f88f6d1b.npz",
       "field_ref": {
-        "path": "fields/70d26b53cff112876f68c44897710b6e.npz",
-        "key": "70d26b53cff112876f68c44897710b6e",
-        "revision": 39,
+        "path": "fields/5fc56cafbfacc95d0c66b414f88f6d1b.npz",
+        "key": "5fc56cafbfacc95d0c66b414f88f6d1b",
+        "revision": 75,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
         "schema_version": 2
       },
-      "peak_temperature_C": 627.75,
-      "peak_heatflux_MW_m2": 5.4
+      "peak_temperature_C": 1158.21,
+      "peak_heatflux_MW_m2": 17.948
     },
     {
-      "id": "longleg/rampdown/highload",
-      "path": "cases/longleg/rampdown/highload.json",
-      "fields": "fields/7bda8b06bca59399f6e86e9408e2740a.npz",
+      "id": "longleg/rampdown/h35/ne_on",
+      "path": "cases/longleg/rampdown/h35/ne_on.json",
+      "fields": "fields/5210ff371b936a63fe157cb32e31cdf4.npz",
       "field_ref": {
-        "path": "fields/7bda8b06bca59399f6e86e9408e2740a.npz",
-        "key": "7bda8b06bca59399f6e86e9408e2740a",
-        "revision": 40,
+        "path": "fields/5210ff371b936a63fe157cb32e31cdf4.npz",
+        "key": "5210ff371b936a63fe157cb32e31cdf4",
+        "revision": 76,
         "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
         "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
         "schema_version": 2
       },
-      "peak_temperature_C": 757.63,
-      "peak_heatflux_MW_m2": 8.643
+      "peak_temperature_C": 442.09,
+      "peak_heatflux_MW_m2": 2.81
+    },
+    {
+      "id": "longleg/rampdown/h50/ne_off",
+      "path": "cases/longleg/rampdown/h50/ne_off.json",
+      "fields": "fields/22d67e3a21170f032cebdf54ece2b911.npz",
+      "field_ref": {
+        "path": "fields/22d67e3a21170f032cebdf54ece2b911.npz",
+        "key": "22d67e3a21170f032cebdf54ece2b911",
+        "revision": 77,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1187.8,
+      "peak_heatflux_MW_m2": 18.567
+    },
+    {
+      "id": "longleg/rampdown/h50/ne_on",
+      "path": "cases/longleg/rampdown/h50/ne_on.json",
+      "fields": "fields/fe2fd74b5cf5b2cedfd95d491c21a755.npz",
+      "field_ref": {
+        "path": "fields/fe2fd74b5cf5b2cedfd95d491c21a755.npz",
+        "key": "fe2fd74b5cf5b2cedfd95d491c21a755",
+        "revision": 78,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 446.99,
+      "peak_heatflux_MW_m2": 2.907
+    },
+    {
+      "id": "longleg/rampdown/h65/ne_off",
+      "path": "cases/longleg/rampdown/h65/ne_off.json",
+      "fields": "fields/fca20143c992830589d645efe1020692.npz",
+      "field_ref": {
+        "path": "fields/fca20143c992830589d645efe1020692.npz",
+        "key": "fca20143c992830589d645efe1020692",
+        "revision": 79,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 1217.39,
+      "peak_heatflux_MW_m2": 19.185
+    },
+    {
+      "id": "longleg/rampdown/h65/ne_on",
+      "path": "cases/longleg/rampdown/h65/ne_on.json",
+      "fields": "fields/a87c31f8cff18e7147e8ef62b2dd3f27.npz",
+      "field_ref": {
+        "path": "fields/a87c31f8cff18e7147e8ef62b2dd3f27.npz",
+        "key": "a87c31f8cff18e7147e8ef62b2dd3f27",
+        "revision": 80,
+        "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+        "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
+        "schema_version": 2
+      },
+      "peak_temperature_C": 451.89,
+      "peak_heatflux_MW_m2": 3.004
     }
   ]
 }

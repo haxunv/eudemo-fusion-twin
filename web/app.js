@@ -3,14 +3,21 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
 const translations = {
   zh: {
+    engineering: '工程', syntheticCase: '合成情景', heating: '辅助加热', neon: 'Ne 杂质注入', neonHint: '合成辐射冷却情景', divertorDesign: '偏滤器方案',
+    fourCases: '四工况对比', sameInputs: '相同输入', fourCasesHint: '保持加热、冷却与磁平衡条件相同。', selectCaseHint: '选择卡片，在三维视口中查看该工况。',
+    engineeringTools: '工程检查', thermalControls: '热工参数', powerHint: '基准热预算不含辅助加热；全部加热功率假定被吸收。', advancedViews: '工程场与装配', loadStudy: '独立负荷扫描', loadStudyHint: '无量纲准稳态负荷扫描。播放改变热负荷，不代表真实放电时间。',
+    colorScale: '色标', logScale: '对数', linearScale: '线性', volumeDisplay: '体场显示', plasmaStyle: '等离子体', temperatureStyle: '温度', lineMotion: '方向示意动画',
+    targetPeak: '靶板峰值热流', relativeNoNe: '相对同方案无 Ne 情景', equilibriumStages: '磁平衡快照', snapshotHint: '独立源快照 · 非连续瞬态',
+    neOn: '有 Ne', neOff: '无 Ne', magneticStrength: '磁场强度', magneticHint: '箭头仅示意磁场方向，不表示粒子速度。', plasmaStyleHint: '粉紫色为等离子体展示示意；切换温度可查看合成 keV 场。', temperatureStyleHint: '源磁通形状约束的合成温度场，未经等离子体输运求解。',
+    logHint: '零值中性灰 · 低于下限的正值取最低色阶', fixedScale: '四工况共用固定色标', sourceGeometry: '源 CAD', syncing: '同步中', synchronized: '已同步', close: '关闭', positiveChange: '增加', negativeChange: '降低', versusNoNe: '相对无 Ne',
     stateRetrying: '正在重试工况更新', stateUnsaved: '工况尚未保存，点击重试', stateRejected: '工况参数被拒绝，请检查输入',
-    volume: '等离子体体积场', volumeError: '体积场生成失败，请切换模式后重试', volumePreparing: '体积渲染正在准备', plasmaHidden: '科学场模式下隐藏等离子体边界实体',
+    volume: '等离子体', volumeError: '体积场生成失败，请切换模式后重试', volumePreparing: '体积渲染正在准备', plasmaHidden: '科学场模式下隐藏等离子体边界实体',
     design: '反应堆方案', conventional: '常规偏滤器', longleg: '长腿偏滤器', equilibrium: '磁平衡状态', eqRampup: '电流爬升', eqSof: '平顶开始', eqEof: '平顶结束', eqRampdown: '电流下降',
-    differenceField: '三维差值场', deltaTemperature: '温度差', deltaHeatflux: '热流差', differenceNote: '当前工况减参考工况，使用相同几何与磁平衡。', powerBalance: '功率收支', powerInput: '当前输入热功率', surfacePower: '表面沉积', volumePower: '体积沉积', unresolvedPower: '未解析功率', balanceError: '收支误差', strikeUnresolved: '当前平衡未解析出有效靶板打击点', actionCancelled: '场景已变化，请重新操作', actionPending: '操作仍在处理中', fieldUpdating: '正在同步三维场', fieldSynchronized: '三维场已同步',
+    differenceField: '三维差值场', deltaTemperature: '温度差', deltaHeatflux: '热流差', differenceNote: '当前工况减同方案无 Ne 工况，保持几何、磁平衡及其余热工参数相同。', powerBalance: '功率收支', powerInput: '当前输入热功率', surfacePower: '表面沉积', volumePower: '体积沉积', unresolvedPower: '未解析功率', balanceError: '收支误差', strikeUnresolved: '当前平衡未解析出有效靶板打击点', actionCancelled: '场景已变化，请重新操作', actionPending: '操作仍在处理中', fieldUpdating: '正在同步三维场', fieldSynchronized: '三维场已同步',
     digitalTwin: '聚变数字孪生', connecting: '正在连接', connected: 'RTX 实时串流', preview: 'RTX 预览', offline: '渲染器未连接', serverOffline: '服务未连接', fullscreen: '全屏',
     views: '视角', orbit: '环绕', assembly: '装配', assemblyTree: '模型装配树', measure: '测量', measureTitle: '部件尺寸与双点测量', reset: '重置', resetView: '恢复默认视角',
     searchComponents: '搜索部件', isolate: '隔离所选', showAll: '全部显示', selectComponent: '选择部件查看工程属性', explore: '探索', compare: '对比', settings: '工况设置', scenario: '运行工况',
-    nominal: '额定运行', ramp: '热负荷爬升', lowflow: '低冷却流量', highload: '高热负荷', fusionPower: '名义热功率预算', coolantFlow: '冷却流量', inletTemperature: '冷却剂入口温度',
+    nominal: '额定运行', ramp: '热负荷爬升', lowflow: '低冷却流量', highload: '高热负荷', fusionPower: '基准热预算', coolantFlow: '冷却流量', inletTemperature: '冷却剂入口温度',
     visualization: '可视化方式', assemblyMode: '工程装配', temperature: '温度', heatflux: '热流密度', magnetic: '磁力线', slice: '截面场', adjustment: '可视化调整', cutaway: '剖开角度', explode: '装配爆炸', opacity: '不透明度', fieldLines: '叠加磁力线',
     compareTitle: '工况对比', compareDescription: '比较参考工况与当前工况的热管理响应。', baseline: '参考工况', candidate: '当前工况', compareNote: '同一几何模型 · 同一数据生成方法', trendTitle: '准稳态负荷扫描', surfaceTemperature: '峰值表面温度',
     readouts: '计算结果', peakTemperature: '峰值温度', peakHeatflux: '峰值热流', outletTemperature: '出口温度', coolingMargin: '温度裕量', fieldCompute: '场计算', export: '导出工况', screenshot: '截图',
@@ -20,19 +27,26 @@ const translations = {
     overviewDescription: '公开 CAD 装配 · 交互工况与多物理场', frontDescription: 'TF / PF 线圈、真空室与等离子体边界', topDescription: '环向扇区、径向层级与维护通道', sectionDescription: '包层、屏蔽结构与真空边界', divertorDescription: '等离子体面对部件与热流分布',
     material: '材料', parts: '零部件', triangles: '三角面', source: '来源', dimensionsXYZ: '包围盒 X × Y × Z', downloadStep: '下载 STEP 源模型', downloadUsd: '下载 USD 场景', sourceCad: '源 CAD 文件', noResult: '等待计算结果', noHistory: '计算后显示负荷扫描曲线',
     selectFirst: '请先在装配树中选择部件', dimensionsHint: '所选部件的轴对齐包围盒尺寸，单位为米。', measureHint: '在三维视口中依次点击两个表面点。', startMeasure: '双点测量', clearMeasure: '清除测量', measurementStarted: '测量已开启，请在模型表面选择两个点', measuredDistance: '两点距离', noBounds: '当前部件尚无尺寸数据',
-    exportDone: '已导出当前工况、计算结果与来源说明', screenshotDone: '已保存 RTX 渲染截图', screenshotUnavailable: '等待 RTX 画面后可保存截图', requestFailed: '操作未完成，请检查本地服务', updated: '工况已更新', noComponents: '没有匹配的部件', dataPending: '等待数据源信息', reference: '参考', gpuCompute: 'GPU 场计算', cpuCompute: 'CPU 场计算', liveRender: '实时渲染', connectHint: '点击重新连接串流', sourceEquilibrium: '公开平衡数据', heatfluxLimit: '色标上限 12 MW/m²', temperatureLimit: '色标上限 1,100 °C',
+    exportDone: '已导出当前工况、计算结果与来源说明', screenshotDone: '已保存 RTX 渲染截图', screenshotUnavailable: '等待 RTX 画面后可保存截图', requestFailed: '操作未完成，请检查本地服务', updated: '工况已更新', noComponents: '没有匹配的部件', dataPending: '等待数据源信息', reference: '参考', gpuCompute: 'GPU 场计算', cpuCompute: 'CPU 场计算', liveRender: '实时渲染', connectHint: '点击重新连接串流', sourceEquilibrium: '公开平衡数据', heatfluxLimit: '色标上限 200 MW/m²', temperatureLimit: '色标上限 1,100 °C',
     compareAssembly: '查看当前工况', renderPending: 'RTX 正在加载场景', rendererError: '渲染器启动失败，检查运行日志', dimensionX: '宽度 X', dimensionY: '深度 Y', dimensionZ: '高度 Z', demoTimeline: '准稳态 · 合成工况',
   },
   en: {
+    engineering: 'Engineering', syntheticCase: 'SYNTHETIC', heating: 'Auxiliary heating', neon: 'Ne impurity seeding', neonHint: 'Synthetic radiation-cooling scenario', divertorDesign: 'Divertor design',
+    fourCases: 'FOUR-CASE COMPARISON', sameInputs: 'SAME INPUTS', fourCasesHint: 'Same heating, cooling & magnetic equilibrium.', selectCaseHint: 'Select a card to inspect the case in the 3D view.',
+    engineeringTools: 'ENGINEERING INSPECTION', thermalControls: 'Thermal controls', powerHint: 'Base thermal budget excludes auxiliary heating; all heating is assumed absorbed.', advancedViews: 'Engineering fields & assembly', loadStudy: 'Independent load scan', loadStudyHint: 'Dimensionless quasi-steady load scan. Playback varies heat load and does not represent discharge time.',
+    colorScale: 'Color scale', logScale: 'Log', linearScale: 'Linear', volumeDisplay: 'Volume display', plasmaStyle: 'Plasma', temperatureStyle: 'Temperature', lineMotion: 'Direction animation',
+    targetPeak: 'Peak divertor heat flux', relativeNoNe: 'vs. same-design, no-Ne case', equilibriumStages: 'EQUILIBRIUM SNAPSHOTS', snapshotHint: 'Independent source snapshots · No transient solution',
+    neOn: 'Ne ON', neOff: 'Ne OFF', magneticStrength: 'Magnetic strength', magneticHint: 'Direction only · Animation does not represent speed.', plasmaStyleHint: 'Pink-purple color is illustrative. Select Temperature for the synthetic keV field.', temperatureStyleHint: 'Synthetic temperature shaped by source flux; no plasma transport solve.',
+    logHint: 'Zero: gray · Positive values below scale: lowest color', fixedScale: 'One fixed scale for all four cases', sourceGeometry: 'SOURCE CAD', syncing: 'Syncing', synchronized: 'Synced', close: 'Close', positiveChange: 'increase', negativeChange: 'reduction', versusNoNe: 'vs. no Ne',
     stateRetrying: 'Retrying scenario update', stateUnsaved: 'Scenario not saved. Click to retry.', stateRejected: 'Scenario parameters were rejected. Check the input.',
     volume: 'Plasma volume', volumeError: 'Volume generation failed. Switch modes to retry.', volumePreparing: 'Volume rendering is preparing', plasmaHidden: 'The plasma boundary solid is hidden in field modes',
     design: 'Reactor design', conventional: 'Conventional divertor', longleg: 'Long-leg divertor', equilibrium: 'Magnetic equilibrium', eqRampup: 'Current ramp-up', eqSof: 'Start of flat-top', eqEof: 'End of flat-top', eqRampdown: 'Current ramp-down',
-    differenceField: '3D DIFFERENCE FIELD', deltaTemperature: 'Temperature difference', deltaHeatflux: 'Heat-flux difference', differenceNote: 'Current minus reference, with identical geometry and magnetic equilibrium.', powerBalance: 'POWER BALANCE', powerInput: 'Current thermal input', surfacePower: 'Surface deposition', volumePower: 'Volume deposition', unresolvedPower: 'Unresolved power', balanceError: 'Balance error', strikeUnresolved: 'No valid target strike point resolved for this equilibrium', actionCancelled: 'The scene changed. Please retry the action.', actionPending: 'The action is still in progress.', fieldUpdating: 'Synchronizing 3D fields', fieldSynchronized: '3D fields synchronized',
+    differenceField: '3D DIFFERENCE FIELD', deltaTemperature: 'Temperature difference', deltaHeatflux: 'Heat-flux difference', differenceNote: 'Current minus the same-design no-Ne case, with identical equilibrium and other thermal inputs.', powerBalance: 'POWER BALANCE', powerInput: 'Current thermal input', surfacePower: 'Surface deposition', volumePower: 'Volume deposition', unresolvedPower: 'Unresolved power', balanceError: 'Balance error', strikeUnresolved: 'No valid target strike point resolved for this equilibrium', actionCancelled: 'The scene changed. Please retry the action.', actionPending: 'The action is still in progress.', fieldUpdating: 'Synchronizing 3D fields', fieldSynchronized: '3D fields synchronized',
     digitalTwin: 'Fusion Digital Twin', connecting: 'Connecting', connected: 'RTX LIVE STREAM', preview: 'RTX PREVIEW', offline: 'Renderer offline', serverOffline: 'Service offline', fullscreen: 'Fullscreen',
     views: 'VIEWS', orbit: 'ORBIT', assembly: 'Assembly', assemblyTree: 'ASSEMBLY TREE', measure: 'Measure', measureTitle: 'Component dimensions and point measurement', reset: 'Reset', resetView: 'Reset view',
     searchComponents: 'Search components', isolate: 'Isolate', showAll: 'Show all', selectComponent: 'Select a component to inspect its properties', explore: 'Explore', compare: 'Compare', settings: 'SETTINGS', scenario: 'Scenario',
-    nominal: 'Nominal operation', ramp: 'Thermal load ramp', lowflow: 'Reduced coolant flow', highload: 'High heat load', fusionPower: 'Nominal thermal budget', coolantFlow: 'Coolant flow', inletTemperature: 'Coolant inlet temperature',
-    visualization: 'VISUALIZATION TECHNIQUES', assemblyMode: 'Assembly', temperature: 'Temperature', heatflux: 'Heat flux', magnetic: 'Field lines', slice: 'Field section', adjustment: 'VISUALIZATION ADJUSTMENT', cutaway: 'Cutaway angle', explode: 'Explode', opacity: 'Opacity', fieldLines: 'Show magnetic field lines',
+    nominal: 'Nominal operation', ramp: 'Thermal load ramp', lowflow: 'Reduced coolant flow', highload: 'High heat load', fusionPower: 'Base thermal budget', coolantFlow: 'Coolant flow', inletTemperature: 'Coolant inlet temperature',
+    visualization: 'VISUALIZATION', assemblyMode: 'Assembly', temperature: 'Temperature', heatflux: 'Heat flux', magnetic: 'Field lines', slice: 'Field section', adjustment: 'VISUALIZATION ADJUSTMENT', cutaway: 'Cutaway angle', explode: 'Explode', opacity: 'Opacity', fieldLines: 'Show magnetic field lines',
     compareTitle: 'SCENARIO COMPARISON', compareDescription: 'Thermal response of the reference and active operating scenarios.', baseline: 'BASELINE', candidate: 'CURRENT', compareNote: 'Same geometry · Same field-generation method', trendTitle: 'QUASI-STEADY LOAD SCAN', surfaceTemperature: 'Peak surface temperature',
     readouts: 'SIMULATION READOUTS', peakTemperature: 'Peak temperature', peakHeatflux: 'Peak heat flux', outletTemperature: 'Outlet temperature', coolingMargin: 'Thermal margin', fieldCompute: 'Field calculation', export: 'Export scenario', screenshot: 'Capture',
     play: 'Play / pause', discharge: 'LOAD SCAN', rampUp: 'Low load', flatTop: 'Intermediate', rampDown: 'Nominal load', dataProvenance: 'DATA & MODEL PROVENANCE', initializing: 'Preparing the engineering scene', initializingDetail: 'Loading EU-DEMO assembly and RTX renderer',
@@ -41,14 +55,14 @@ const translations = {
     overviewDescription: 'Public CAD assembly · Interactive scenarios & multiphysics fields', frontDescription: 'TF / PF coils, vacuum vessel and plasma boundary', topDescription: 'Toroidal sectors, radial layers and maintenance access', sectionDescription: 'Blanket, shielding and vacuum boundary', divertorDescription: 'Plasma-facing components and heat-flux distribution',
     material: 'Material', parts: 'Parts', triangles: 'Triangles', source: 'Source', dimensionsXYZ: 'Bounding box X × Y × Z', downloadStep: 'Download source STEP', downloadUsd: 'Download USD scene', sourceCad: 'Source CAD files', noResult: 'Waiting for calculation', noHistory: 'History appears after calculation',
     selectFirst: 'Select a component in the assembly tree first', dimensionsHint: 'Axis-aligned bounding-box dimensions of the selected component, in metres.', measureHint: 'Select two surface points in the 3D viewport.', startMeasure: 'Point-to-point', clearMeasure: 'Clear measurement', measurementStarted: 'Measurement enabled. Select two points on the model.', measuredDistance: 'Point-to-point distance', noBounds: 'Dimensions are not available for this component',
-    exportDone: 'Scenario, results and provenance exported', screenshotDone: 'RTX render saved', screenshotUnavailable: 'Capture is available after the RTX image arrives', requestFailed: 'Action failed. Check the local service.', updated: 'Scenario updated', noComponents: 'No matching components', dataPending: 'Waiting for source metadata', reference: 'Reference', gpuCompute: 'GPU field calculation', cpuCompute: 'CPU field calculation', liveRender: 'Live rendering', connectHint: 'Click to reconnect the stream', sourceEquilibrium: 'Public equilibrium data', heatfluxLimit: 'Color scale capped at 12 MW/m²', temperatureLimit: 'Color scale capped at 1,100 °C',
+    exportDone: 'Scenario, results and provenance exported', screenshotDone: 'RTX render saved', screenshotUnavailable: 'Capture is available after the RTX image arrives', requestFailed: 'Action failed. Check the local service.', updated: 'Scenario updated', noComponents: 'No matching components', dataPending: 'Waiting for source metadata', reference: 'Reference', gpuCompute: 'GPU field calculation', cpuCompute: 'CPU field calculation', liveRender: 'Live rendering', connectHint: 'Click to reconnect the stream', sourceEquilibrium: 'Public equilibrium data', heatfluxLimit: 'Color scale capped at 200 MW/m²', temperatureLimit: 'Color scale capped at 1,100 °C',
     compareAssembly: 'View current scenario', renderPending: 'RTX is loading the scene', rendererError: 'Renderer failed to start. Check runtime logs.', dimensionX: 'Width X', dimensionY: 'Depth Y', dimensionZ: 'Height Z', demoTimeline: 'QUASI-STEADY · SYNTHETIC',
   },
 };
 
 let language = localStorage.getItem('fusion-language') === 'en' ? 'en' : 'zh';
 let manifest = { components: [] };
-let state = { view: 'overview', tab: 'explore', mode: 'assembly', scenario: 'nominal', power: 2000, flow: 1, inlet: 300, phase: 0.65, cutaway: 80, explode: 0, opacity: 1, visible: {}, selected: '', fieldLines: false, orbit: false, playing: false };
+let state = { view: 'overview', tab: 'explore', mode: 'volume', scenario: 'nominal', power: 2000, flow: 1, inlet: 300, phase: 1, cutaway: 80, explode: 0, opacity: 1, visible: {}, selected: '', fieldLines: true, orbit: false, playing: false };
 let result = {};
 let renderer = {};
 let revision = -1;
@@ -69,14 +83,21 @@ let lastPreview = 0;
 let streamerStarted = false;
 let toastTimer;
 let measureMode = false;
+let measurementGeneration = 0;
 let pointerStart = null;
 let lastMeasuredDistance = null;
 let actionTail = Promise.resolve();
 let activeActions = 0;
 let serverEpoch = null;
+let committedGeometry = null;
 
 state.design = 'conventional';
-state.equilibrium = 'reference';
+state.equilibrium = 'sof';
+state.heating = 50;
+state.neon = false;
+state.heatScale = 'log';
+state.volumeStyle = 'plasma';
+state.lineMotion = true;
 
 const t = (key) => translations[language][key] || key;
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -98,16 +119,10 @@ function applyLanguage() {
   if ($('#measure-dialog').open) renderMeasurement();
 }
 
-const cameraDrawings = {
-  overview: '<g transform="translate(50 26) rotate(-22)"><ellipse rx="25" ry="16"/><ellipse rx="17" ry="10"/><ellipse rx="10" ry="6"/><path d="M-25 0v9a25 16 0 0 0 50 0V0M-17 0v8a17 10 0 0 0 34 0V0M0-16v5m-16-7 4 7m28-7-4 7m12 9-7-1M-25 0h8"/><path d="M0-16v-6m-25 24-6 5m56-5 6 5"/></g>',
-  front: '<g transform="translate(50 28)"><path d="M-26 15v-24q0-13 13-13h26q13 0 13 13v24M-19 15V-7q0-11 10-11H9q10 0 10 11v22M-12 15V-5q0-10 7-10H5q7 0 7 10v20M-5 15v-26M5 15v-26M-29 15h58M-24 19h48"/><path d="M-30-10h60m-59 22h58"/></g>',
-  top: '<g transform="translate(50 28)"><circle r="23"/><circle r="17"/><circle r="11"/><circle r="5"/><path d="M0-23v12M0 11v12M-23 0h12m22 0h12M-16-16l8 8m16 16 8 8M16-16 8-8m-16 16-8 8M-9-21l5 11m8 20 5 11M21-9 10-4m-20 8-11 5M-21-9l11 5m20 8 11 5M9-21 4-10m-8 20-5 11"/></g>',
-  section: '<g transform="translate(50 28)"><path d="M-25 15v-25q0-12 11-12h9v40m10 0v-40h9q11 0 11 12v25M-20 15V-8q0-10 10-10v31m20 0v-31q10 0 10 10v23M-16 8q-4-12 4-20m24 0q8 8 4 20M-19 15l8-7 6 10m10 0 6-10 8 7M-30 19h60"/><path d="M-1-22v43" stroke-dasharray="2 3"/></g>',
-  divertor: '<g transform="translate(50 25)"><path d="M-30-11q-1 18 17 25l8-11h10l8 11q18-7 17-25M-30-6q1 11 15 16l6-10m18 0 6 10q14-5 15-16M-22 12v7h44v-7M-12 14v5m24-5v5M0-16v17"/><path d="m-5-5 5 6 5-6M-5-17q-11 9-13 16m23-16q11 9 13 16" stroke="#86ab66"/></g>',
-};
+const cameraViews = ['overview', 'front', 'top', 'section', 'divertor'];
 
 function renderCameras() {
-  $('#camera-buttons').innerHTML = Object.entries(cameraDrawings).map(([view, drawing], index) => `<button class="camera-button ${state.view === view ? 'active' : ''}" data-view="${view}" title="${t(view)}" aria-label="${t(view)}"><span class="view-number">0${index + 1}</span><svg viewBox="0 0 100 56" aria-hidden="true">${drawing}</svg><span class="view-label">${t(view)}</span></button>`).join('');
+  $('#camera-buttons').innerHTML = cameraViews.map((view, index) => `<button class="camera-button ${state.view === view ? 'active' : ''}" data-view="${view}" title="${t(view)}" aria-label="${t(view)}" aria-pressed="${state.view === view}"><img src="/assets/ui/cameras/${view}.png" alt=""><span class="view-number">0${index + 1}</span><span class="view-label">${t(view)}</span></button>`).join('');
 }
 
 function getDimensions(component) {
@@ -175,22 +190,51 @@ function renderConnection() {
   $('#gpu-label').textContent = typeof gpu === 'string' ? gpu : 'GPU —';
 }
 
+function colorGradient(map) {
+  const colors = map?.colors || map?.rgba;
+  if (!colors?.length) return '';
+  return `linear-gradient(90deg,${colors.map((rgba, index) => `rgb(${rgba.slice(0, 3).map(value => Math.round(value * 255)).join(' ')}) ${(map.positions?.[index] ?? index / (colors.length - 1)) * 100}%`).join(',')})`;
+}
+
+function heatRange() {
+  return result.color_ranges?.[state.heatScale === 'log' ? 'heatflux_log' : 'heatflux'] || (state.heatScale === 'log' ? [0.01, 200] : [0, 200]);
+}
+
 function renderLegend() {
-  const modes = { temperature: ['temperature', '°C', 300, 1100], heatflux: ['heatflux', 'MW/m²', 0, 12], delta_temperature: ['deltaTemperature', '°C', -1, 1], delta_heatflux: ['deltaHeatflux', 'MW/m²', -1, 1], slice: ['temperature', 'keV', 0, 30], volume: ['volume', 'keV', 0, 30], magnetic: ['magnetic', t('sourceEquilibrium'), null, null] };
-  const legend = modes[state.mode];
-  $('#field-legend').hidden = !legend;
-  if (!legend) return;
+  const modes = { temperature: ['temperature', '°C', 300, 1100], heatflux: ['heatflux', 'MW/m²', 0, 200], delta_temperature: ['deltaTemperature', '°C', -1, 1], delta_heatflux: ['deltaHeatflux', 'MW/m²', -1, 1], slice: ['temperature', 'keV', 0, 40], volume: ['temperature', 'keV', 0, 40], magnetic: ['magneticStrength', 'T', 2, 12] };
+  const mode = state.mode;
+  const legend = modes[mode];
+  const showLegend = Boolean(legend) && (mode !== 'volume' || (state.volumeStyle === 'temperature' && renderer.volume_style === 'temperature'));
+  $('#heat-options').hidden = mode !== 'heatflux';
+  $('#volume-options').hidden = mode !== 'volume';
+  $('#magnetic-options').hidden = mode !== 'magnetic';
+  $('#field-legend').hidden = !showLegend;
+  const note = mode === 'magnetic' ? 'magneticHint' : mode === 'volume' ? (state.volumeStyle === 'plasma' ? 'plasmaStyleHint' : 'temperatureStyleHint') : mode === 'slice' ? 'temperatureStyleHint' : mode === 'heatflux' && state.heatScale === 'log' ? 'logHint' : null;
+  $('#mode-note').hidden = !note;
+  $('#mode-note').textContent = note ? t(note) : '';
+  $$('[data-heat-scale]').forEach(button => { button.classList.toggle('active', button.dataset.heatScale === state.heatScale); button.setAttribute('aria-pressed', button.dataset.heatScale === state.heatScale); });
+  $$('[data-volume-style]').forEach(button => { button.classList.toggle('active', button.dataset.volumeStyle === state.volumeStyle); button.setAttribute('aria-pressed', button.dataset.volumeStyle === state.volumeStyle); });
+  if (!showLegend) return;
   $('#legend-title').textContent = t(legend[0]);
   $('#legend-unit').textContent = legend[1];
-  $('.colormap').hidden = state.mode === 'magnetic';
-  $('.colormap').classList.toggle('diverging', state.mode.startsWith('delta_'));
-  $('.colormap').classList.toggle('volume-colormap', state.mode === 'volume');
-  const volumeColors = renderer.volume_colormap;
-  $('.colormap').style.background = state.mode === 'volume' && volumeColors ? `linear-gradient(90deg,${volumeColors.rgba.map((rgba, i) => `rgb(${rgba.slice(0, 3).map(value => Math.round(value * 255)).join(' ')}) ${volumeColors.positions[i] * 100}%`).join(',')})` : '';
-  const range = state.mode === 'volume' ? (renderer.volume_range_keV || [0, 30]) : (result.color_ranges?.[state.mode] || legend.slice(2));
-  $('#legend-min').textContent = range[0] === null ? '' : number(range[0], state.mode.includes('heatflux') ? 2 : 0);
-  const overflow = state.mode === 'heatflux' ? result.peak_heatflux_MW_m2 > range[1] : state.mode === 'temperature' ? result.peak_temperature_C > range[1] : false;
-  $('#legend-max').textContent = range[1] === null ? '' : number(range[1], state.mode.includes('heatflux') ? 2 : 0) + (overflow && !state.mode.startsWith('delta_') ? '+' : '');
+  const bar = $('.colormap');
+  bar.classList.toggle('diverging', mode.startsWith('delta_'));
+  bar.classList.toggle('heat-colormap', mode === 'heatflux');
+  const colorMap = mode === 'volume' ? renderer.volume_colormap : result.color_maps?.[mode];
+  bar.style.background = colorGradient(colorMap);
+  const range = mode === 'heatflux' ? heatRange() : mode === 'volume' ? (renderer.volume_colormap?.domain || result.color_ranges?.slice || [0, 40]) : (result.color_ranges?.[mode] || legend.slice(2));
+  const isLog = mode === 'heatflux' && state.heatScale === 'log';
+  const ticks = isLog ? [range[0], ...[0.1, 1, 10].filter(value => value > range[0] && value < range[1]), range[1]] : [range[0], (range[0] + range[1]) / 2, range[1]];
+  $('#legend-ticks').innerHTML = ticks.map(value => {
+    const position = isLog ? (Math.log10(value) - Math.log10(range[0])) / (Math.log10(range[1]) - Math.log10(range[0])) : (value - range[0]) / (range[1] - range[0]);
+    return `<span style="left:${position * 100}%">${number(value, Math.abs(value) > 0 && Math.abs(value) < 1 ? 2 : Number.isInteger(value) ? 0 : 1)}</span>`;
+  }).join('');
+}
+
+function fieldsSynchronized() {
+  return renderer.ready && result.field_ref?.key && renderer.applied_field_key === result.field_ref.key &&
+    !sendingPatch && !Object.keys(pendingPatch).length && renderer.applied_revision >= revision &&
+    (state.mode !== 'volume' || (!renderer.volume_pending && !renderer.volume_error && renderer.applied_volume_field_key === result.field_ref.key && renderer.volume_mask_angle === state.cutaway));
 }
 
 function renderPowerBudget() {
@@ -198,8 +242,7 @@ function renderPowerBudget() {
   if (!budget) { $('#power-budget').textContent = t('noResult'); return; }
   const rows = [['powerInput', 'requested_thermal_MW'], ['surfacePower', 'surface_absorbed_MW'], ['volumePower', 'volume_absorbed_MW'], ['unresolvedPower', 'unresolved_MW'], ['balanceError', 'closure_residual_MW']];
   const volume = state.mode === 'volume';
-  const synchronized = renderer.ready && result.field_ref?.key && renderer.applied_field_key === result.field_ref.key &&
-    (!volume || (!renderer.volume_pending && !renderer.volume_error && renderer.applied_volume_field_key === result.field_ref.key && renderer.volume_mask_angle === state.cutaway));
+  const synchronized = fieldsSynchronized();
   $('#power-budget').innerHTML = rows.map(([label, key]) => `<div class="property-row"><span>${t(label)}</span><span>${number(budget[key], 2)} MW</span></div>`).join('') +
     `${budget.unresolved_MW > 0.01 ? `<p class="budget-warning">${t('strikeUnresolved')}</p>` : ''}<p class="field-sync ${synchronized ? 'synchronized' : ''}">${t(volume && renderer.volume_error ? 'volumeError' : synchronized ? 'fieldSynchronized' : 'fieldUpdating')}</p>`;
 }
@@ -213,8 +256,13 @@ function renderResults() {
   $('#gpu-time').textContent = result.gpu_ms != null ? `${number(result.gpu_ms, 2)} ms` : result.cpu_ms != null ? `${number(result.cpu_ms, 2)} ms · CPU` : '—';
   const sourceLabel = ['synthetic_thermal_bluemira_equilibrium', 'synthetic_demo_source_geometry_equilibrium'].includes(result.source_label) ? (language === 'zh' ? '合成热预算与简化传热模型 / Bluemira 概念几何与磁平衡' : 'Synthetic thermal budget and reduced heat-transfer model / Bluemira concept geometry and equilibrium') : result.source_label || manifest.source_label || t('dataPending');
   const assumptions = result.assumptions || {};
-  const assumptionLabels = { thermal: ['传热模型', 'Thermal model'], coolant: ['冷却回路', 'Coolant'], budget: ['功率预算', 'Power budget'], radiation: ['辐射沉积', 'Radiation deposition'], target: ['靶板热流', 'Target heat flux'], history: ['扫描坐标', 'Scan coordinate'], limit: ['演示阈值', 'Demonstration threshold'], magnetics: ['磁平衡', 'Magnetic equilibrium'], plasma_slice: ['等离子体截面', 'Plasma section'] };
+  const assumptionLabels = { thermal: ['传热模型', 'Thermal model'], coolant: ['冷却回路', 'Coolant'], budget: ['功率预算', 'Power budget'], radiation: ['辐射沉积', 'Radiation deposition'], target: ['靶板热流', 'Target heat flux'], history: ['扫描坐标', 'Scan coordinate'], limit: ['演示阈值', 'Demonstration threshold'], magnetics: ['磁平衡', 'Magnetic equilibrium'], plasma_slice: ['等离子体截面', 'Plasma section'], neon: ['Ne 情景', 'Ne scenario'], color: ['色标', 'Color scales'] };
   const assumptionChinese = {
+    'power is the base thermal budget excluding auxiliary heating. At scan fraction L: total=(power+heating)*L; blanket volume=.8*power*L; plasma=(.2*power+heating)*L. Core radiation=.65*plasma; SOL radiation=.30 (Ne off) or .80 (Ne on) of separatrix power, wall particles=.03, targets receive the remainder, inner/outer 30/70%. All heating is assumed absorbed; no solved fusion source': 'power 为不含辅助加热的基准热预算。扫描负荷比例为 L 时，总输入=(power+heating)×L；包层体积热源=0.8×power×L；等离子体通道=(0.2×power+heating)×L。核心辐射占等离子体通道的 65%；SOL 辐射占分离面功率的 30%（无 Ne）或 80%（有 Ne），主壁粒子占 3%，其余进入靶板，内外靶板按 30/70% 分配。全部加热假定被吸收，未求解聚变源项。',
+    'Synthetic Eich widths: lambda_q=6 mm, S=2 mm, both divided by hotspot. Ne-on multipliers 1.5/2; longleg S multiplier 1.35. Flux mapping and incidence at source psi=1 intersections, local +/-0.75 m footprint; no 3D shadowing or detached SOL solution': '合成 Eich 宽度 λq=6 mm、S=2 mm，均除以热点系数。Ne 情景分别乘以 1.5 和 2，长腿方案的 S 再乘以 1.35。在源 ψ=1 交点进行磁通映射并考虑入射角，局部热斑范围为 ±0.75 m；未求解三维遮挡或脱靶 SOL。',
+    'Boolean radiation/spreading hypothesis; no injection rate, impurity transport, radiation-front solve or measured detachment claim. Four cases share all controls except design/neon; differences use same design/equilibrium/controls with neon off': 'Ne 开关对应辐射与热斑展宽假设，不包含注入率、杂质输运或辐射前沿求解，也不代表实测脱靶。四工况仅改变方案和 Ne 开关；差值场采用相同方案、平衡及其余参数的无 Ne 工况为基准。',
+    'Fixed linear heatflux 0..200 and log10 0.01..200 MW/m2. Nonpositive/no-data samples are neutral; positive log values below minimum clamp to lower color. Out-of-range counts are explicit; no per-case autoscaling': '热流固定使用 0–200 MW/m² 线性色标或 0.01–200 MW/m² 对数色标。非正值和缺失值使用中性灰；低于对数下限的正值使用最低色阶。记录超范围数量，各工况不单独自动缩放色标。',
+    'Synthetic source-flux-shaped core profile: 25 keV * (.2*power+heating)/450 * load_fraction, with a prescribed .95 multiplier for Ne on; 193x225 RZ sampling, not a plasma transport solution': '按源磁通形状构造合成核心温度：25 keV×(0.2×power+heating)/450×负荷比例；Ne 开启时再乘以 0.95。RZ 采样为 193×225，未求解等离子体输运。',
     'Synthetic quasi-steady wall resistance; prescribed load scan, no time-dependent heat transport or qualified material model': '采用合成壁面热阻的准稳态负荷扫描，未求解瞬态热输运，材料模型未经工程评定。',
     'Absorbed surface plus assumed blanket volume heat only; helium cp=5200 J/(kg K), 3500 kg/s times flow, 85/15% circuit split; unresolved power excluded': '回路吸热包含表面沉积与假定包层体积热源，不包含未解析功率。氦比热 5,200 J/(kg·K)，总质量流量为 3,500 kg/s 乘流量系数，两回路按 85/15% 分配。',
     'Input is effective thermal power, not fusion power. Synthetic split: 80% blanket volume, 20% plasma-surface channel; 65% core radiation, then 70% SOL radiation, 3% wall particles and 27% targets; target inner/outer 30/70%': '输入代表有效热功率。合成预算分配：80% 包层体积热源，20% 等离子体表面通道；后者 65% 分配给核心辐射，余量再按 70% SOL 辐射、3% 主壁粒子、27% 靶板分配；内外靶板按 30/70% 分配。',
@@ -233,20 +281,53 @@ function renderResults() {
   if ($('#source-description').dataset.content !== sourceMarkup) { $('#source-description').innerHTML = sourceMarkup; $('#source-description').dataset.content = sourceMarkup; }
 }
 
+function storyCasesReady() {
+  const controls = result.story?.comparison_controls;
+  return controls && result.scenario_label === state.scenario && ['power', 'heating', 'flow', 'inlet', 'phase', 'equilibrium'].every(key => controls[key] === state[key]);
+}
+
+function signedPercent(value) {
+  return value == null ? '—' : `${value > 0 ? '+' : ''}${number(value, 1)}%`;
+}
+
+function renderStory() {
+  const selectedCase = storyCasesReady() ? result.story.cases?.find(item => item.design === state.design && item.neon === state.neon) : null;
+  $('#story-peak').textContent = number(selectedCase?.peak_divertor_heatflux_MW_m2, 2);
+  $('#story-relative').textContent = signedPercent(selectedCase?.relative_no_neon_percent);
+  const synchronized = fieldsSynchronized();
+  $('#story-sync').textContent = t(synchronized ? 'synchronized' : 'syncing');
+  $('#story-sync').classList.toggle('synchronized', Boolean(synchronized));
+}
+
 function renderComparison() {
-  $('#compare-candidate').textContent = t(state.scenario);
-  const compare = result.comparison;
-  const metrics = [['peak_temperature_C', 'peakTemperature', '°C', 0], ['peak_heatflux_MW_m2', 'peakHeatflux', 'MW/m²', 2], ['outlet_temperature_C', 'outletTemperature', '°C', 0], ['cooling_margin_C', 'coolingMargin', '°C', 0]];
-  $('#comparison-results').innerHTML = metrics.map(([key, label, unit, precision]) => {
-    const baseline = compare?.baseline?.[key];
-    const candidate = compare?.candidate?.[key];
-    const delta = compare?.delta?.[key] ?? (baseline != null && candidate != null ? candidate - baseline : null);
-    const signed = delta == null ? '—' : `${delta > 0 ? '+' : ''}${number(delta, precision)} ${unit}`;
-    const ratio = candidate != null && baseline != null ? Math.max(0, Math.min(100, candidate / Math.max(Math.abs(candidate), Math.abs(baseline), 1) * 100)) : 0;
-    const worse = key === 'cooling_margin_C' ? delta < 0 : delta > 0;
-    return `<div class="compare-metric"><header><span>${t(label)}</span><small class="${worse ? 'negative' : ''}">${signed}</small></header><div class="compare-values"><span>${number(baseline, precision)}</span><span>${number(candidate, precision)}</span></div><div class="compare-bars"><i style="width:${ratio}%"></i></div></div>`;
-  }).join('');
-  renderHistory();
+  const cases = storyCasesReady() ? result.story.cases : [];
+  const container = $('#comparison-cases');
+  if (!container.children.length) {
+    container.innerHTML = ['conventional', 'longleg'].flatMap(design => [false, true].map(neon =>
+      `<button class="case-card" data-case-design="${design}" data-case-neon="${neon}"><span class="case-design"></span><span class="case-neon"></span><div class="case-value"><strong></strong><small>MW/m²</small></div><span class="case-delta"></span></button>`
+    )).join('');
+  }
+  $$('[data-case-design]', container).forEach(button => {
+    const design = button.dataset.caseDesign, neon = button.dataset.caseNeon === 'true';
+    const item = cases?.find(candidate => candidate.design === design && candidate.neon === neon);
+    const active = state.design === design && state.neon === neon;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', active);
+    button.setAttribute('aria-busy', !item);
+    $('.case-design', button).textContent = t(design);
+    $('.case-neon', button).textContent = t(neon ? 'neOn' : 'neOff');
+    $('.case-value strong', button).textContent = number(item?.peak_divertor_heatflux_MW_m2, 2);
+    $('.case-delta', button).textContent = `${signedPercent(item?.relative_no_neon_percent)} · ${t('versusNoNe')}`;
+  });
+  const range = heatRange();
+  $('#comparison-scale').textContent = `${t('fixedScale')} · ${number(range[0], range[0] < 1 && range[0] > 0 ? 2 : 0)}–${number(range[1])} MW/m² · ${t(state.heatScale === 'log' ? 'logScale' : 'linearScale')}`;
+}
+
+function renderCameraSelection() {
+  $$('[data-view]').forEach(button => {
+    button.classList.toggle('active', button.dataset.view === state.view);
+    button.setAttribute('aria-pressed', button.dataset.view === state.view);
+  });
 }
 
 function renderHistory() {
@@ -257,7 +338,7 @@ function renderHistory() {
   const xs = entries.map((item) => item.x), ys = entries.map((item) => item.y);
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
   const points = entries.map((item) => `${8 + (item.x - minX) / (maxX - minX || 1) * 272},${95 - (item.y - minY) / (maxY - minY || 1) * 74}`).join(' ');
-  chart.innerHTML = `<svg viewBox="0 0 290 115" role="img" aria-label="${t('surfaceTemperature')}"><path d="M8 20h272M8 58h272M8 96h272" stroke="#ffffff14" stroke-width=".7"/><polyline points="${points}" fill="none" stroke="#8db96d"/><text x="8" y="111" fill="#728569" stroke="none" font-size="8">${number(minX, 1)}</text><text x="280" y="111" fill="#728569" stroke="none" font-size="8" text-anchor="end">${number(maxX, 1)}</text><text x="280" y="13" fill="#9ab48b" stroke="none" font-size="8" text-anchor="end">${number(maxY)} °C</text></svg>`;
+  chart.innerHTML = `<svg viewBox="0 0 290 115" role="img" aria-label="${t('surfaceTemperature')}"><path d="M8 20h272M8 58h272M8 96h272" stroke="#ffffff14" stroke-width=".7"/><polyline points="${points}" fill="none" stroke="#8db96d"/><text x="8" y="111" fill="#728569" stroke="none" font-size="12">${number(minX, 1)}</text><text x="280" y="111" fill="#728569" stroke="none" font-size="12" text-anchor="end">${number(maxX, 1)}</text><text x="280" y="13" fill="#9ab48b" stroke="none" font-size="12" text-anchor="end">${number(maxY)} °C</text></svg>`;
 }
 
 function render() {
@@ -268,12 +349,11 @@ function render() {
     renderDownloads();
   }
   $$('[data-tab]').forEach((button) => { button.classList.toggle('active', button.dataset.tab === state.tab); button.setAttribute('aria-selected', button.dataset.tab === state.tab); });
-  $('#explore-panel').hidden = state.tab === 'compare';
-  $('#compare-panel').hidden = state.tab !== 'compare';
+  for (const tab of ['explore', 'compare', 'engineering']) $(`#${tab}-panel`).hidden = state.tab !== tab;
   $$('[data-mode]').forEach((button) => { button.classList.toggle('active', button.dataset.mode === state.mode); button.setAttribute('aria-pressed', button.dataset.mode === state.mode); });
   $('[data-mode="volume"]').disabled = !renderer.rtwt_ready;
   $('[data-mode="volume"]').title = renderer.rtwt_ready ? '' : t('volumePreparing');
-  $$('[data-view]').forEach((button) => button.classList.toggle('active', button.dataset.view === state.view));
+  renderCameraSelection();
   $$('[data-state]').forEach((input) => {
     const key = input.dataset.state;
     if (document.activeElement !== input) input.value = state[key];
@@ -282,7 +362,11 @@ function render() {
     if (output) output.innerHTML = sliderValue(key);
   });
   $('#scenario-select').value = state.scenario;
-  $('#design-select').value = state.design;
+  $$('[data-design]').forEach(button => { button.classList.toggle('active', button.dataset.design === state.design); button.setAttribute('aria-pressed', button.dataset.design === state.design); });
+  $$('[data-heating]').forEach(button => { button.classList.toggle('active', Number(button.dataset.heating) === state.heating); button.setAttribute('aria-pressed', Number(button.dataset.heating) === state.heating); });
+  $$('[data-equilibrium]').forEach(button => { button.classList.toggle('active', button.dataset.equilibrium === state.equilibrium); button.setAttribute('aria-pressed', button.dataset.equilibrium === state.equilibrium); });
+  $('#neon-toggle').checked = state.neon;
+  $('#line-motion-toggle').checked = state.lineMotion;
   $('#equilibrium-select').value = state.equilibrium;
   $('#fieldlines-toggle').checked = state.fieldLines;
   $('#orbit-button').classList.toggle('active', state.orbit);
@@ -295,6 +379,8 @@ function render() {
   renderResults();
   renderPowerBudget();
   renderComparison();
+  renderStory();
+  renderHistory();
   if ($('#measure-dialog').open) renderMeasurement();
 }
 
@@ -304,6 +390,14 @@ async function api(path, options) {
   return response.json();
 }
 
+function resetMeasurement() {
+  measurementGeneration += 1;
+  measureMode = false;
+  lastMeasuredDistance = null;
+  renderer.measurement = null;
+  $('#measure-button').classList.remove('active');
+}
+
 function applySnapshot(snapshot) {
   if (snapshot.server_epoch && snapshot.server_epoch !== serverEpoch) { serverEpoch = snapshot.server_epoch; revision = -1; }
   if (snapshot.revision != null && snapshot.revision < revision) return;
@@ -311,6 +405,10 @@ function applySnapshot(snapshot) {
   const previousSelected = state.selected;
   const previousVisibility = JSON.stringify(state.visible);
   const previousDesign = state.design;
+  const previousEquilibrium = state.equilibrium;
+  const committedGeometryChanged = snapshot.state && committedGeometry &&
+    ['design', 'equilibrium'].some(key => snapshot.state[key] !== committedGeometry[key]);
+  if (snapshot.state) committedGeometry = { design: snapshot.state.design, equilibrium: snapshot.state.equilibrium };
   const previousMode = state.mode;
   const previousRendererEpoch = renderer.renderer_epoch;
   state = { ...state, ...(snapshot.state || {}), ...inflightPatch, ...pendingPatch };
@@ -321,11 +419,11 @@ function applySnapshot(snapshot) {
     renderer.measurement = null;
     renderDownloads();
   }
-  if (previousDesign !== state.design || (previousRendererEpoch && previousRendererEpoch !== renderer.renderer_epoch)) {
-    measureMode = false;
-    lastMeasuredDistance = null;
-    $('#measure-button').classList.remove('active');
-  }
+  const geometryPending = snapshot.state && ['design', 'equilibrium'].some(key => state[key] !== snapshot.state[key]);
+  const fieldGeometry = result.field_ref;
+  const rendererGeometryPending = fieldGeometry && (renderer.topology_key !== fieldGeometry.topology_key || renderer.equilibrium_key !== fieldGeometry.equilibrium_key);
+  if (committedGeometryChanged || geometryPending || rendererGeometryPending || previousDesign !== state.design ||
+      previousEquilibrium !== state.equilibrium || (previousRendererEpoch && previousRendererEpoch !== renderer.renderer_epoch)) resetMeasurement();
   if (!('selected' in inflightPatch) && !('selected' in pendingPatch) && renderer.selected && renderer.applied_revision >= revision && state.selected !== renderer.selected) {
     state.selected = renderer.selected;
     pendingPatch.selected = renderer.selected;
@@ -338,6 +436,7 @@ function applySnapshot(snapshot) {
 }
 
 function setState(patch, delay = 0) {
+  if (['design', 'equilibrium'].some(key => key in patch && patch[key] !== state[key])) resetMeasurement();
   if (patchPaused) resumePatch();
   pendingPatch = { ...pendingPatch, ...patch };
   state = { ...state, ...patch };
@@ -480,6 +579,31 @@ function openMeasurement() {
   $('#measure-dialog').showModal();
 }
 
+async function startMeasurement() {
+  resetMeasurement();
+  const generation = measurementGeneration;
+  const response = await action('measure_start');
+  if (!response || generation !== measurementGeneration) return;
+  measureMode = true;
+  $('#measure-dialog').close();
+  $('#measure-button').classList.add('active');
+  toast(t('measurementStarted'));
+}
+
+async function selectViewportPoint(x, y) {
+  const measuring = measureMode;
+  const generation = measurementGeneration;
+  const completed = await action(measuring ? 'measure' : 'pick', { x, y });
+  const measurement = completed?.result?.measurement;
+  if (measuring && generation === measurementGeneration && measureMode && measurement?.type === 'distance') {
+    renderer.measurement = measurement;
+    measureMode = false;
+    lastMeasuredDistance = measurement.distance_m;
+    $('#measure-button').classList.remove('active');
+    openMeasurement();
+  }
+}
+
 function startStream() {
   if (!window.FusionStreamer || streamerStarted) return;
   streamerStarted = true;
@@ -530,7 +654,13 @@ document.addEventListener('click', async (event) => {
     const mode = button.dataset.mode;
     setState({ mode, selected: '' });
   }
-  if (button.dataset.tab) setState({ tab: button.dataset.tab });
+  if (button.dataset.tab) { setState({ tab: button.dataset.tab, ...(button.dataset.tab !== 'engineering' ? { playing: false } : {}) }); if (button.dataset.tab !== 'engineering') toggleAssembly(false); }
+  if (button.dataset.heating) setState({ heating: Number(button.dataset.heating) });
+  if (button.dataset.design) setState({ design: button.dataset.design, selected: '', playing: false });
+  if (button.dataset.equilibrium) setState({ equilibrium: button.dataset.equilibrium, playing: false });
+  if (button.dataset.heatScale) setState({ heatScale: button.dataset.heatScale });
+  if (button.dataset.volumeStyle) setState({ volumeStyle: button.dataset.volumeStyle });
+  if (button.dataset.caseDesign) setState({ design: button.dataset.caseDesign, neon: button.dataset.caseNeon === 'true', selected: '' });
   if (button.dataset.close === 'assembly-drawer') toggleAssembly(false);
   if (button.hasAttribute('data-dialog-close')) button.closest('dialog').close();
   switch (button.id) {
@@ -543,12 +673,10 @@ document.addEventListener('click', async (event) => {
       setState({ visible: Object.fromEntries(manifest.components.map((component) => [component.id, component.id === state.selected])) }); break;
     case 'show-all-button': setState({ visible: Object.fromEntries(manifest.components.map((component) => [component.id, true])) }); break;
     case 'measure-button': case 'component-measure': openMeasurement(); break;
-    case 'start-measure-button': {
-      const response = await action('measure_start');
-      if (response) { measureMode = true; lastMeasuredDistance = null; $('#measure-dialog').close(); $('#measure-button').classList.add('active'); toast(t('measurementStarted')); } break;
-    }
+    case 'start-measure-button': await startMeasurement(); break;
     case 'clear-measure-button':
-      if (await action('measure_clear')) { measureMode = false; lastMeasuredDistance = null; renderer.measurement = null; $('#measure-button').classList.remove('active'); renderMeasurement(); } break;
+      resetMeasurement();
+      if (await action('measure_clear')) renderMeasurement(); break;
     case 'provenance-button': $('#provenance-dialog').showModal(); break;
     case 'fullscreen-button': if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); break;
     case 'export-button':
@@ -582,8 +710,9 @@ document.addEventListener('change', (event) => {
   const element = event.target;
   if (element.dataset.visible) setState({ visible: { ...state.visible, [element.dataset.visible]: element.checked } });
   if (element.id === 'scenario-select') setState({ scenario: element.value });
-  if (element.id === 'design-select') setState({ design: element.value, selected: '', playing: false });
-  if (element.id === 'equilibrium-select') setState({ equilibrium: element.value });
+  if (element.id === 'equilibrium-select') setState({ equilibrium: element.value, playing: false });
+  if (element.id === 'neon-toggle') setState({ neon: element.checked });
+  if (element.id === 'line-motion-toggle') setState({ lineMotion: element.checked });
   if (element.id === 'fieldlines-toggle') setState({ fieldLines: element.checked });
   if (element.dataset.state) flushPatch();
 });
@@ -613,16 +742,7 @@ for (const surface of [$('#remote-video'), $('#render-preview')]) {
     const x = (event.clientX - rect.left - (rect.width - width) / 2) / width;
     const y = (event.clientY - rect.top - (rect.height - height) / 2) / height;
     if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
-      const measuring = measureMode;
-      const completed = await action(measuring ? 'measure' : 'pick', { x, y });
-      const measurement = completed?.result?.measurement;
-      if (measuring && measurement?.type === 'distance') {
-        renderer.measurement = measurement;
-        measureMode = false;
-        lastMeasuredDistance = measurement.distance_m;
-        $('#measure-button').classList.remove('active');
-        openMeasurement();
-      }
+      await selectViewportPoint(x, y);
     }
   });
 }

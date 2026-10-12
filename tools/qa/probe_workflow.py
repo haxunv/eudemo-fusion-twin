@@ -43,7 +43,7 @@ async def probe():
         workflow=module.NvidiaWorkflow(stage,root)
         workflow.submit({**state,"mode":"assembly","power":1234.},data,reference)
         await asyncio.wait_for(workflow.task,timeout=180)
-        report["power_binding_MW"]=workflow.dataset.GetAttribute("fusion:effectiveThermalPowerMW").Get()
+        report["power_binding_MW"]=workflow.dataset.GetAttribute("fusion:baselineThermalPowerMW").Get()
         if report["power_binding_MW"]!=1234.:
             raise RuntimeError("RTWT attribute binding did not apply")
         for mode,cut in (("volume",80),("assembly",80),("volume",80),("volume",100)):

@@ -9,6 +9,17 @@ from fusion_twin.server import Handler, validate_patch
 
 
 class StateValidationTests(unittest.TestCase):
+    def test_story_controls_accept_only_baked_heating_steps_and_explicit_styles(self):
+        for value in (20, 35, 50, 65):
+            self.assertEqual(validate_patch({"heating": value, "neon": True}, set()),
+                             {"heating": float(value), "neon": True})
+        for patch in ({"heating": 21}, {"heating": True}, {"neon": 1},
+                      {"heatScale": "auto"}, {"volumeStyle": "real_emission"}):
+            with self.subTest(patch=patch), self.assertRaises(ValueError):
+                validate_patch(patch, set())
+        values = {"heatScale": "log", "volumeStyle": "plasma", "lineMotion": True, "tab": "engineering"}
+        self.assertEqual(validate_patch(values, set()), values)
+
     def test_numeric_controls_reject_nonfinite_and_out_of_range(self):
         for value in (math.nan, math.inf, -1, True, "2000"):
             with self.subTest(value=value), self.assertRaises(ValueError):

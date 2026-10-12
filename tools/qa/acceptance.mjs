@@ -17,7 +17,7 @@ const videoMetrics = { method: 'requestVideoFrameCallback presentation callbacks
   fullWorkflow: null, steady: null, captures: [] };
 let videoStart = null, videoEnd = null;
 const browser = await chromium.launch({channel:'msedge',headless,args:['--autoplay-policy=no-user-gesture-required','--no-proxy-server']});
-const context = await browser.newContext({viewport:{width:1600,height:1000},deviceScaleFactor:1,acceptDownloads:true});
+const context = await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,acceptDownloads:true});
 const page = await context.newPage();
 page.on('pageerror', error => errors.push(error.message));
 page.on('console', message => {
@@ -28,6 +28,11 @@ page.on('console', message => {
 });
 page.on('requestfailed', request => failedRequests.push({url: request.url(),
   method: request.method(), error: request.failure()?.errorText}));
+async function toggleInput(page, selector, checked) {
+  const input = page.locator(selector);
+  if (await input.isChecked() !== checked) await input.locator('xpath=..').click();
+  assert.equal(await input.isChecked(), checked, selector);
+}
 async function waitState(predicate,label) {
   const deadline = Date.now() + 45000;
   while (Date.now() < deadline) {
@@ -54,7 +59,16 @@ async function uiCommand(type, trigger) {
   assert.ok(response.ok(), `${type}: ${response.status()} ${await response.text()}`);
   return complete((await response.json()).request_id);
 }
-async function slider(id,value){await page.locator(id).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));},value);}
+async function engineeringControl(selector) {
+  if (!await page.locator('#engineering-panel').isVisible()) {
+    await page.locator('[data-tab="engineering"]').click();
+    await waitState(s => s.state.tab === 'engineering', 'engineering tools visible');
+  }
+  const section = page.locator('#engineering-panel details').filter({ has: page.locator(selector) });
+  if (await section.count() && !await section.evaluate(element => element.open)) await section.locator('summary').click();
+  await page.locator(selector).scrollIntoViewIfNeeded();
+}
+async function slider(id,value){if(id!=='#cutaway-range')await engineeringControl(id);await page.locator(id).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));},value);}
 async function capture(name) {
   const before = await videoSample();
   await page.waitForTimeout(800);
@@ -90,6 +104,7 @@ try {
   const initial = {
     design: 'conventional', equilibrium: 'reference', language: 'zh', view: 'overview', tab: 'explore',
     mode: 'assembly', scenario: 'nominal', power: 2000, flow: 1, inlet: 300, phase: 0.65,
+    heating: 50, neon: false, heatScale: 'log', volumeStyle: 'plasma', lineMotion: false,
     cutaway: 80, explode: 0, opacity: 1, selected: '', fieldLines: false, orbit: false, playing: false,
     visible: Object.fromEntries(manifest.components.map(component => [component.id, component.default_visible !== false])),
   };
@@ -114,6 +129,7 @@ try {
   await page.locator('[data-lang="en"]').click();
   await page.waitForFunction(()=>document.documentElement.lang==='en');
   assert.match(await page.title(),/Fusion Digital Twin/);checks.push('English localization');
+  await engineeringControl('#assembly-button');
   await page.locator('#assembly-button').click();
   await page.locator('[data-component="blanket"]').click();
   await waitState(s=>s.state.selected==='blanket','CAD component selection');
@@ -138,21 +154,30 @@ try {
   await capture('04-exploded.png');
   await uiCommand('reset_camera', () => page.locator('#reset-view-button').click());
   await waitState(s=>s.state.explode===0&&s.state.cutaway===80,'reset transformations');
+  await engineeringControl('[data-mode="temperature"]');
   await page.locator('[data-mode="temperature"]').click();
   const nominal=await waitState(s=>s.state.mode==='temperature','temperature surface mode');
+  await engineeringControl('#scenario-select');
   await page.locator('#scenario-select').selectOption('highload');
   const hot=await waitState(s=>s.state.scenario==='highload'&&s.state.power===2400,'high thermal load scenario');
   assert.ok(hot.result.peak_temperature_C>nominal.result.peak_temperature_C);assert.ok(hot.result.gpu_device.startsWith('cuda'));checks.push('real CUDA scenario response');
   await capture('05-temperature-highload.png');
+  await page.locator('[data-tab="explore"]').click();
+  await waitState(s=>s.state.tab==='explore','heating and Ne controls visible');
+  await toggleInput(page, '#neon-toggle', true);
+  const seeded=await waitState(s=>s.state.neon,'Ne radiation scenario');
   await page.locator('[data-tab="compare"]').click();
   await waitState(s=>s.state.tab==='compare','comparison tab');
-  assert.ok(hot.result.comparison.delta.peak_temperature_C>0);checks.push('reference/current delta');
+  assert.ok(seeded.result.comparison.delta.peak_divertor_heatflux_MW_m2<0);
+  assert.equal(await page.locator('#comparison-cases .case-card').count(),4);
+  checks.push('same-design no-Ne delta and four actual cases');
   await capture('06-comparison.png');
   await page.locator('[data-tab="explore"]').click();
   await waitState(s=>s.state.tab==='explore','exploration restore');
   await page.locator('[data-mode="magnetic"]').click();
   await waitState(s=>s.state.mode==='magnetic','equilibrium magnetic lines mode');
   await capture('07-magnetic.png');
+  await engineeringControl('[data-mode="slice"]');
   await page.locator('[data-mode="slice"]').click();
   await page.locator('[data-view="section"]').click();
   await waitState(s=>s.state.mode==='slice'&&s.state.view==='section','plasma section mode and camera');
@@ -208,9 +233,13 @@ try {
   await invalid.arrayBuffer();
   assert.equal(invalid.status,400);checks.push('invalid state rejected');
   await page.locator('[data-mode="assembly"]').click();
+  await engineeringControl('#scenario-select');
   await page.locator('#scenario-select').selectOption('nominal');
   await uiCommand('reset_camera', () => page.locator('#reset-view-button').click());
   await slider('#phase-range',0.65);
+  await page.locator('[data-tab="explore"]').click();
+  await waitState(s=>s.state.tab==='explore','explore page restored');
+  await toggleInput(page, '#neon-toggle', false);
   await page.locator('[data-lang="zh"]').click();
   await waitState(s=>s.state.mode==='assembly'&&s.state.scenario==='nominal'&&s.state.view==='overview'&&s.state.phase===0.65,'default view restored');
   await capture('09-final-zh.png');

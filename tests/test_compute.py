@@ -5,6 +5,7 @@ They do not validate the model as a reactor thermal or plasma solver.
 """
 
 import json
+import itertools
 import os
 import sys
 import tempfile
@@ -18,7 +19,9 @@ from scipy.interpolate import RegularGridInterpolator
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "app"))
-from fusion_twin.compute import FieldEngine, SCENARIOS, atomic_json, atomic_replace, colormap
+from fusion_twin.compute import (FieldEngine, SCENARIOS, atomic_json, atomic_replace, colormap,
+                                 scientific_colors, HEATFLUX_RANGE, HEATFLUX_LOG_RANGE, MAGNETIC_RANGE, ZERO_COLOR)
+from fusion_twin.physics import DESIGNS, EQUILIBRIA
 
 
 class AtomicPublicationTests(unittest.TestCase):
@@ -67,7 +70,7 @@ class ComputeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.output = tempfile.TemporaryDirectory(prefix="fusion_compute_test_")
-        cls.engine = FieldEngine(ROOT, runtime=Path(cls.output.name))
+        cls.engine = FieldEngine(ROOT, device="cpu", runtime=Path(cls.output.name))
 
     @classmethod
     def tearDownClass(cls):
@@ -85,7 +88,7 @@ class ComputeTests(unittest.TestCase):
         high_t, high_q = self.solve(high)
         self.assertTrue(np.all(high_t > low_t))
         self.assertTrue(np.all(high_q > low_q))
-        np.testing.assert_allclose(high_q / low_q, 2.4, rtol=2e-5)
+        np.testing.assert_allclose(high_q / low_q, (0.2 * 2400 + 50) / (0.2 * 1000 + 50), rtol=2e-5)
 
     def test_low_flow_heats_wall_without_changing_prescribed_heat_load(self):
         nominal_t, nominal_q = self.solve(SCENARIOS["nominal"])
@@ -111,7 +114,7 @@ class ComputeTests(unittest.TestCase):
             recovered_power = mass_flow * 5200.0 * (metrics["outlet_temperature_C"] - parameters["inlet"])
             # The exported outlet temperature is rounded to 0.01 degrees Celsius.
             rounding_error_watts = mass_flow * 5200.0 * 0.0051
-            self.assertLess(abs(recovered_power - 1750.0e6), rounding_error_watts)
+            self.assertLess(abs(recovered_power - 1800.0e6), rounding_error_watts)
             self.assertGreater(metrics["outlet_temperature_C"], parameters["inlet"])
 
     def test_history_matches_kernel_across_the_scenario(self):
@@ -157,7 +160,7 @@ class ComputeTests(unittest.TestCase):
         for array in fields.values():
             if array.dtype.kind in "fi":
                 self.assertTrue(np.isfinite(array).all())
-        for name in ("temperature_rgb", "heatflux_rgb", "slice_rgb", "delta_temperature_rgb", "delta_heatflux_rgb"):
+        for name in ("temperature_rgb", "heatflux_rgb", "heatflux_log_rgb", "slice_rgb", "delta_temperature_rgb", "delta_heatflux_rgb"):
             self.assertEqual(fields[name].shape[1], 3)
             self.assertTrue(np.all((fields[name] >= 0) & (fields[name] <= 1)))
         for bounds in metadata["ranges"].values():
@@ -171,6 +174,29 @@ class ComputeTests(unittest.TestCase):
         self.assertEqual(int(fields["field_revision"]), result["field_ref"]["revision"])
         self.assertEqual(str(fields["topology_key"]), result["field_ref"]["topology_key"])
         fields.close()
+
+    def test_magnetic_colours_sample_actual_equilibrium_and_use_fixed_tesla_legend(self):
+        state = {**SCENARIOS["nominal"], "scenario": "nominal", "phase": 0.83, "heating": 35, "neon": True}
+        result = self.engine.compute(state, 103)
+        with np.load(self.engine.runtime / result["field_ref"]["path"]) as fields:
+            lines, magnitude = fields["magnetic_lines"], fields["field_line_B_T"]
+            expected = np.linalg.norm(self.engine.equilibrium.field(lines.reshape(-1, 3)), axis=1).reshape(lines.shape[:2])
+            np.testing.assert_allclose(magnitude, expected, rtol=1e-6)
+            np.testing.assert_allclose(fields["field_line_rgb"], scientific_colors(magnitude, MAGNETIC_RANGE, magnetic=True))
+            self.assertGreater(float(np.ptp(magnitude)), 1.0)
+            self.assertEqual(fields["field_line_rgb"].shape, lines.shape)
+            self.assertEqual(fields["slice_points"].shape, (193 * 225, 3))
+
+    def test_fixed_heatflux_colors_are_shared_and_log_zero_is_neutral(self):
+        values = np.array([0.0, 0.001, 0.01, 1.0, 200.0, 500.0, np.nan])
+        colors = scientific_colors(values, HEATFLUX_LOG_RANGE, logarithmic=True)
+        np.testing.assert_allclose(colors[[0, 6]], np.tile(ZERO_COLOR, (2, 1)))
+        np.testing.assert_array_equal(colors[1], colors[2])
+        np.testing.assert_array_equal(colors[4], colors[5])
+        self.assertFalse(np.array_equal(colors[2], colors[3]))
+        self.assertTrue(np.isfinite(colors).all())
+        linear = scientific_colors(np.array([0.0, 1.0, 200.0]), HEATFLUX_RANGE)
+        self.assertFalse(np.array_equal(linear[1], colors[3]))
 
     def test_magnetic_lines_stay_in_equilibrium_domain_and_follow_flux(self):
         eq, lines = self.engine.eq, self.engine.lines
@@ -212,6 +238,67 @@ class ComputeTests(unittest.TestCase):
         self.assertTrue(np.all((colors >= 0) & (colors <= 1)))
 
 
+class HistoryBatchTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.output = tempfile.TemporaryDirectory(prefix="fusion_history_test_")
+        cls.engine = FieldEngine(ROOT, device="cpu", runtime=Path(cls.output.name))
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.output.cleanup()
+
+    def test_batch_matches_all_31_independent_surface_solves_at_control_boundaries(self):
+        # All source contexts, both Ne states, and both heating/flow boundaries.
+        for design, equilibrium, neon, heating, flow in itertools.product(
+                DESIGNS, EQUILIBRIA, (False, True), (20, 65), (0.4, 1.4)):
+            self.engine._select_context(design, equilibrium)
+            parameters = {**SCENARIOS["highload"], "neon": neon, "heating": heating, "flow": flow}
+            peaks, fluxes, budgets = self.engine._solve_history(parameters)
+            self.assertEqual(peaks.shape, (31,))
+            self.assertEqual(len(budgets), 31)
+            for index, phase in enumerate(np.linspace(0, 1, 31)):
+                with self.subTest(design=design, equilibrium=equilibrium, neon=neon, heating=heating, flow=flow, phase=phase):
+                    temperature, flux, _ = self.engine._solve(parameters, float(phase))
+                    self.assertEqual(float(peaks[index]), float(temperature.max()))
+                    self.assertEqual(float(fluxes[index]), float(flux.max()))
+                    self.assertEqual(budgets[index], self.engine._last_budget)
+                    outlet = parameters["inlet"] + budgets[index]["absorbed_thermal_MW"] * 1e6 / (3500 * flow * 5200)
+                    self.assertEqual(round(outlet, 2), self.engine.metrics(temperature, flux, parameters)["outlet_temperature_C"])
+
+    def test_history_uses_one_launch_and_one_explicit_synchronization(self):
+        self.engine._select_context("conventional", "reference")
+        with patch("fusion_twin.compute.wp.launch", wraps=wp.launch) as launch, \
+             patch("fusion_twin.compute.wp.synchronize_device", wraps=wp.synchronize_device) as synchronize, \
+             patch.object(self.engine, "_solve", side_effect=AssertionError("Repeated surface solve")):
+            peaks, fluxes, budgets = self.engine._solve_history(SCENARIOS["nominal"])
+        self.assertEqual(launch.call_count, 1)
+        self.assertEqual(synchronize.call_count, 1)
+        self.assertEqual(len(peaks), 31)
+        self.assertTrue(np.all(np.diff(peaks) > 0))
+        self.assertTrue(np.all(np.diff(fluxes) > 0))
+        self.assertLess(abs(budgets[-1]["closure_residual_MW"]), 1e-8)
+
+    def test_design_buffers_are_reused_across_equilibria_and_four_case_round_trip(self):
+        buffers = {}
+        for design, equilibrium in itertools.product(DESIGNS, EQUILIBRIA):
+            self.engine._select_context(design, equilibrium)
+            if design in buffers:
+                self.assertIs(self.engine.wp_regions, buffers[design][0])
+                self.assertIs(self.engine.wp_temperature, buffers[design][1])
+            else:
+                buffers[design] = (self.engine.wp_regions, self.engine.wp_temperature)
+        self.assertIsNot(buffers["conventional"][1], buffers["longleg"][1])
+        self.engine._select_context("conventional", "reference")
+        parameters = {**SCENARIOS["nominal"], "heating": 35, "neon": True}
+        with patch("fusion_twin.compute.wp.empty", side_effect=AssertionError("Design buffer reallocated")):
+            cases = self.engine._four_cases(parameters, 0.37, "conventional", "reference")
+        self.assertEqual(len(cases), 4)
+        self.assertEqual(self.engine._context, ("conventional", "reference"))
+        self.assertIs(self.engine.wp_regions, buffers["conventional"][0])
+        self.assertIs(self.engine.wp_temperature, buffers["conventional"][1])
+
+
 @unittest.skipUnless(wp.is_cuda_available(), "CUDA device is unavailable")
 class DeviceConsistencyTests(unittest.TestCase):
     @classmethod
@@ -224,7 +311,10 @@ class DeviceConsistencyTests(unittest.TestCase):
             for equilibrium in ("reference", "rampup", "sof", "eof", "rampdown"):
                 self.cpu._select_context(design, equilibrium)
                 self.gpu._select_context(design, equilibrium)
-                for parameters in (SCENARIOS["nominal"], SCENARIOS["highload"]):
+                parameters_grid = ({**preset, "neon": neon, "heating": heating}
+                                   for preset in (SCENARIOS["nominal"], SCENARIOS["highload"])
+                                   for neon in (False, True) for heating in (20, 65))
+                for parameters in parameters_grid:
                     with self.subTest(design=design, equilibrium=equilibrium, parameters=parameters):
                         cpu_t, cpu_q, _ = self.cpu._solve(parameters, 0.41)
                         gpu_t, gpu_q, _ = self.gpu._solve(parameters, 0.41)
@@ -237,6 +327,18 @@ class DeviceConsistencyTests(unittest.TestCase):
         self.cpu._solve(SCENARIOS["nominal"], 0.8)
         np.testing.assert_array_equal(temperatures, expected_t)
         np.testing.assert_array_equal(heatflux, expected_q)
+
+    def test_cuda_history_batch_matches_all_independent_surface_samples(self):
+        for design, neon, heating, flow in itertools.product(DESIGNS, (False, True), (20, 65), (0.4, 1.4)):
+            self.gpu._select_context(design, "reference")
+            parameters = {**SCENARIOS["highload"], "neon": neon, "heating": heating, "flow": flow}
+            peaks, fluxes, budgets = self.gpu._solve_history(parameters)
+            for i, phase in enumerate(np.linspace(0, 1, 31)):
+                with self.subTest(design=design, neon=neon, heating=heating, flow=flow, phase=phase):
+                    temperature, flux, _ = self.gpu._solve(parameters, float(phase))
+                    self.assertAlmostEqual(float(peaks[i]), float(temperature.max()), delta=0.01)
+                    self.assertEqual(float(fluxes[i]), float(flux.max()))
+                    self.assertEqual(budgets[i], self.gpu._last_budget)
 
     def test_all_equilibrium_traces_stay_in_domain_and_agree_between_devices(self):
         for design in ("conventional", "longleg"):

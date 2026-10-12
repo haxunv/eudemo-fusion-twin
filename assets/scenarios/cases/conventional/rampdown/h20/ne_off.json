@@ -1,0 +1,891 @@
+{
+  "state": {
+    "power": 2000.0,
+    "flow": 1.0,
+    "inlet": 300.0,
+    "scenario": "nominal",
+    "phase": 1.0,
+    "design": "conventional",
+    "equilibrium": "rampdown",
+    "heating": 20,
+    "neon": false
+  },
+  "result": {
+    "peak_temperature_C": 805.82,
+    "peak_heatflux_MW_m2": 10.425,
+    "peak_divertor_heatflux_MW_m2": 10.425,
+    "outlet_temperature_C": 409.37,
+    "cooling_margin_C": 94.18,
+    "limit_temperature_C": 900.0,
+    "mass_flow_kg_s": 3500.0,
+    "thermal_power_MW": 1990.453,
+    "field_ref": {
+      "path": "fields/ea56bf79cea4bbe48877e884e470a0c5.npz",
+      "key": "ea56bf79cea4bbe48877e884e470a0c5",
+      "revision": 33,
+      "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+      "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+      "schema_version": 2
+    },
+    "power_budget": {
+      "definition": "synthetic_base_plus_auxiliary_thermal_budget",
+      "load_fraction": 1.0,
+      "nominal_thermal_MW": 2000.0,
+      "base_thermal_MW": 2000.0,
+      "nominal_auxiliary_MW": 20.0,
+      "auxiliary_absorbed_MW": 20.0,
+      "plasma_channel_MW": 420.0,
+      "requested_thermal_MW": 2020.0,
+      "volume_blanket_MW": 1600.0,
+      "radiation_core_MW": 273.0,
+      "separatrix_MW": 147.0,
+      "sol_radiation_fraction": 0.3,
+      "target_requested_MW": 98.49000000000001,
+      "wall_particle_requested_MW": 4.41,
+      "radiation_sol_MW": 44.1,
+      "radiation_absorbed_MW": 317.1000000000001,
+      "particle_blanket_MW": 4.410000000000001,
+      "particle_divertor_MW": 68.94300000000001,
+      "surface_absorbed_MW": 390.4530000000001,
+      "volume_absorbed_MW": 1600.0,
+      "absorbed_thermal_MW": 1990.453,
+      "unresolved_MW": 29.547,
+      "closure_residual_MW": 2.4868995751603507e-14,
+      "blanket_absorbed_MW": 1889.8,
+      "divertor_absorbed_MW": 100.653,
+      "full_machine_pfc_area_m2": 1724.331979028173
+    },
+    "strike_points": {
+      "inner": {
+        "status": "unresolved",
+        "reason": "missing or ambiguous lower-leg intersection or outboard map",
+        "candidate_count": 0
+      },
+      "outer": {
+        "rz_m": [
+          8.739397788138666,
+          -6.688976142550907
+        ],
+        "s_m": 3.887587467580075,
+        "leg": "outer",
+        "psi_n_residual": 0.0,
+        "status": "intersection_model",
+        "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+      }
+    },
+    "model_version": "pfc-aux-neon-budget-v3.0",
+    "color_ranges": {
+      "temperature": [
+        250,
+        1100
+      ],
+      "heatflux": [
+        0.0,
+        200.0
+      ],
+      "heatflux_log": [
+        0.01,
+        200.0
+      ],
+      "magnetic": [
+        2.0,
+        12.0
+      ],
+      "slice": [
+        0,
+        40
+      ],
+      "delta_temperature": [
+        -1.0,
+        1.0
+      ],
+      "delta_heatflux": [
+        -0.01,
+        0.01
+      ]
+    },
+    "color_maps": {
+      "heatflux": {
+        "name": "inferno_sampled",
+        "positions": [
+          0.0,
+          0.125,
+          0.25,
+          0.375,
+          0.5,
+          0.625,
+          0.75,
+          0.875,
+          1.0
+        ],
+        "colors": [
+          [
+            0.001462,
+            0.000466,
+            0.013866
+          ],
+          [
+            0.129285,
+            0.047293,
+            0.290788
+          ],
+          [
+            0.3415,
+            0.062325,
+            0.429425
+          ],
+          [
+            0.54092,
+            0.134729,
+            0.415123
+          ],
+          [
+            0.735683,
+            0.215906,
+            0.330245
+          ],
+          [
+            0.894305,
+            0.353399,
+            0.193584
+          ],
+          [
+            0.978422,
+            0.557937,
+            0.034931
+          ],
+          [
+            0.974638,
+            0.797692,
+            0.206332
+          ],
+          [
+            0.988362,
+            0.998364,
+            0.644924
+          ]
+        ],
+        "zero_color": [
+          0.12,
+          0.14,
+          0.16
+        ]
+      },
+      "magnetic": {
+        "name": "viridis_sampled",
+        "positions": [
+          0.0,
+          0.25,
+          0.5,
+          0.75,
+          1.0
+        ],
+        "colors": [
+          [
+            0.267004,
+            0.004874,
+            0.329415
+          ],
+          [
+            0.229739,
+            0.322361,
+            0.545706
+          ],
+          [
+            0.127568,
+            0.566949,
+            0.550556
+          ],
+          [
+            0.369214,
+            0.788888,
+            0.382914
+          ],
+          [
+            0.993248,
+            0.906157,
+            0.143936
+          ]
+        ]
+      }
+    },
+    "color_scales": {
+      "heatflux": "linear",
+      "heatflux_log": "log10",
+      "magnetic": "linear"
+    },
+    "color_clipping": {
+      "heatflux_above_max": 0,
+      "heatflux_log_positive_below_min": 0,
+      "heatflux_nonpositive": 0,
+      "magnetic_below_min": 0,
+      "magnetic_above_max": 0
+    },
+    "story": {
+      "classification": "synthetic_demo",
+      "comparison_controls": {
+        "power": 2000.0,
+        "flow": 1.0,
+        "inlet": 300.0,
+        "hotspot": 1.0,
+        "heating": 20.0,
+        "equilibrium": "rampdown",
+        "phase": 1.0
+      },
+      "selected_case_id": "conventional/ne_off",
+      "cases": [
+        {
+          "id": "conventional/ne_off",
+          "design": "conventional",
+          "neon": false,
+          "heating": 20.0,
+          "equilibrium": "rampdown",
+          "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+          "source_equilibrium": "assets/source/eudemo/conventional/equilibria/rampdown.npz",
+          "peak_temperature_C": 805.82,
+          "peak_heatflux_MW_m2": 10.425,
+          "peak_divertor_heatflux_MW_m2": 10.425,
+          "outlet_temperature_C": 409.37,
+          "cooling_margin_C": 94.18,
+          "limit_temperature_C": 900.0,
+          "mass_flow_kg_s": 3500.0,
+          "thermal_power_MW": 1990.453,
+          "power_budget": {
+            "definition": "synthetic_base_plus_auxiliary_thermal_budget",
+            "load_fraction": 1.0,
+            "nominal_thermal_MW": 2000.0,
+            "base_thermal_MW": 2000.0,
+            "nominal_auxiliary_MW": 20.0,
+            "auxiliary_absorbed_MW": 20.0,
+            "plasma_channel_MW": 420.0,
+            "requested_thermal_MW": 2020.0,
+            "volume_blanket_MW": 1600.0,
+            "radiation_core_MW": 273.0,
+            "separatrix_MW": 147.0,
+            "sol_radiation_fraction": 0.3,
+            "target_requested_MW": 98.49000000000001,
+            "wall_particle_requested_MW": 4.41,
+            "radiation_sol_MW": 44.1,
+            "radiation_absorbed_MW": 317.1000000000001,
+            "particle_blanket_MW": 4.410000000000001,
+            "particle_divertor_MW": 68.94300000000001,
+            "surface_absorbed_MW": 390.4530000000001,
+            "volume_absorbed_MW": 1600.0,
+            "absorbed_thermal_MW": 1990.453,
+            "unresolved_MW": 29.547,
+            "closure_residual_MW": 2.4868995751603507e-14,
+            "blanket_absorbed_MW": 1889.8,
+            "divertor_absorbed_MW": 100.653,
+            "full_machine_pfc_area_m2": 1724.331979028173
+          },
+          "strike_status": {
+            "inner": "unresolved",
+            "outer": "intersection_model"
+          },
+          "relative_no_neon_percent": 0.0
+        },
+        {
+          "id": "conventional/ne_on",
+          "design": "conventional",
+          "neon": true,
+          "heating": 20.0,
+          "equilibrium": "rampdown",
+          "equilibrium_key": "conventional/rampdown:c817d384a63458ce",
+          "source_equilibrium": "assets/source/eudemo/conventional/equilibria/rampdown.npz",
+          "peak_temperature_C": 400.94,
+          "peak_heatflux_MW_m2": 1.732,
+          "peak_divertor_heatflux_MW_m2": 1.732,
+          "outlet_temperature_C": 410.58,
+          "cooling_margin_C": 499.06,
+          "limit_temperature_C": 900.0,
+          "mass_flow_kg_s": 3500.0,
+          "thermal_power_MW": 2012.503,
+          "power_budget": {
+            "definition": "synthetic_base_plus_auxiliary_thermal_budget",
+            "load_fraction": 1.0,
+            "nominal_thermal_MW": 2000.0,
+            "base_thermal_MW": 2000.0,
+            "nominal_auxiliary_MW": 20.0,
+            "auxiliary_absorbed_MW": 20.0,
+            "plasma_channel_MW": 420.0,
+            "requested_thermal_MW": 2020.0,
+            "volume_blanket_MW": 1600.0,
+            "radiation_core_MW": 273.0,
+            "separatrix_MW": 147.0,
+            "sol_radiation_fraction": 0.8,
+            "target_requested_MW": 24.98999999999999,
+            "wall_particle_requested_MW": 4.41,
+            "radiation_sol_MW": 117.60000000000001,
+            "radiation_absorbed_MW": 390.59999999999997,
+            "particle_blanket_MW": 4.410000000000001,
+            "particle_divertor_MW": 17.492999999999988,
+            "surface_absorbed_MW": 412.503,
+            "volume_absorbed_MW": 1600.0,
+            "absorbed_thermal_MW": 2012.503,
+            "unresolved_MW": 7.496999999999997,
+            "closure_residual_MW": 7.37188088351104e-14,
+            "blanket_absorbed_MW": 1955.95,
+            "divertor_absorbed_MW": 56.553,
+            "full_machine_pfc_area_m2": 1724.331979028173
+          },
+          "strike_status": {
+            "inner": "unresolved",
+            "outer": "intersection_model"
+          },
+          "relative_no_neon_percent": -83.386
+        },
+        {
+          "id": "longleg/ne_off",
+          "design": "longleg",
+          "neon": false,
+          "heating": 20.0,
+          "equilibrium": "rampdown",
+          "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
+          "source_equilibrium": "assets/source/eudemo/longleg/equilibria/rampdown.npz",
+          "peak_temperature_C": 1128.61,
+          "peak_heatflux_MW_m2": 17.329,
+          "peak_divertor_heatflux_MW_m2": 17.329,
+          "outlet_temperature_C": 409.37,
+          "cooling_margin_C": -228.61,
+          "limit_temperature_C": 900.0,
+          "mass_flow_kg_s": 3500.0,
+          "thermal_power_MW": 1990.453,
+          "power_budget": {
+            "definition": "synthetic_base_plus_auxiliary_thermal_budget",
+            "load_fraction": 1.0,
+            "nominal_thermal_MW": 2000.0,
+            "base_thermal_MW": 2000.0,
+            "nominal_auxiliary_MW": 20.0,
+            "auxiliary_absorbed_MW": 20.0,
+            "plasma_channel_MW": 420.0,
+            "requested_thermal_MW": 2020.0,
+            "volume_blanket_MW": 1600.0,
+            "radiation_core_MW": 273.0,
+            "separatrix_MW": 147.0,
+            "sol_radiation_fraction": 0.3,
+            "target_requested_MW": 98.49000000000001,
+            "wall_particle_requested_MW": 4.41,
+            "radiation_sol_MW": 44.1,
+            "radiation_absorbed_MW": 317.09999999999997,
+            "particle_blanket_MW": 4.409999999999999,
+            "particle_divertor_MW": 68.94300000000001,
+            "surface_absorbed_MW": 390.453,
+            "volume_absorbed_MW": 1600.0,
+            "absorbed_thermal_MW": 1990.453,
+            "unresolved_MW": 29.547,
+            "closure_residual_MW": 2.4868995751603507e-14,
+            "blanket_absorbed_MW": 1889.8,
+            "divertor_absorbed_MW": 100.65300000000003,
+            "full_machine_pfc_area_m2": 1760.2953006405833
+          },
+          "strike_status": {
+            "inner": "unresolved",
+            "outer": "intersection_model"
+          },
+          "relative_no_neon_percent": 0.0
+        },
+        {
+          "id": "longleg/ne_on",
+          "design": "longleg",
+          "neon": true,
+          "heating": 20.0,
+          "equilibrium": "rampdown",
+          "equilibrium_key": "longleg/rampdown:c09f8dcc1379cd46",
+          "source_equilibrium": "assets/source/eudemo/longleg/equilibria/rampdown.npz",
+          "peak_temperature_C": 437.19,
+          "peak_heatflux_MW_m2": 2.713,
+          "peak_divertor_heatflux_MW_m2": 2.713,
+          "outlet_temperature_C": 410.58,
+          "cooling_margin_C": 462.81,
+          "limit_temperature_C": 900.0,
+          "mass_flow_kg_s": 3500.0,
+          "thermal_power_MW": 2012.5030000000002,
+          "power_budget": {
+            "definition": "synthetic_base_plus_auxiliary_thermal_budget",
+            "load_fraction": 1.0,
+            "nominal_thermal_MW": 2000.0,
+            "base_thermal_MW": 2000.0,
+            "nominal_auxiliary_MW": 20.0,
+            "auxiliary_absorbed_MW": 20.0,
+            "plasma_channel_MW": 420.0,
+            "requested_thermal_MW": 2020.0,
+            "volume_blanket_MW": 1600.0,
+            "radiation_core_MW": 273.0,
+            "separatrix_MW": 147.0,
+            "sol_radiation_fraction": 0.8,
+            "target_requested_MW": 24.98999999999999,
+            "wall_particle_requested_MW": 4.41,
+            "radiation_sol_MW": 117.60000000000001,
+            "radiation_absorbed_MW": 390.6,
+            "particle_blanket_MW": 4.409999999999999,
+            "particle_divertor_MW": 17.49299999999999,
+            "surface_absorbed_MW": 412.50300000000004,
+            "volume_absorbed_MW": 1600.0,
+            "absorbed_thermal_MW": 2012.5030000000002,
+            "unresolved_MW": 7.496999999999997,
+            "closure_residual_MW": -1.5365486660812167e-13,
+            "blanket_absorbed_MW": 1955.95,
+            "divertor_absorbed_MW": 56.553000000000004,
+            "full_machine_pfc_area_m2": 1760.2953006405833
+          },
+          "strike_status": {
+            "inner": "unresolved",
+            "outer": "intersection_model"
+          },
+          "relative_no_neon_percent": -84.344
+        }
+      ],
+      "relative_metric": "peak_divertor_heatflux_MW_m2; 100*(case/same-design-no-neon - 1)",
+      "units": {
+        "heatflux": "MW/m2",
+        "temperature": "degC",
+        "power": "MW",
+        "relative_no_neon": "percent"
+      }
+    },
+    "relative_no_neon_percent": 0.0,
+    "analysis_surface": {
+      "method": "CAD-generating poloidal profiles revolved over source FW/cassette angular bounds",
+      "parts": [
+        {
+          "id": "blanket/p000",
+          "name": "IBS_FW_0 1 1",
+          "profile": "blanket_panel_points",
+          "angular_bounds_deg": [
+            0.0612143777391592,
+            9.938785694270186
+          ]
+        },
+        {
+          "id": "blanket/p001",
+          "name": "IBS_FW_1 1 1",
+          "profile": "blanket_panel_points",
+          "angular_bounds_deg": [
+            10.061214262142942,
+            19.93878542531472
+          ]
+        },
+        {
+          "id": "blanket/p006",
+          "name": "OBS_FW_0 1 1",
+          "profile": "blanket_panel_points",
+          "angular_bounds_deg": [
+            0.04627833856883438,
+            6.620388253787688
+          ]
+        },
+        {
+          "id": "blanket/p007",
+          "name": "OBS_FW_1 1 1",
+          "profile": "blanket_panel_points",
+          "angular_bounds_deg": [
+            6.712944701474935,
+            13.287054901012235
+          ]
+        },
+        {
+          "id": "blanket/p008",
+          "name": "OBS_FW_2 1 1",
+          "profile": "blanket_panel_points",
+          "angular_bounds_deg": [
+            13.379612308672288,
+            19.95372043852647
+          ]
+        },
+        {
+          "id": "divertor/p000",
+          "name": "segment_0 1 1",
+          "profile": "div_internal_boundary",
+          "angular_bounds_deg": [
+            0.05387962935983305,
+            6.6127869908836425
+          ]
+        },
+        {
+          "id": "divertor/p001",
+          "name": "segment_1 1 1",
+          "profile": "div_internal_boundary",
+          "angular_bounds_deg": [
+            6.720546628717679,
+            13.27945354347209
+          ]
+        },
+        {
+          "id": "divertor/p002",
+          "name": "segment_2 1 1",
+          "profile": "div_internal_boundary",
+          "angular_bounds_deg": [
+            13.387212476264637,
+            19.946120562601493
+          ]
+        }
+      ],
+      "sector_count": 18,
+      "base_sector_degrees": 20,
+      "full_machine_area_m2": 1724.331979028173,
+      "excluded": [
+        "BZ",
+        "MANIFOLD",
+        "solid backs",
+        "material interfaces",
+        "toroidal end caps"
+      ],
+      "limitation": "Axisymmetric analysis skin; no toroidal bevel, gap-edge heating or 3D shadow model"
+    },
+    "design": "conventional",
+    "equilibrium": "rampdown",
+    "gpu_ms": 0.296,
+    "compute_backend": "CPU / Warp",
+    "gpu_device": "cpu",
+    "gpu_name": "AMD64 Family 26 Model 68 Stepping 0, AuthenticAMD",
+    "gpu_timing_scope": "Warp local thermal kernel and synchronization; excludes CPU budget, footprint construction and transfers",
+    "field_samples": 29450,
+    "magnetic_line_count": 24,
+    "magnetic_trace_ms": 2.964,
+    "source_label": "synthetic_demo_source_geometry_equilibrium",
+    "scenario_label": "nominal",
+    "history": [
+      {
+        "phase": 0.0,
+        "load_fraction": 0.22,
+        "heatflux": 2.293,
+        "temperature": 411.28,
+        "peak_temperature_C": 411.28,
+        "outlet_temperature_C": 324.06,
+        "absorbed_thermal_MW": 437.89966000000004
+      },
+      {
+        "phase": 0.03333333333333333,
+        "load_fraction": 0.246,
+        "heatflux": 2.564,
+        "temperature": 424.43,
+        "peak_temperature_C": 424.43,
+        "outlet_temperature_C": 326.9,
+        "absorbed_thermal_MW": 489.65143800000004
+      },
+      {
+        "phase": 0.06666666666666667,
+        "load_fraction": 0.272,
+        "heatflux": 2.835,
+        "temperature": 437.58,
+        "peak_temperature_C": 437.58,
+        "outlet_temperature_C": 329.75,
+        "absorbed_thermal_MW": 541.403216
+      },
+      {
+        "phase": 0.1,
+        "load_fraction": 0.29800000000000004,
+        "heatflux": 3.107,
+        "temperature": 450.73,
+        "peak_temperature_C": 450.73,
+        "outlet_temperature_C": 332.59,
+        "absorbed_thermal_MW": 593.1549940000002
+      },
+      {
+        "phase": 0.13333333333333333,
+        "load_fraction": 0.324,
+        "heatflux": 3.378,
+        "temperature": 463.88,
+        "peak_temperature_C": 463.88,
+        "outlet_temperature_C": 335.43,
+        "absorbed_thermal_MW": 644.906772
+      },
+      {
+        "phase": 0.16666666666666666,
+        "load_fraction": 0.35,
+        "heatflux": 3.649,
+        "temperature": 477.04,
+        "peak_temperature_C": 477.04,
+        "outlet_temperature_C": 338.28,
+        "absorbed_thermal_MW": 696.65855
+      },
+      {
+        "phase": 0.2,
+        "load_fraction": 0.376,
+        "heatflux": 3.92,
+        "temperature": 490.19,
+        "peak_temperature_C": 490.19,
+        "outlet_temperature_C": 341.12,
+        "absorbed_thermal_MW": 748.410328
+      },
+      {
+        "phase": 0.23333333333333334,
+        "load_fraction": 0.402,
+        "heatflux": 4.191,
+        "temperature": 503.34,
+        "peak_temperature_C": 503.34,
+        "outlet_temperature_C": 343.96,
+        "absorbed_thermal_MW": 800.1621060000001
+      },
+      {
+        "phase": 0.26666666666666666,
+        "load_fraction": 0.428,
+        "heatflux": 4.462,
+        "temperature": 516.49,
+        "peak_temperature_C": 516.49,
+        "outlet_temperature_C": 346.81,
+        "absorbed_thermal_MW": 851.913884
+      },
+      {
+        "phase": 0.3,
+        "load_fraction": 0.45399999999999996,
+        "heatflux": 4.733,
+        "temperature": 529.64,
+        "peak_temperature_C": 529.64,
+        "outlet_temperature_C": 349.65,
+        "absorbed_thermal_MW": 903.665662
+      },
+      {
+        "phase": 0.3333333333333333,
+        "load_fraction": 0.48,
+        "heatflux": 5.004,
+        "temperature": 542.79,
+        "peak_temperature_C": 542.79,
+        "outlet_temperature_C": 352.5,
+        "absorbed_thermal_MW": 955.4174399999999
+      },
+      {
+        "phase": 0.36666666666666664,
+        "load_fraction": 0.506,
+        "heatflux": 5.275,
+        "temperature": 555.94,
+        "peak_temperature_C": 555.94,
+        "outlet_temperature_C": 355.34,
+        "absorbed_thermal_MW": 1007.169218
+      },
+      {
+        "phase": 0.4,
+        "load_fraction": 0.532,
+        "heatflux": 5.546,
+        "temperature": 569.1,
+        "peak_temperature_C": 569.1,
+        "outlet_temperature_C": 358.18,
+        "absorbed_thermal_MW": 1058.920996
+      },
+      {
+        "phase": 0.43333333333333335,
+        "load_fraction": 0.558,
+        "heatflux": 5.817,
+        "temperature": 582.25,
+        "peak_temperature_C": 582.25,
+        "outlet_temperature_C": 361.03,
+        "absorbed_thermal_MW": 1110.6727740000001
+      },
+      {
+        "phase": 0.4666666666666667,
+        "load_fraction": 0.5840000000000001,
+        "heatflux": 6.088,
+        "temperature": 595.4,
+        "peak_temperature_C": 595.4,
+        "outlet_temperature_C": 363.87,
+        "absorbed_thermal_MW": 1162.4245520000002
+      },
+      {
+        "phase": 0.5,
+        "load_fraction": 0.61,
+        "heatflux": 6.359,
+        "temperature": 608.55,
+        "peak_temperature_C": 608.55,
+        "outlet_temperature_C": 366.71,
+        "absorbed_thermal_MW": 1214.17633
+      },
+      {
+        "phase": 0.5333333333333333,
+        "load_fraction": 0.636,
+        "heatflux": 6.63,
+        "temperature": 621.7,
+        "peak_temperature_C": 621.7,
+        "outlet_temperature_C": 369.56,
+        "absorbed_thermal_MW": 1265.928108
+      },
+      {
+        "phase": 0.5666666666666667,
+        "load_fraction": 0.662,
+        "heatflux": 6.901,
+        "temperature": 634.85,
+        "peak_temperature_C": 634.85,
+        "outlet_temperature_C": 372.4,
+        "absorbed_thermal_MW": 1317.679886
+      },
+      {
+        "phase": 0.6,
+        "load_fraction": 0.688,
+        "heatflux": 7.172,
+        "temperature": 648.0,
+        "peak_temperature_C": 648.0,
+        "outlet_temperature_C": 375.24,
+        "absorbed_thermal_MW": 1369.431664
+      },
+      {
+        "phase": 0.6333333333333333,
+        "load_fraction": 0.714,
+        "heatflux": 7.443,
+        "temperature": 661.15,
+        "peak_temperature_C": 661.15,
+        "outlet_temperature_C": 378.09,
+        "absorbed_thermal_MW": 1421.183442
+      },
+      {
+        "phase": 0.6666666666666666,
+        "load_fraction": 0.74,
+        "heatflux": 7.714,
+        "temperature": 674.31,
+        "peak_temperature_C": 674.31,
+        "outlet_temperature_C": 380.93,
+        "absorbed_thermal_MW": 1472.93522
+      },
+      {
+        "phase": 0.7,
+        "load_fraction": 0.7659999999999999,
+        "heatflux": 7.985,
+        "temperature": 687.46,
+        "peak_temperature_C": 687.46,
+        "outlet_temperature_C": 383.77,
+        "absorbed_thermal_MW": 1524.686998
+      },
+      {
+        "phase": 0.7333333333333333,
+        "load_fraction": 0.7919999999999999,
+        "heatflux": 8.256,
+        "temperature": 700.61,
+        "peak_temperature_C": 700.61,
+        "outlet_temperature_C": 386.62,
+        "absorbed_thermal_MW": 1576.4387759999997
+      },
+      {
+        "phase": 0.7666666666666666,
+        "load_fraction": 0.818,
+        "heatflux": 8.527,
+        "temperature": 713.76,
+        "peak_temperature_C": 713.76,
+        "outlet_temperature_C": 389.46,
+        "absorbed_thermal_MW": 1628.1905540000002
+      },
+      {
+        "phase": 0.8,
+        "load_fraction": 0.8440000000000001,
+        "heatflux": 8.798,
+        "temperature": 726.91,
+        "peak_temperature_C": 726.91,
+        "outlet_temperature_C": 392.3,
+        "absorbed_thermal_MW": 1679.9423320000003
+      },
+      {
+        "phase": 0.8333333333333334,
+        "load_fraction": 0.87,
+        "heatflux": 9.069,
+        "temperature": 740.06,
+        "peak_temperature_C": 740.06,
+        "outlet_temperature_C": 395.15,
+        "absorbed_thermal_MW": 1731.69411
+      },
+      {
+        "phase": 0.8666666666666667,
+        "load_fraction": 0.896,
+        "heatflux": 9.34,
+        "temperature": 753.21,
+        "peak_temperature_C": 753.21,
+        "outlet_temperature_C": 397.99,
+        "absorbed_thermal_MW": 1783.4458880000002
+      },
+      {
+        "phase": 0.9,
+        "load_fraction": 0.922,
+        "heatflux": 9.611,
+        "temperature": 766.36,
+        "peak_temperature_C": 766.36,
+        "outlet_temperature_C": 400.84,
+        "absorbed_thermal_MW": 1835.1976660000003
+      },
+      {
+        "phase": 0.9333333333333333,
+        "load_fraction": 0.9480000000000001,
+        "heatflux": 9.883,
+        "temperature": 779.52,
+        "peak_temperature_C": 779.52,
+        "outlet_temperature_C": 403.68,
+        "absorbed_thermal_MW": 1886.949444
+      },
+      {
+        "phase": 0.9666666666666667,
+        "load_fraction": 0.974,
+        "heatflux": 10.154,
+        "temperature": 792.67,
+        "peak_temperature_C": 792.67,
+        "outlet_temperature_C": 406.52,
+        "absorbed_thermal_MW": 1938.7012220000001
+      },
+      {
+        "phase": 1.0,
+        "load_fraction": 1.0,
+        "heatflux": 10.425,
+        "temperature": 805.82,
+        "peak_temperature_C": 805.82,
+        "outlet_temperature_C": 409.37,
+        "absorbed_thermal_MW": 1990.453
+      }
+    ],
+    "comparison": {
+      "baseline": {
+        "peak_temperature_C": 805.82,
+        "peak_heatflux_MW_m2": 10.425,
+        "peak_divertor_heatflux_MW_m2": 10.425,
+        "outlet_temperature_C": 409.37,
+        "cooling_margin_C": 94.18,
+        "limit_temperature_C": 900.0,
+        "mass_flow_kg_s": 3500.0,
+        "thermal_power_MW": 1990.453
+      },
+      "candidate": {
+        "peak_temperature_C": 805.82,
+        "peak_heatflux_MW_m2": 10.425,
+        "peak_divertor_heatflux_MW_m2": 10.425,
+        "outlet_temperature_C": 409.37,
+        "cooling_margin_C": 94.18,
+        "limit_temperature_C": 900.0,
+        "mass_flow_kg_s": 3500.0,
+        "thermal_power_MW": 1990.453
+      },
+      "context": {
+        "design": "conventional",
+        "equilibrium": "rampdown",
+        "phase": 1.0,
+        "baseline_parameters": {
+          "power": 2000.0,
+          "flow": 1.0,
+          "inlet": 300.0,
+          "hotspot": 1.0,
+          "heating": 20.0,
+          "neon": false
+        },
+        "definition": "same-controls-neon-off"
+      },
+      "delta": {
+        "peak_temperature_C": 0.0,
+        "peak_heatflux_MW_m2": 0.0,
+        "peak_divertor_heatflux_MW_m2": 0.0,
+        "outlet_temperature_C": 0.0,
+        "cooling_margin_C": 0.0,
+        "limit_temperature_C": 0.0,
+        "mass_flow_kg_s": 0.0,
+        "thermal_power_MW": 0.0
+      }
+    },
+    "assumptions": {
+      "thermal": "Synthetic quasi-steady wall resistance; prescribed load scan, no time-dependent heat transport or qualified material model",
+      "coolant": "Absorbed surface plus assumed blanket volume heat only; helium cp=5200 J/(kg K), 3500 kg/s times flow, 85/15% circuit split; unresolved power excluded",
+      "budget": "power is the base thermal budget excluding auxiliary heating. At scan fraction L: total=(power+heating)*L; blanket volume=.8*power*L; plasma=(.2*power+heating)*L. Core radiation=.65*plasma; SOL radiation=.30 (Ne off) or .80 (Ne on) of separatrix power, wall particles=.03, targets receive the remainder, inner/outer 30/70%. All heating is assumed absorbed; no solved fusion source",
+      "radiation": "Uniform area deposition split 90/10% wall/divertor; no photon transport or neutron transport calculation",
+      "target": "Synthetic Eich widths: lambda_q=6 mm, S=2 mm, both divided by hotspot. Ne-on multipliers 1.5/2; longleg S multiplier 1.35. Flux mapping and incidence at source psi=1 intersections, local +/-0.75 m footprint; no 3D shadowing or detached SOL solution",
+      "neon": "Boolean radiation/spreading hypothesis; no injection rate, impurity transport, radiation-front solve or measured detachment claim. Four cases share all controls except design/neon; differences use same design/equilibrium/controls with neon off",
+      "color": "Fixed linear heatflux 0..200 and log10 0.01..200 MW/m2. Nonpositive/no-data samples are neutral; positive log values below minimum clamp to lower color. Out-of-range counts are explicit; no per-case autoscaling",
+      "limit": "900 degC demonstration threshold; not a material qualification limit",
+      "magnetics": "Selected Bluemira axisymmetric equilibrium, Bphi=fvac/R approximation; cached per equilibrium; no discrete TF ripple",
+      "plasma_slice": "Synthetic source-flux-shaped core profile: 25 keV * (.2*power+heating)/450 * load_fraction, with a prescribed .95 multiplier for Ne on; 193x225 RZ sampling, not a plasma transport solution",
+      "history": "Dimensionless quasi-steady load scan, phase in [0,1]; no elapsed-time coordinate; equilibria are independently selected snapshots"
+    }
+  },
+  "data_class": "synthetic_demo",
+  "geometry": "conventional",
+  "source_equilibrium": "assets/source/eudemo/conventional/equilibria/rampdown.npz"
+}

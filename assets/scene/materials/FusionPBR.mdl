@@ -1,0 +1,20 @@
+mdl 1.7;
+import ::OmniPBR::*;
+export material FusionPBR(
+    color base_color = color(0.3),
+    float metallic = 0.0,
+    float roughness = 0.5,
+    uniform texture_2d normal_map = texture_2d(),
+    uniform float normal_strength = 0.1,
+    uniform float repeat_per_meter = 1.0
+) = ::OmniPBR::OmniPBR(
+    diffuse_color_constant: base_color,
+    metallic_constant: metallic,
+    reflection_roughness_constant: roughness,
+    normalmap_texture: normal_map,
+    bump_factor: normal_strength,
+    project_uvw: true,
+    world_or_object: true,
+    texture_scale: float2(repeat_per_meter),
+    round_edges_radius: 0.002
+);

@@ -30,10 +30,10 @@ values = ["nominal", "ramp", "lowflow", "highload"]
 schema_attr = "fusion:state:power"
 role = "inference"
 widget = "slider"
-label = "Effective thermal power"
+label = "Baseline thermal budget (excluding auxiliary heating)"
 unit = "MW"
 bounds = {min = 500, max = 2600, step = 50}
-bindings = [{kind = "Attribute", knobs = ["power"], targets = ["/World/FusionResults"], attribute = "fusion:effectiveThermalPowerMW"}]
+bindings = [{kind = "Attribute", knobs = ["power"], targets = ["/World/FusionResults"], attribute = "fusion:baselineThermalPowerMW"}]
 
 [controls.flow]
 schema_attr = "fusion:state:flow"
@@ -41,6 +41,38 @@ role = "inference"
 widget = "slider"
 unit = "ratio"
 bounds = {min = 0.4, max = 1.4, step = 0.05}
+
+[controls.heating]
+schema_attr = "fusion:state:heating"
+role = "inference"
+widget = "slider"
+label = "Auxiliary heating"
+unit = "MW"
+bounds = {min = 20, max = 65, step = 15}
+
+[controls.neon]
+schema_attr = "fusion:state:neon"
+role = "inference"
+widget = "toggle"
+label = "Synthetic neon radiation scenario"
+
+[controls.heatScale]
+schema_attr = "fusion:state:heatScale"
+role = "visualization"
+widget = "select"
+values = ["log", "linear"]
+
+[controls.volumeStyle]
+schema_attr = "fusion:state:volumeStyle"
+role = "visualization"
+widget = "select"
+values = ["plasma", "temperature"]
+
+[controls.lineMotion]
+schema_attr = "fusion:state:lineMotion"
+role = "visualization"
+widget = "toggle"
+label = "Magnetic direction markers (illustrative speed)"
 
 [controls.inlet]
 schema_attr = "fusion:state:inlet"

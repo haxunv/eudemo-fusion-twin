@@ -22,20 +22,22 @@ from .protocol import CommandQueue, ProtocolError, interaction_key
 ROOT = Path(__file__).resolve().parents[2]
 
 DEFAULT_STATE = {
-    "language": "zh", "view": "overview", "tab": "explore", "mode": "assembly",
-    "design": "conventional", "equilibrium": "reference",
+    "language": "zh", "view": "overview", "tab": "explore", "mode": "volume",
+    "design": "conventional", "equilibrium": "sof", "heating": 50.0, "neon": False,
     "scenario": "nominal", "power": 2000.0, "flow": 1.0, "inlet": 300.0,
-    "phase": 0.65, "cutaway": 80, "explode": 0.0, "opacity": 1.0,
-    "visible": {}, "selected": "", "fieldLines": False, "orbit": False, "playing": False,
+    "phase": 1.0, "cutaway": 80, "explode": 0.0, "opacity": 1.0,
+    "heatScale": "log", "volumeStyle": "plasma", "lineMotion": True,
+    "visible": {}, "selected": "", "fieldLines": True, "orbit": False, "playing": False,
 }
 ENUMS = {
     "design": {"conventional", "longleg"}, "equilibrium": {"reference", "rampup", "sof", "eof", "rampdown"},
     "language": {"zh", "en"}, "view": {"overview", "front", "top", "section", "divertor"},
-    "tab": {"explore", "compare"}, "mode": {"assembly", "temperature", "heatflux", "delta_temperature", "delta_heatflux", "magnetic", "slice", "volume"},
+    "tab": {"explore", "compare", "engineering"}, "mode": {"assembly", "temperature", "heatflux", "delta_temperature", "delta_heatflux", "magnetic", "slice", "volume"},
+    "heatScale": {"log", "linear"}, "volumeStyle": {"plasma", "temperature"},
     "scenario": set(SCENARIOS),
 }
-BOUNDS = {"power": (500, 2600), "flow": (0.4, 1.4), "inlet": (200, 400), "phase": (0, 1), "cutaway": (0, 180), "explode": (0, 1), "opacity": (0.1, 1)}
-BOOLEANS = {"fieldLines", "orbit", "playing"}
+BOUNDS = {"power": (500, 2600), "heating": (20, 65), "flow": (0.4, 1.4), "inlet": (200, 400), "phase": (0, 1), "cutaway": (0, 180), "explode": (0, 1), "opacity": (0.1, 1)}
+BOOLEANS = {"fieldLines", "lineMotion", "neon", "orbit", "playing"}
 
 
 def validate_patch(patch: dict, component_ids: set[str]) -> dict:
@@ -52,6 +54,8 @@ def validate_patch(patch: dict, component_ids: set[str]) -> dict:
             low, high = BOUNDS[key]
             if not low <= value <= high:
                 raise ValueError(f"{key} must be in [{low}, {high}]")
+            if key == "heating" and value not in (20, 35, 50, 65):
+                raise ValueError("heating must be one of 20, 35, 50, 65 MW")
             value = float(value)
             if key == "cutaway":
                 value = int(round(value / 20)) * 20

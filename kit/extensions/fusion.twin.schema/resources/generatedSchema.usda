@@ -3,18 +3,23 @@
 class "FusionTwinAppStateAPI"
 {
     uniform token fusion:state:design = "conventional" (allowedTokens = ["conventional", "longleg"])
-    uniform token fusion:state:equilibrium = "reference" (allowedTokens = ["reference", "rampup", "sof", "eof", "rampdown"])
+    uniform token fusion:state:equilibrium = "sof" (allowedTokens = ["reference", "rampup", "sof", "eof", "rampdown"])
     uniform token fusion:state:scenario = "nominal" (allowedTokens = ["nominal", "ramp", "lowflow", "highload"])
     uniform float fusion:state:power = 2000
+    uniform float fusion:state:heating = 50
+    uniform bool fusion:state:neon = false
+    uniform token fusion:state:heatScale = "log" (allowedTokens = ["log", "linear"])
+    uniform token fusion:state:volumeStyle = "plasma" (allowedTokens = ["plasma", "temperature"])
+    uniform bool fusion:state:lineMotion = true
     uniform float fusion:state:flow = 1
     uniform float fusion:state:inlet = 300
-    uniform float fusion:state:phase = 0.65
-    uniform token fusion:state:mode = "assembly" (allowedTokens = ["assembly", "temperature", "heatflux", "delta_temperature", "delta_heatflux", "magnetic", "slice", "volume"])
+    uniform float fusion:state:phase = 1
+    uniform token fusion:state:mode = "volume" (allowedTokens = ["assembly", "temperature", "heatflux", "delta_temperature", "delta_heatflux", "magnetic", "slice", "volume"])
     uniform token fusion:state:view = "overview" (allowedTokens = ["overview", "front", "top", "section", "divertor"])
     uniform float fusion:state:cutaway = 80
     uniform float fusion:state:explode = 0
     uniform float fusion:state:opacity = 1
-    uniform bool fusion:state:fieldLines = false
+    uniform bool fusion:state:fieldLines = true
     uniform bool fusion:state:orbit = false
     uniform bool fusion:state:playing = false
 }

@@ -32,7 +32,7 @@ class FusionTwinExtension(omni.ext.IExt):
         self.load_field_packet = load_field_packet
         settings = carb.settings.get_settings()
         settings.set("/rtx/background/source/type", 2)
-        settings.set("/rtx/background/source/color", [0.012, 0.018, 0.026])
+        settings.set("/rtx/background/source/color", [0.11, 0.135, 0.16])
         settings.set("/rtx/rtpt/cached/enabled", True)
         settings.set("/rtx/post/dlss/execMode", 2)
         self.render_resolution = (
@@ -63,6 +63,9 @@ class FusionTwinExtension(omni.ext.IExt):
         self.topology_key = None
         self.equilibrium_key = None
         self.color_key = None
+        self.line_points = None
+        self.line_motion_time = 0.0
+        self.last_line_update = 0.0
         self.last_poll = 0
         self.apply_timing = None
         self.render_reset = None
@@ -73,6 +76,9 @@ class FusionTwinExtension(omni.ext.IExt):
         self.sectors = []
         self.materials = {}
         self.camera_transforms = {}
+        self.hall_walls = []
+        self.hall_hidden_walls = []
+        self.hall_explode = None
         self.field_topology_loaded = False
         self.original_bindings = {}
         self.measure_points = []
@@ -107,32 +113,14 @@ class FusionTwinExtension(omni.ext.IExt):
             if not machine:
                 raise RuntimeError("Scene has no /World/Machine assembly")
             self._collect_components()
+            self._collect_hall_walls()
             self.geometry_controller = GeometryController(self.stage)
             from .nvidia_workflow import NvidiaWorkflow
             self.nvidia_workflow = NvidiaWorkflow(self.stage, self.root)
             cameras = self.stage.GetPrimAtPath("/World/Cameras")
             if cameras:
                 for camera in cameras.GetChildren():
-                    if camera.GetName() == "overview":
-                        transform = UsdGeom.Xformable(camera).GetLocalTransformation()
-                        eye = transform.ExtractTranslation()
-                        target = Gf.Vec3d(0, 0, -2.6)
-                        eye = target + (eye - target) * 1.5
-                        matrix = Gf.Matrix4d().SetLookAt(eye, target, Gf.Vec3d(0, 0, 1)).GetInverse()
-                        UsdGeom.Xformable(camera).MakeMatrixXform().Set(matrix)
-                        UsdGeom.Camera(camera).GetHorizontalApertureOffsetAttr().Set(2.8)
                     self.camera_transforms[camera.GetName()] = UsdGeom.Xformable(camera).GetLocalTransformation()
-            for light_name, multiplier in (("Key", 1.65), ("Fill", 1.45), ("Section", 1.8)):
-                light = self.stage.GetPrimAtPath(f"/World/Lighting/{light_name}")
-                if light and light.GetAttribute("inputs:intensity"):
-                    intensity = light.GetAttribute("inputs:intensity")
-                    intensity.Set(float(intensity.Get()) * multiplier)
-            fill = self.stage.GetPrimAtPath("/World/Lighting/StudioFill")
-            if fill:
-                fill.GetAttribute("inputs:intensity").Set(380.0)
-            floor = self.stage.GetPrimAtPath("/World/Environment/Floor")
-            if floor:
-                floor.GetAttribute("xformOp:scale").Set(Gf.Vec3f(1000, 1000, 0.6))
             for _ in range(12):
                 await omni.kit.app.get_app().next_update_async()
             self.viewport = get_active_viewport()
@@ -175,6 +163,7 @@ class FusionTwinExtension(omni.ext.IExt):
             self.orbit_angle += dt * 0.1
             self._orbit()
         if self.stage:
+            self._animate_field_lines(now)
             self._update_quality(now)
         if now - self.last_report > 0.5:
             self.last_report = now
@@ -192,6 +181,10 @@ class FusionTwinExtension(omni.ext.IExt):
         if pose != self.last_camera_pose:
             self.last_camera_pose = pose
             self.last_camera_motion = now
+        if pose != getattr(self, "hall_camera_pose", None) or self.state.get("explode", 0) != getattr(self, "hall_explode", None):
+            self.hall_camera_pose = pose
+            self.hall_explode = self.state.get("explode", 0)
+            self._update_hall_visibility(UsdGeom.Xformable(camera).ComputeLocalToWorldTransform(Usd.TimeCode.Default()).ExtractTranslation())
         interacting = self.state.get("orbit") or self.state.get("playing") or now - self.last_camera_motion < self.settle_seconds
         self.quality = "interaction" if interacting and not self.capture_pending else "detail"
         resolution = self.interactive_resolution if self.quality == "interaction" else self.render_resolution
@@ -200,6 +193,64 @@ class FusionTwinExtension(omni.ext.IExt):
         settings = carb.settings.get_settings()
         if settings.get("/rtx/rendermode") != "RealTimePathTracing":
             settings.set("/rtx/rendermode", "RealTimePathTracing")
+
+    def _collect_hall_walls(self):
+        """Resolve the three authored facility segments once, outside the frame loop."""
+        self.hall_walls = []
+        self.hall_hidden_walls = []
+        self.hall_camera_pose = None
+        hall = self.stage.GetPrimAtPath("/World/Environment/Hall")
+        if not hall:
+            return
+        for wall in hall.GetChildren():
+            rule = wall.GetCustomDataByKey("cameraCutaway")
+            if not rule:
+                continue
+            targets = [wall]
+            for path in rule["linkedPrims"]:
+                if Sdf.Path(path).HasPrefix(hall.GetPath()):
+                    prim = self.stage.GetPrimAtPath(path)
+                    if prim:
+                        targets.append(prim)
+            self.hall_walls.append({"name": wall.GetName(), "rule": rule, "hidden": None,
+                                    "attributes": [UsdGeom.Imageable(prim).GetVisibilityAttr() for prim in targets]})
+
+    @staticmethod
+    def _wall_obscures_machine(eye, rule, explode=0):
+        axis, plane = int(rule["axis"]), float(rule["plane"])
+        if (eye[axis] - plane) * rule["outsideSign"] <= .75:
+            return False
+        # Project a conservative CAD inspection envelope to the wall plane. This
+        # catches walls covering a machine edge even when its centre stays visible.
+        radius = 22. + 6. * float(explode)
+        tangents, heights = [], []
+        for x in (-radius, radius):
+            for y in (-radius, radius):
+                for z in (-23., 14.):
+                    target = (x, y, z)
+                    denominator = target[axis] - eye[axis]
+                    if not denominator:
+                        continue
+                    t = (plane - eye[axis]) / denominator
+                    if 0 < t < 1:
+                        tangents.append(eye[1-axis] + t*(target[1-axis]-eye[1-axis]))
+                        heights.append(eye[2] + t*(target[2]-eye[2]))
+        return bool(tangents and max(tangents) >= rule["tangentMin"] and min(tangents) <= rule["tangentMax"]
+                    and max(heights) >= rule["zMin"] and min(heights) <= rule["zMax"])
+
+    def _update_hall_visibility(self, eye):
+        hidden_names = []
+        for wall in getattr(self, "hall_walls", ()):
+            hidden = self._wall_obscures_machine(eye, wall["rule"], self.state.get("explode", 0))
+            if hidden != wall["hidden"]:
+                value = "invisible" if hidden else "inherited"
+                for attribute in wall["attributes"]:
+                    if attribute.Get() != value:
+                        attribute.Set(value)
+                wall["hidden"] = hidden
+            if hidden:
+                hidden_names.append(wall["name"])
+        self.hall_hidden_walls = hidden_names
 
     def _poll(self, force=False):
         request_path = self.runtime / "state.json"
@@ -257,7 +308,8 @@ class FusionTwinExtension(omni.ext.IExt):
                 self.measurement = None
                 self.selected = None
             self._apply_state(previous)
-            if reference["key"] != self.applied_field_key or self.state.get("mode") != previous.get("mode"):
+            if (reference["key"] != self.applied_field_key or self.state.get("mode") != previous.get("mode")
+                    or self.state.get("heatScale") != previous.get("heatScale")):
                 self._apply_fields(reference, data)
                 if self.state.get("mode") in ("temperature", "heatflux", "delta_temperature", "delta_heatflux", "slice"):
                     # Let the pending reset consume the latest colours during continuous input.
@@ -266,7 +318,7 @@ class FusionTwinExtension(omni.ext.IExt):
             self.field_reference = reference
             self.field_data = data
             self.applied_field_key = reference["key"]
-            if design_changed or any(self.state.get(key) != previous.get(key) for key in ("mode", "visible", "cutaway", "explode", "fieldLines", "selected")):
+            if design_changed or any(self.state.get(key) != previous.get(key) for key in ("mode", "visible", "cutaway", "explode", "fieldLines", "lineMotion", "selected")):
                 self._field_visibility()
             if self.nvidia_workflow:
                 self.nvidia_workflow.submit(self.state, data, reference)
@@ -302,12 +354,13 @@ class FusionTwinExtension(omni.ext.IExt):
         variants.SetVariantSelection(design)
         self._collect_components()
         self.geometry_controller.reset(self.stage)
-        for path in ("/World/Fields/Surface", "/World/Fields/Slice", "/World/Fields/FieldLines"):
+        for path in ("/World/Fields/Surface", "/World/Fields/Slice", "/World/Fields/FieldLines", "/World/Fields/DirectionMarkers"):
             self.stage.RemovePrim(path)
         UsdGeom.Xform.Define(self.stage, "/World/Fields")
         UsdGeom.Xform.Define(self.stage, "/World/Fields/Surface")
         self.topology_key = self.equilibrium_key = self.color_key = self.applied_field_key = None
         self.field_topology_loaded = False
+        self.line_points = None
 
     def _apply_state(self, previous):
         state = self.state
@@ -323,7 +376,7 @@ class FusionTwinExtension(omni.ext.IExt):
             self._select(selected)
         if state.get("opacity") != previous.get("opacity") or state.get("design") != previous.get("design"):
             self._apply_materials()
-        if any(state.get(key) != previous.get(key) for key in ("design", "equilibrium", "view", "mode", "visible", "cutaway", "explode", "opacity", "fieldLines")):
+        if any(state.get(key) != previous.get(key) for key in ("design", "equilibrium", "view", "mode", "volumeStyle", "visible", "cutaway", "explode", "opacity", "fieldLines")):
             if self.reset_task:
                 self.reset_task.cancel()
             self.reset_task = asyncio.ensure_future(self._reset_renderer())
@@ -357,8 +410,9 @@ class FusionTwinExtension(omni.ext.IExt):
         a = self.orbit_angle
         default_eye = self.camera_transforms.get("overview", Gf.Matrix4d(1)).ExtractTranslation()
         radius = math.hypot(default_eye[0], default_eye[1]) or 76
-        eye = Gf.Vec3d(radius * math.cos(a), radius * math.sin(a), default_eye[2] or 34)
-        mat = Gf.Matrix4d().SetLookAt(eye, Gf.Vec3d(0, 0, 0), Gf.Vec3d(0, 0, 1)).GetInverse()
+        a += math.atan2(default_eye[1], default_eye[0])
+        eye = Gf.Vec3d(radius * math.cos(a), radius * math.sin(a), default_eye[2])
+        mat = Gf.Matrix4d().SetLookAt(eye, Gf.Vec3d(0, 0, -1.8), Gf.Vec3d(0, 0, 1)).GetInverse()
         camera.GetPrim().GetAttribute("xformOp:transform").Set(mat)
         self._set_camera("overview")
 
@@ -523,6 +577,8 @@ class FusionTwinExtension(omni.ext.IExt):
         mode = self.state.get("mode", "assembly")
         field_key = {"heatflux": "heatflux_rgb", "delta_heatflux": "delta_heatflux_rgb",
                      "delta_temperature": "delta_temperature_rgb"}.get(mode, "temperature_rgb")
+        if mode == "heatflux" and self.state.get("heatScale", "log") == "log":
+            field_key = "heatflux_log_rgb"
         color_key = (reference["key"], field_key)
 
         def linear_colors(values):
@@ -570,20 +626,65 @@ class FusionTwinExtension(omni.ext.IExt):
             mesh.CreateDisplayColorPrimvar(UsdGeom.Tokens.vertex).Set(linear_colors(data["slice_rgb"]))
 
         if equilibrium_changed:
-            lines = data["magnetic_lines"]
+            lines = np.asarray(data["magnetic_lines"], dtype=np.float32)
             curves = UsdGeom.BasisCurves.Define(self.stage, "/World/Fields/FieldLines")
             curves.CreateTypeAttr("linear")
             curves.CreateWrapAttr("nonperiodic")
             curves.CreateCurveVertexCountsAttr(Vt.IntArray([len(line) for line in lines]))
             curves.CreatePointsAttr(Vt.Vec3fArray.FromNumpy(np.asarray(lines.reshape(-1, 3), dtype=np.float32)))
-            curves.CreateWidthsAttr([0.028])
+            curves.CreateWidthsAttr([0.023])
             curves.SetWidthsInterpolation("constant")
-            curves.CreateDisplayColorAttr([Gf.Vec3f(0.12, 0.8, 0.95)])
+            colors = np.asarray(data["field_line_rgb"], dtype=np.float32).reshape(-1, 3)
+            curves.CreateDisplayColorPrimvar(UsdGeom.Tokens.vertex).Set(linear_colors(colors))
+            UsdGeom.PrimvarsAPI(curves).CreatePrimvar("magneticFieldTesla", Sdf.ValueTypeNames.FloatArray,
+                                                   UsdGeom.Tokens.vertex).Set(Vt.FloatArray.FromNumpy(np.asarray(data["field_line_B_T"], dtype=np.float32).ravel()))
+            UsdShade.MaterialBindingAPI.Apply(curves.GetPrim()).Bind(self._vertex_material())
             curves.GetVisibilityAttr().Set("inherited" if self.state.get("fieldLines") or mode == "magnetic" else "invisible")
+            self.line_points = lines
+            self.last_line_update = 0.0
+            self.line_motion_time = 0.0
+            markers = UsdGeom.BasisCurves.Define(self.stage, "/World/Fields/DirectionMarkers")
+            markers.CreateTypeAttr("linear")
+            markers.CreateWrapAttr("nonperiodic")
+            marker_count = min(len(lines) * 4, 96)
+            markers.CreateCurveVertexCountsAttr(Vt.IntArray([4] * marker_count))
+            markers.CreateWidthsAttr(Vt.FloatArray([.025, .025, .085, .002] * marker_count))
+            markers.SetWidthsInterpolation("vertex")
+            markers.CreateDisplayColorAttr([Gf.Vec3f(.88, .94, 1.0)])
+            markers.GetPrim().SetCustomDataByKey("animationMeaning", "Direction of traced B; schematic marker speed, not plasma velocity")
+            UsdShade.MaterialBindingAPI.Apply(markers.GetPrim()).Bind(self._vertex_material())
+            self._animate_field_lines(time.perf_counter(), force=True)
         self.stage.GetPrimAtPath("/World/Fields/Surface").SetActive(mode in ("temperature", "heatflux", "delta_temperature", "delta_heatflux"))
         mesh.GetVisibilityAttr().Set("inherited" if mode == "slice" else "invisible")
         self.topology_key = reference["topology_key"]
         self.equilibrium_key = reference["equilibrium_key"]
+
+    def _animate_field_lines(self, now, force=False):
+        """Update at most 384 marker vertices at 15 Hz; traced field geometry stays fixed."""
+        import numpy as np
+        lines = getattr(self, "line_points", None)
+        if lines is None or len(lines) == 0:
+            return
+        enabled = self.state.get("lineMotion", True) and (self.state.get("fieldLines") or self.state.get("mode") == "magnetic")
+        if not force and (not enabled or now - self.last_line_update < 1 / 15):
+            return
+        if self.last_line_update:
+            self.line_motion_time += min(now - self.last_line_update, .2)
+        self.last_line_update = now
+        count, length = len(lines), lines.shape[1]
+        marker_ids = np.arange(min(count * 4, 96))
+        line_ids = marker_ids % count
+        # No end-to-start connector: each marker remains on its own nonperiodic line.
+        head = ((marker_ids // count) / 4 + self.line_motion_time / 14) % 1
+        span = min(5., max(0., length - 1.))
+        samples = head[:, None] * max(0., length - 1 - span) + np.array([0., .58, .72, 1.]) * span
+        lower = np.floor(samples).astype(np.int32)
+        upper = np.minimum(lower + 1, length - 1)
+        fraction = (samples - lower)[..., None]
+        points = lines[line_ids[:, None], lower] * (1 - fraction) + lines[line_ids[:, None], upper] * fraction
+        markers = UsdGeom.BasisCurves.Get(self.stage, "/World/Fields/DirectionMarkers")
+        markers.GetPointsAttr().Set(Vt.Vec3fArray.FromNumpy(points.reshape(-1, 3).astype(np.float32)))
+        markers.CreateVisibilityAttr("inherited" if enabled else "invisible")
 
     def _vertex_material(self):
         path = "/World/Fields/Materials/ScalarField"
@@ -634,6 +735,10 @@ class FusionTwinExtension(omni.ext.IExt):
         curves = self.stage.GetPrimAtPath("/World/Fields/FieldLines")
         if curves:
             UsdGeom.Imageable(curves).GetVisibilityAttr().Set("inherited" if self.state.get("fieldLines") or mode == "magnetic" else "invisible")
+        markers = self.stage.GetPrimAtPath("/World/Fields/DirectionMarkers")
+        if markers:
+            show = self.state.get("lineMotion", True) and (self.state.get("fieldLines") or mode == "magnetic")
+            UsdGeom.Imageable(markers).GetVisibilityAttr().Set("inherited" if show else "invisible")
         self._highlight_selection()
 
     async def _capture(self, request_id=None, raise_errors=False):
@@ -691,7 +796,7 @@ class FusionTwinExtension(omni.ext.IExt):
                        "RaytracedLighting": "RTX Real-Time (Legacy)"}.get(render_mode, str(render_mode))
         path_tracing = render_mode == "PathTracing"
         if self.stage:
-            for path in ("/World/Fields/Surface", "/World/Fields/Surface/sector_00/blanket", "/World/Fields/Surface/sector_00/divertor", "/World/Fields/Slice", "/World/Fields/FieldLines"):
+            for path in ("/World/Fields/Surface", "/World/Fields/Surface/sector_00/blanket", "/World/Fields/Surface/sector_00/divertor", "/World/Fields/Slice", "/World/Fields/FieldLines", "/World/Fields/DirectionMarkers"):
                 prim = self.stage.GetPrimAtPath(path)
                 if prim:
                     field_visibility[path] = {"active": prim.IsActive(), "authored": UsdGeom.Imageable(prim).GetVisibilityAttr().Get(), "effective": UsdGeom.Imageable(prim).ComputeVisibility()}
@@ -723,8 +828,12 @@ class FusionTwinExtension(omni.ext.IExt):
             "rt2_cached": settings.get("/rtx/rtpt/cached/enabled"),
             "auto_exposure": settings.get("/rtx/post/histogram/enabled"),
             "camera_path": str(viewport.camera_path) if viewport else None,
+            "hall_hidden_walls": getattr(self, "hall_hidden_walls", []),
             "selected": self.selected,
             "mode": self.state.get("mode"),
+            "heat_scale": self.state.get("heatScale", "log"),
+            "line_motion": self.state.get("lineMotion", True),
+            "line_marker_vertices": min(len(self.line_points) * 4, 96) * 4 if getattr(self, "line_points", None) is not None else 0,
             "field_visibility": field_visibility,
             "visible": {name: UsdGeom.Imageable(prim).ComputeVisibility() != UsdGeom.Tokens.invisible for name, prim in self.components.items()},
             "measurement": self.measurement,

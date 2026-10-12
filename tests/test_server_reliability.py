@@ -35,6 +35,7 @@ class ApplicationReliabilityTests(unittest.TestCase):
         (self.root / "assets").mkdir()
         (self.root / "assets/manifest.json").write_text(json.dumps({"components": [{"id": "blanket"}]}))
         self.app = TwinApplication(self.root, engine_factory=FakeEngine, start_background=False)
+        self.app.patch({"mode": "assembly"})
         self.renderer = {}
         self.sync_renderer()
 

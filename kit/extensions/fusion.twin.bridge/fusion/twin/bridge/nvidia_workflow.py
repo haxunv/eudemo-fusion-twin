@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 import numpy as np
@@ -25,16 +26,20 @@ from omni.cae.viz.listener import Listener
 from omni.rtwt.controller import control_registry, web_api
 from omni.rtwt.controller.callbacks import CallbackRegistry
 from omni.rtwt.inference import results
-from pxr import Gf, OmniSci, OmniSciVtk, Sdf, Usd, UsdGeom, UsdVol, Vt
+from pxr import Gf, OmniSci, OmniSciVtk, Sdf, Tf, Usd, UsdGeom, UsdVol, Vt
 
 DATASET = "/World/FusionResults"
 VOLUME = "/World/CAE/PlasmaVolume"
-MODEL_VERSION = "axisymmetric-profile-grid-v2"
-GRID_ORIGIN = (-32,-32,-28)
-GRID_SPACING = (28/64,28/64,.3)
-COLOR_STOPS = [0,.03,.15,.4,.7,1]
-COLOR_RGBA = [(0,0,0,0),(0,0,0,0),(.03,.18,.62,.025),
-              (.05,.75,.85,.08),(1,.67,.08,.25),(.95,.12,.025,.5)]
+MODEL_VERSION = "axisymmetric-profile-grid-v3-128"
+GRID_DIMENSIONS = (128,128,112)
+GRID_ORIGIN = (-64,-64,-56)
+GRID_SPACING = (28/128,28/128,.15)
+COLOR_STOPS = [0,.025,.10,.3,.6,1]
+TEMPERATURE_DOMAIN = (0,40)
+COLOR_RGBA = [(0,0,0,0),(.07,.03,.19,.01),(.34,.06,.43,.04),
+              (.73,.21,.33,.10),(.97,.55,.04,.23),(.99,1,.65,.45)]
+PLASMA_RGBA = [(0,0,0,0),(.12,.015,.32,.005),(.35,.035,.75,.025),
+               (.74,.10,.95,.065),(1,.33,.76,.15),(1,.80,.95,.28)]
 _active = None
 
 
@@ -52,8 +57,12 @@ async def fusion_set_state(state: dict):
         request = Request(server.rstrip("/")+"/api/state",
                           data=json.dumps(state).encode("utf-8"),
                           headers={"Content-Type": "application/json"}, method="POST")
-        with urlopen(request, timeout=45) as response:
-            return json.load(response)
+        try:
+            with urlopen(request, timeout=45) as response:
+                return json.load(response)
+        except HTTPError as exc:
+            detail = json.load(exc)
+            raise ValueError(detail.get("error", f"HTTP {exc.code}")) from None
     try:
         result = await asyncio.to_thread(post)
         _active.status["rtwt_remote_writes"] += 1
@@ -76,7 +85,7 @@ def _sample_volume(data, cutaway):
     active[np.unique(data["slice_triangles"])] = True
     temperatures[~active] = 0
     profile = temperatures.reshape(len(radii),len(heights))
-    dimensions = (64,64,56)
+    dimensions = GRID_DIMENSIONS
     spacing = GRID_SPACING
     # The stock CAE XAC shader samples p / voxel_size - 0.5. Keep the same
     # world-space voxel centres in the profile, NanoVDB and ImageData metadata.
@@ -106,6 +115,12 @@ class NvidiaWorkflow:
         self.latest = None
         self.closed = False
         self.volume_key = None
+        self.transfer_style = None
+        self.syncing_controls = False
+        self.committed_controls = {}
+        self.requested_controls = {}
+        self.inflight_controls = {}
+        self.control_task = None
         self.operator_events = {}
         self.operator_subscription = carb.eventdispatcher.get_eventdispatcher().observe_event(
             observer_name="fusion.workflow.operators",event_name=EVT_OPERATOR_COMPLETE+":immediate",
@@ -113,19 +128,21 @@ class NvidiaWorkflow:
         self.memory_keys = OrderedDict()
         self.status = {"rtwt_workflow": "fusion-engineering", "rtwt_ready": False,
                        "rtwt_remote_writes": 0, "rtwt_control_count": 0,
+                       "rtwt_standard_writes": 0, "control_pending": False, "control_error": None,
                        "volume_pending": False, "pending_volume_field_key": None, "volume_error": None,
                        "applied_volume_field_key": None, "applied_volume_key": None,
                        "index_native_volume": False, "volume_roundtrip": None,
                        "volume_cache_hits": 0, "volume_cache_misses": 0,
                        "volume_units": "keV", "volume_source": "synthetic axisymmetric temperature profile",
-                       "volume_colormap":{"positions":COLOR_STOPS,"rgba":COLOR_RGBA}}
+                       "volume_colormap":{"positions":COLOR_STOPS,"rgba":PLASMA_RGBA,"domain":list(TEMPERATURE_DOMAIN)},
+                       "volume_style":"plasma","volume_spacing_m":list(GRID_SPACING)}
         self.directory = self.root / "runtime/nvidia"
         self.directory.mkdir(parents=True,exist_ok=True)
         CallbackRegistry.register("fusion.engineering.volume_visibility",_volume_visibility)
         self.dataset = OmniSci.Dataset.Define(stage,DATASET).GetPrim()
         self.dataset.AddAppliedSchema("RtwtInferenceResultsAPI")
         self.dataset.CreateAttribute("omni:rtwt:inference_results:revision",Sdf.ValueTypeNames.Token).Set("")
-        self.dataset.CreateAttribute("fusion:effectiveThermalPowerMW",Sdf.ValueTypeNames.Float).Set(2000.)
+        self.dataset.CreateAttribute("fusion:baselineThermalPowerMW",Sdf.ValueTypeNames.Float).Set(2000.)
         self.dataset.SetCustomDataByKey("dataProvenance","Synthetic profile on public Bluemira equilibrium; not a transport solution")
         field = OmniSci.FieldAPI.Apply(self.dataset,"Temperature")
         field.CreateNameAttr("Temperature")
@@ -140,11 +157,14 @@ class NvidiaWorkflow:
         if registry is None or any(not c.usd_type for c in registry.controls()):
             raise RuntimeError("RTWT workflow/schema configuration is incomplete")
         self.keys = set(registry.short_to_full())
+        self.attribute_keys = {full:short for short,full in registry.short_to_full().items()}
+        self.state_notice = Tf.Notice.Register(Usd.Notice.ObjectsChanged,self._controls_changed,stage)
         self.status.update(rtwt_registered=True,rtwt_control_count=len(self.keys))
         messaging.register_event_type_to_send("fusion_cache_signal")
         _active = self
 
     def submit(self, state, field_data, field_ref):
+        self.committed_controls = {key:value for key,value in state.items() if key in self.keys}
         self.latest = (dict(state),field_data,dict(field_ref))
         pending = state.get("mode") == "volume"
         self.status.update(volume_pending=pending,pending_volume_field_key=field_ref["key"] if pending else None)
@@ -164,10 +184,55 @@ class NvidiaWorkflow:
         self.status.update(volume_pending=False,pending_volume_field_key=None)
         if self.task:
             self.task.cancel()
+        if self.control_task:
+            self.control_task.cancel()
+        self.state_notice.Revoke()
         self.operator_subscription.reset()
         if _active is self:
             _active = None
         CallbackRegistry.unregister("fusion.engineering.volume_visibility")
+
+    def _controls_changed(self, notice, stage):
+        """Standard RTWT set_state and USD edits enter the same validated solver."""
+        if self.closed or self.syncing_controls or not self.committed_controls:
+            return
+        for path in notice.GetChangedInfoOnlyPaths():
+            if str(path.GetPrimPath()) != "/World/AppState":
+                continue
+            name = path.name
+            key = self.attribute_keys.get(name)
+            if key:
+                value = self.app_state.GetAttribute(name).Get()
+                if (value != self.committed_controls.get(key) or key in self.requested_controls
+                        or key in self.inflight_controls):
+                    self.requested_controls[key] = value
+        if self.requested_controls and (self.control_task is None or self.control_task.done()):
+            self.control_task = asyncio.ensure_future(self._commit_control_requests())
+
+    async def _sync_controls(self, state):
+        self.syncing_controls = True
+        try:
+            return await web_api.set_state(state)
+        finally:
+            self.syncing_controls = False
+
+    async def _commit_control_requests(self):
+        await omni.kit.app.get_app().next_update_async()
+        while self.requested_controls and not self.closed:
+            patch = self.requested_controls
+            self.requested_controls = {}
+            self.inflight_controls = patch
+            self.status.update(control_pending=True,control_error=None)
+            result = await fusion_set_state(patch)
+            self.inflight_controls = {}
+            if result.get("accepted"):
+                self.status["rtwt_standard_writes"] += 1
+                self.status["control_accepted_revision"] = result["accepted_revision"]
+            else:
+                self.status["control_error"] = result.get("error","State rejected")
+                await self._sync_controls({key:self.committed_controls[key] for key in patch
+                                           if key in self.committed_controls and key not in self.requested_controls})
+            self.status["control_pending"] = bool(self.requested_controls)
 
     def _emit_cache(self, state, field_key, volume_key):
         omni.kit.app.queue_event("fusion_cache_signal",{
@@ -220,7 +285,11 @@ class NvidiaWorkflow:
         key,payload,source = self._volume_bytes(state,data,reference)
         if self.volume_key == key:
             self.status["volume_cache_source"] = source
+            self._apply_transfer(state)
             return key,source
+        # Publishing replaces the dataset before its GPU completion is known.
+        # A superseding request or failure must not reuse the previous applied key.
+        self.volume_key = None
         dimensions = tuple(int(x) for x in payload["dimensions"])
         image = OmniSciVtk.ImageDataAPI.Apply(self.dataset)
         image.CreateMinExtentAttr(Gf.Vec3i(*GRID_ORIGIN))
@@ -242,14 +311,25 @@ class NvidiaWorkflow:
             await execute_command("CreateCaeVizVolume",dataset_path=DATASET,prim_path=VOLUME,type="vdb")
             volume = self.stage.GetPrimAtPath(VOLUME)
             cae_viz.FieldSelectionAPI(volume,"colors").CreateFieldNamesAttr().Set(["Temperature"])
-            colormap = self.stage.GetPrimAtPath(VOLUME+"/Material/Colormap")
-            colormap.GetAttribute("rgbaPoints").Set(Vt.Vec4fArray([Gf.Vec4f(*color) for color in COLOR_RGBA]))
-            colormap.GetAttribute("xPoints").Set(Vt.FloatArray(COLOR_STOPS))
-        self.stage.GetPrimAtPath(VOLUME+"/Material/Colormap").GetAttribute("domain").Set(Gf.Vec2f(0,max(float(payload["range"][1]),.01)))
+        self._apply_transfer(state)
         self.status.update(volume_grid=list(dimensions),volume_range_keV=actual_range.tolist(),
                            rtwt_result_revision=revision,volume_cache_source=source,nanovdb_roundtrip=True,
                            volume_roundtrip="exact",volume_grid_voxels=int(np.prod(dimensions)))
         return key,source
+
+    def _apply_transfer(self,state):
+        style = state.get("volumeStyle","plasma")
+        if style == self.transfer_style:
+            return
+        colors = PLASMA_RGBA if style == "plasma" else COLOR_RGBA
+        colormap = self.stage.GetPrimAtPath(VOLUME+"/Material/Colormap")
+        colormap.GetAttribute("rgbaPoints").Set(Vt.Vec4fArray([Gf.Vec4f(*color) for color in colors]))
+        colormap.GetAttribute("xPoints").Set(Vt.FloatArray(COLOR_STOPS))
+        colormap.GetAttribute("domain").Set(Gf.Vec2f(*TEMPERATURE_DOMAIN))
+        self.status.update(volume_style=style,volume_colormap={"positions":COLOR_STOPS,"rgba":colors,
+                           "domain":list(TEMPERATURE_DOMAIN)},
+                           volume_presentation="illustrative plasma glow" if style == "plasma" else "quantitative synthetic keV")
+        self.transfer_style = style
 
     async def _run(self):
         while self.latest is not None and not self.closed:
@@ -258,30 +338,51 @@ class NvidiaWorkflow:
             try:
                 self.status["volume_error"] = None
                 key = None
+                await Listener.wait_for_sync_idle()
+                accepted = await self._sync_controls({k:v for k,v in state.items() if k in self.keys
+                                                     and k not in self.requested_controls and k not in self.inflight_controls})
+                if accepted is not True:
+                    raise RuntimeError("RTWT did not accept committed application state")
+                # CAE skips invisible operators and then clears their dirty fields.
+                # Commit the visibility binding before publishing a new dataset.
+                expected_visibility = "inherited" if state.get("mode") == "volume" else "invisible"
+                for _ in range(200):
+                    await omni.kit.app.get_app().next_update_async()
+                    if self.latest is not None:
+                        break
+                    bindings_ready = (self.stage.GetPrimAtPath(VOLUME).GetAttribute("visibility").Get()==expected_visibility
+                                      and abs(self.dataset.GetAttribute("fusion:baselineThermalPowerMW").Get()-state["power"])<.01)
+                    if bindings_ready:
+                        break
+                    await asyncio.sleep(.01)
+                else:
+                    raise RuntimeError(f"RTWT binding timeout: expected {expected_visibility}, power={state['power']}")
+                if self.latest is not None:
+                    continue
+                await Listener.wait_for_sync_idle()
                 prior_volume_events = self.operator_events.get(VOLUME,{}).get("count",0)
                 native_cache_key = f"[viz:index_compute_task_vdb]::{VOLUME}"
                 prior_native = cache.get(native_cache_key,timeCode=Usd.TimeCode.EarliestTime())
                 if state.get("mode") == "volume":
                     key,_ = await self._publish(state,data,reference)
-                await Listener.wait_for_sync_idle()
-                accepted = await web_api.set_state({k:v for k,v in state.items() if k in self.keys})
-                if accepted is not True:
-                    raise RuntimeError("RTWT did not accept committed application state")
                 # USD/Fabric population and the CAE listener run on subsequent Kit updates.
                 # Wait for the actual binding/output, not merely for set_state to return.
-                expected_visibility = "inherited" if key is not None else "invisible"
                 for _ in range(200):
                     await omni.kit.app.get_app().next_update_async()
+                    if self.latest is not None:
+                        break
                     volume_event = self.operator_events.get(VOLUME,{})
                     output_ready = (key is None or key == self.volume_key or
                                     (volume_event.get("count",0)>prior_volume_events and volume_event.get("success")))
                     bindings_ready = (self.stage.GetPrimAtPath(VOLUME).GetAttribute("visibility").Get()==expected_visibility
-                                      and abs(self.dataset.GetAttribute("fusion:effectiveThermalPowerMW").Get()-state["power"])<.01)
+                                      and abs(self.dataset.GetAttribute("fusion:baselineThermalPowerMW").Get()-state["power"])<.01)
                     if output_ready and bindings_ready:
                         break
                     await asyncio.sleep(.01)
                 else:
-                    raise RuntimeError(f"RTWT/IndeX completion timeout: {self.operator_events}")
+                    raise RuntimeError(f"RTWT/IndeX completion timeout: output={output_ready}, bindings={bindings_ready}, events={self.operator_events}")
+                if self.latest is not None:
+                    continue
                 if key is not None:
                     dataset = cache.get(f"[viz:index_volume]::{VOLUME}",timeCode=Usd.TimeCode.EarliestTime())
                     volume = self.stage.GetPrimAtPath(VOLUME)

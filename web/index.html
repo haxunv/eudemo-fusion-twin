@@ -1,48 +1,59 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1a1a1a">
-  <title>EU-DEMO · Fusion Digital Twin</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/style.css">
-</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101210"><title>EU-DEMO · Fusion Digital Twin</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css"></head>
 <body>
-  <main id="workspace" aria-label="EU-DEMO Fusion Digital Twin">
-    <div class="viewport" id="viewport">
-      <img id="render-preview" alt="EU-DEMO RTX render" hidden>
-      <video id="remote-video" autoplay muted playsinline tabindex="-1"></video>
-      <audio id="remote-audio" autoplay muted hidden></audio>
-      <div class="viewport-vignette"></div>
+<main id="workspace">
+  <div class="viewport" id="viewport"><img id="render-preview" alt="EU-DEMO RTX" hidden><video id="remote-video" autoplay muted playsinline tabindex="-1"></video><audio id="remote-audio" autoplay muted hidden></audio><div class="viewport-vignette"></div></div>
+  <header class="topbar">
+    <div class="identity"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="16" ry="8"/><ellipse cx="18" cy="18" rx="8" ry="16" transform="rotate(30 18 18)"/><circle cx="18" cy="18" r="3"/></svg></span><div><h1>EU-DEMO <span data-i18n="digitalTwin">聚变数字孪生</span></h1><p>BLUEMIRA <span>/</span> NVIDIA OMNIVERSE</p></div></div>
+    <div class="top-actions"><button class="connection" id="connection"><i></i><span data-i18n="connecting">正在连接</span></button><button class="icon-button" id="fullscreen-button" data-title="fullscreen"><svg viewBox="0 0 20 20"><path d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4"/></svg></button><div class="language" role="group" aria-label="Language"><button data-lang="zh" class="active">中</button><button data-lang="en">EN</button></div></div>
+  </header>
+  <aside class="views-panel panel"><div class="section-heading"><h2 data-i18n="views">视角</h2><span class="tiny-tag">RTX</span></div><div id="camera-buttons"></div><button id="orbit-button" class="outline-button orbit-button"><svg viewBox="0 0 20 20"><ellipse cx="10" cy="10" rx="8" ry="4" transform="rotate(-25 10 10)"/><circle cx="10" cy="10" r="2"/><path d="m15 3 2 2-3 1"/></svg><span data-i18n="orbit">环绕</span></button></aside>
+  <aside class="right-sidebar">
+    <nav class="mode-tabs panel" role="tablist"><button role="tab" data-tab="explore" class="active" data-i18n="explore">探索</button><button role="tab" data-tab="compare" data-i18n="compare">对比</button><button role="tab" data-tab="engineering" data-i18n="engineering">工程</button></nav>
+    <div class="sidebar-body">
+      <section id="explore-panel" class="panel settings-panel">
+        <div class="section-heading"><h2 data-i18n="settings">工况设置</h2><span class="tiny-tag" data-i18n="syntheticCase">合成情景</span></div>
+        <div class="field-label"><span data-i18n="heating">辅助加热</span><span>MW</span></div>
+        <div class="heating-grid" role="group" data-title="heating"><button data-heating="20">20</button><button data-heating="35">35</button><button data-heating="50" class="active">50</button><button data-heating="65">65</button></div>
+        <label class="switch-label neon-control"><span><strong data-i18n="neon">Ne 杂质注入</strong><small data-i18n="neonHint">合成辐射冷却情景</small></span><input type="checkbox" id="neon-toggle"><span class="switch-track"></span></label>
+        <div class="field-label"><span data-i18n="divertorDesign">偏滤器方案</span><span class="muted" data-i18n="sourceGeometry">源 CAD</span></div>
+        <div class="design-grid"><button data-design="conventional" class="design-card active"><img src="/assets/ui/designs/conventional.png" alt=""><span data-i18n="conventional">常规偏滤器</span></button><button data-design="longleg" class="design-card"><img src="/assets/ui/designs/longleg.png" alt=""><span data-i18n="longleg">长腿偏滤器</span></button></div>
+      </section>
+      <section id="compare-panel" class="panel comparison-panel" hidden><div class="section-heading"><h2 data-i18n="fourCases">四工况对比</h2><span class="tiny-tag" data-i18n="sameInputs">相同输入</span></div><p class="supporting" data-i18n="fourCasesHint">在同一加热与平衡条件下，比较偏滤器方案和 Ne 情景。</p><div id="comparison-cases" class="comparison-grid"></div><p class="supporting compare-scale" id="comparison-scale"></p></section>
+      <section id="engineering-panel" class="panel engineering-panel" hidden>
+        <div class="section-heading"><h2 data-i18n="engineeringTools">工程检查</h2><span class="tiny-tag">CAD</span></div>
+        <div class="tool-row"><button class="outline-button" id="assembly-button" data-i18n="assemblyTree" aria-expanded="false">模型装配树</button><button class="outline-button" id="measure-button" data-i18n="measure">测量</button></div>
+        <details open><summary data-i18n="thermalControls">热工参数</summary><label class="select-label"><span data-i18n="scenario">运行工况</span><select id="scenario-select"><option value="nominal" data-i18n="nominal"></option><option value="ramp" data-i18n="ramp"></option><option value="lowflow" data-i18n="lowflow"></option><option value="highload" data-i18n="highload"></option></select></label>
+          <div class="range-field"><label for="power-range"><span data-i18n="fusionPower">基准热预算</span><output id="power-value"></output></label><input id="power-range" type="range" min="500" max="2600" step="50" data-state="power"><p class="supporting" data-i18n="powerHint">基准热预算不含辅助加热。</p></div>
+          <div class="range-field"><label for="flow-range"><span data-i18n="coolantFlow">冷却流量</span><output id="flow-value"></output></label><input id="flow-range" type="range" min="0.4" max="1.4" step="0.05" data-state="flow"></div>
+          <div class="range-field"><label for="inlet-range"><span data-i18n="inletTemperature">冷却剂入口温度</span><output id="inlet-value"></output></label><input id="inlet-range" type="range" min="200" max="400" step="5" data-state="inlet"></div>
+        </details>
+        <details><summary data-i18n="advancedViews">工程场与装配</summary><div class="viz-grid engineering-modes"><button data-mode="temperature" class="outline-button" data-i18n="temperature"></button><button data-mode="slice" class="outline-button" data-i18n="slice"></button><button data-mode="delta_temperature" class="outline-button" data-i18n="deltaTemperature"></button><button data-mode="delta_heatflux" class="outline-button" data-i18n="deltaHeatflux"></button></div><p class="supporting" data-i18n="differenceNote"></p>
+          <div class="range-field"><label for="explode-range"><span data-i18n="explode"></span><output id="explode-value"></output></label><input id="explode-range" type="range" min="0" max="1" step="0.05" data-state="explode"></div>
+          <div class="range-field"><label for="opacity-range"><span data-i18n="opacity"></span><output id="opacity-value"></output></label><input id="opacity-range" type="range" min="0.1" max="1" step="0.05" data-state="opacity"></div>
+          <label class="switch-label"><span data-i18n="fieldLines"></span><input type="checkbox" id="fieldlines-toggle"><span class="switch-track"></span></label>
+        </details>
+        <details><summary data-i18n="loadStudy">独立负荷扫描</summary><label class="select-label"><span data-i18n="equilibrium"></span><select id="equilibrium-select"><option value="reference" data-i18n="reference"></option><option value="rampup" data-i18n="eqRampup"></option><option value="sof" data-i18n="eqSof"></option><option value="eof" data-i18n="eqEof"></option><option value="rampdown" data-i18n="eqRampdown"></option></select></label><p class="supporting" data-i18n="loadStudyHint"></p><div class="timeline"><button class="play-button" id="play-button" data-title="play"><svg class="play-symbol" viewBox="0 0 20 20"><path d="m6 3 11 7-11 7Z"/></svg><svg class="pause-symbol" viewBox="0 0 20 20"><path d="M6 3v14M14 3v14"/></svg></button><div class="timeline-content"><div class="field-label"><span data-i18n="discharge"></span><output id="phase-value"></output></div><input id="phase-range" type="range" min="0" max="1" step="0.01" data-state="phase"></div></div><div id="history-chart" class="history-chart"></div></details>
+        <details><summary data-i18n="readouts"></summary><div class="readout-grid"><div><span data-i18n="peakTemperature"></span><strong id="kpi-temperature">—</strong><small>°C</small></div><div><span data-i18n="peakHeatflux"></span><strong id="kpi-heatflux">—</strong><small>MW/m²</small></div><div><span data-i18n="outletTemperature"></span><strong id="kpi-outlet">—</strong><small>°C</small></div><div><span data-i18n="coolingMargin"></span><strong id="kpi-margin">—</strong><small>°C</small></div></div><div class="compute-line"><span id="compute-badge"></span><span id="gpu-time"></span></div><h3 data-i18n="powerBalance"></h3><div id="power-budget"></div></details>
+        <div class="export-row"><button class="outline-button" id="export-button" data-i18n="export"></button><button class="outline-button" id="screenshot-button" data-i18n="screenshot"></button></div><div class="export-row"><a class="outline-button" href="/api/download/cad.zip" download data-i18n="downloadStep"></a><a class="outline-button" href="/api/download/usd.zip" download data-i18n="downloadUsd"></a></div>
+      </section>
     </div>
-
-    <header class="topbar">
-      <div class="identity">
-        <svg class="reactor-mark" viewBox="0 0 36 36" aria-hidden="true"><ellipse cx="18" cy="18" rx="16" ry="8"/><ellipse cx="18" cy="18" rx="8" ry="16" transform="rotate(35 18 18)"/><ellipse cx="18" cy="18" rx="8" ry="16" transform="rotate(-35 18 18)"/><circle cx="18" cy="18" r="3"/></svg>
-        <div><h1>EU-DEMO <span data-i18n="digitalTwin">聚变数字孪生</span></h1><p>BLUEMIRA <span class="slash">/</span> ENGINEERING EXPLORER</p></div>
-      </div>
-      <div class="top-actions">
-        <div class="connection" id="connection"><i></i><span data-i18n="connecting">正在连接</span></div>
-        <button class="icon-button" id="fullscreen-button" data-title="fullscreen" aria-label="Fullscreen"><svg viewBox="0 0 20 20"><path d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4"/></svg></button>
-        <div class="language" role="group" aria-label="Language"><button data-lang="zh" class="active">中</button><button data-lang="en">EN</button></div>
-      </div>
-    </header>
-
-    <aside class="views-panel panel" aria-label="Camera views">
-      <h2 data-i18n="views">视角</h2>
-      <div id="camera-buttons"></div>
-      <button id="orbit-button" class="outline-button orbit-button"><svg viewBox="0 0 20 20"><ellipse cx="10" cy="10" rx="8" ry="4" transform="rotate(-25 10 10)"/><circle cx="10" cy="10" r="2"/><path d="m15 3 2 2-3 1"/></svg><span data-i18n="orbit">环绕</span></button>
-    </aside>
-
-    <div class="cad-toolbar panel">
-      <button class="tool-button" id="assembly-button" data-title="assemblyTree" aria-expanded="false"><svg viewBox="0 0 20 20"><path d="M3 3h5v4H3zm9 5h5v4h-5zm0 7h5v3h-5zM5 7v9h7m-7-6h7"/></svg><span data-i18n="assembly">装配</span></button>
-      <button class="tool-button" id="measure-button" data-title="measureTitle"><svg viewBox="0 0 20 20"><path d="m3 13 10-10 4 4L7 17zm5-5 2 2m1-5 2 2m-8 4 2 2"/></svg><span data-i18n="measure">测量</span></button>
-      <button class="tool-button" id="reset-view-button" data-title="resetView"><svg viewBox="0 0 20 20"><path d="M4 8a6 6 0 1 1 0 5M4 3v5h5"/></svg><span data-i18n="reset">重置</span></button>
-    </div>
-
+    <section class="panel visualization-panel"><div class="section-heading"><h2 data-i18n="visualization">可视化</h2><span class="tiny-tag">RTX</span></div><div class="viz-grid" id="mode-buttons"><button data-mode="assembly" class="outline-button active" data-i18n="assemblyMode"></button><button data-mode="heatflux" class="outline-button" data-i18n="heatflux"></button><button data-mode="magnetic" class="outline-button" data-i18n="magnetic"></button><button data-mode="volume" class="outline-button" data-i18n="volume" disabled></button></div>
+      <div id="heat-options" class="mode-options" hidden><span data-i18n="colorScale"></span><div class="segmented"><button data-heat-scale="log" data-i18n="logScale"></button><button data-heat-scale="linear" data-i18n="linearScale"></button></div></div>
+      <div id="volume-options" class="mode-options" hidden><span data-i18n="volumeDisplay"></span><div class="segmented"><button data-volume-style="plasma" data-i18n="plasmaStyle"></button><button data-volume-style="temperature" data-i18n="temperatureStyle"></button></div></div>
+      <label id="magnetic-options" class="switch-label" hidden><span data-i18n="lineMotion"></span><input type="checkbox" id="line-motion-toggle"><span class="switch-track"></span></label>
+      <div class="legend" id="field-legend" hidden><div class="legend-heading"><span id="legend-title"></span><span id="legend-unit"></span></div><div class="colormap"></div><div class="legend-ticks" id="legend-ticks"></div></div><p class="supporting mode-note" id="mode-note" hidden></p>
+      <div class="range-field compact"><label for="cutaway-range"><span data-i18n="cutaway"></span><output id="cutaway-value"></output></label><input id="cutaway-range" type="range" min="0" max="180" step="20" data-state="cutaway"></div><button class="reset-button" id="reset-view-button"><svg viewBox="0 0 20 20"><path d="M4 8a6 6 0 1 1 0 5M4 3v5h5"/></svg><span data-i18n="resetView"></span></button>
+    </section>
+    <section class="panel hero-readout"><div class="section-heading"><h2 data-i18n="targetPeak">靶板峰值热流</h2><span class="field-sync" id="story-sync">—</span></div><div class="hero-value"><strong id="story-peak">—</strong><span>MW/m²</span></div><div class="relative-readout"><span data-i18n="relativeNoNe">相对无 Ne 情景</span><strong id="story-relative">—</strong></div></section>
+  </aside>
+  <section class="view-caption"><span class="eyebrow" data-i18n="engineeringDemo">工程演示数据</span><h2 id="view-title"></h2><p id="view-subtitle"></p></section>
+  <section class="equilibrium-nav panel"><div class="equilibrium-heading"><h2 data-i18n="equilibriumStages">磁平衡快照</h2><span data-i18n="snapshotHint">独立源快照 · 非连续瞬态</span></div><div class="stage-grid"><button data-equilibrium="rampup"><span>01</span><strong data-i18n="eqRampup"></strong></button><button data-equilibrium="sof"><span>02</span><strong data-i18n="eqSof"></strong></button><button data-equilibrium="eof"><span>03</span><strong data-i18n="eqEof"></strong></button><button data-equilibrium="rampdown"><span>04</span><strong data-i18n="eqRampdown"></strong></button></div></section>
+  <footer class="statusbar"><div><span class="nvidia-accent"></span><strong>NVIDIA</strong><span>OMNIVERSE RTX</span><span class="status-divider">/</span><span>OpenUSD</span><span class="status-divider">/</span><span id="gpu-label">GPU —</span></div><button id="provenance-button" data-i18n="dataProvenance"></button></footer>
+  <div class="loading-state panel" id="loading-state"><div class="spinner"></div><h2 data-i18n="initializing"></h2><p id="loading-detail" data-i18n="initializingDetail"></p></div><div class="toast" id="toast" role="status" hidden></div>
     <aside class="assembly-drawer panel" id="assembly-drawer" hidden>
-      <div class="panel-title"><h2 data-i18n="assemblyTree">模型装配树</h2><button class="icon-button" data-close="assembly-drawer" aria-label="Close">×</button></div>
+      <div class="panel-title"><h2 data-i18n="assemblyTree">模型装配树</h2><button class="icon-button" data-close="assembly-drawer" data-title="close">×</button></div>
       <div class="assembly-summary"><span id="assembly-count">—</span><span class="tiny-tag">OpenUSD</span></div>
       <label class="search-box"><svg viewBox="0 0 20 20"><circle cx="8" cy="8" r="5"/><path d="m12 12 5 5"/></svg><input id="component-search" data-placeholder="searchComponents" placeholder="搜索部件"></label>
       <div id="component-tree" class="component-tree"></div>
@@ -50,56 +61,6 @@
       <section id="component-properties" class="component-properties"><p data-i18n="selectComponent">选择部件查看工程属性</p></section>
     </aside>
 
-    <aside class="right-sidebar" aria-label="Simulation controls">
-      <div class="mode-tabs panel" role="tablist"><button role="tab" data-tab="explore" class="active"><svg viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14M7 2v6m6-1v6m-5-1v6"/></svg><span data-i18n="explore">探索</span></button><button role="tab" data-tab="compare"><svg viewBox="0 0 20 20"><path d="M9 2v16M6 4H2v12h4m7-12h5v12h-5"/></svg><span data-i18n="compare">对比</span></button></div>
-
-      <div id="explore-panel">
-        <section class="panel settings-panel">
-          <h2 data-i18n="settings">工况设置</h2>
-          <label class="select-label"><span data-i18n="design">反应堆方案</span><select id="design-select"><option value="conventional" data-i18n="conventional">常规偏滤器</option><option value="longleg" data-i18n="longleg">长腿偏滤器</option></select></label>
-          <label class="select-label"><span data-i18n="equilibrium">磁平衡状态</span><select id="equilibrium-select"><option value="reference" data-i18n="reference">参考</option><option value="rampup" data-i18n="eqRampup">电流爬升</option><option value="sof" data-i18n="eqSof">平顶开始</option><option value="eof" data-i18n="eqEof">平顶结束</option><option value="rampdown" data-i18n="eqRampdown">电流下降</option></select></label>
-          <label class="select-label"><span data-i18n="scenario">运行工况</span><select id="scenario-select"><option value="nominal" data-i18n="nominal">额定运行</option><option value="ramp" data-i18n="ramp">热负荷爬升</option><option value="lowflow" data-i18n="lowflow">低冷却流量</option><option value="highload" data-i18n="highload">高热负荷</option></select></label>
-          <div class="range-field"><label for="power-range"><span data-i18n="fusionPower">假定热负荷</span><output id="power-value">2,000 <small>MW</small></output></label><input id="power-range" type="range" min="500" max="2600" step="50" data-state="power"><div class="range-ticks"><span>500</span><span>2,600 MW</span></div></div>
-          <div class="range-field"><label for="flow-range"><span data-i18n="coolantFlow">冷却流量</span><output id="flow-value">100 <small>%</small></output></label><input id="flow-range" type="range" min="0.4" max="1.4" step="0.05" data-state="flow"><div class="range-ticks"><span>40%</span><span>140%</span></div></div>
-          <div class="range-field"><label for="inlet-range"><span data-i18n="inletTemperature">冷却剂入口温度</span><output id="inlet-value">300 <small>°C</small></output></label><input id="inlet-range" type="range" min="200" max="400" step="5" data-state="inlet"></div>
-        </section>
-
-        <section class="panel visualization-panel">
-          <h2 data-i18n="visualization">可视化方式</h2>
-          <div class="viz-grid" id="mode-buttons"><button data-mode="assembly" class="outline-button active"><span data-i18n="assemblyMode">工程装配</span></button><button data-mode="temperature" class="outline-button"><span data-i18n="temperature">温度</span></button><button data-mode="heatflux" class="outline-button"><span data-i18n="heatflux">热流密度</span></button><button data-mode="magnetic" class="outline-button"><span data-i18n="magnetic">磁力线</span></button><button data-mode="slice" class="outline-button"><span data-i18n="slice">截面场</span></button><button data-mode="volume" class="outline-button" disabled><span data-i18n="volume">等离子体体积场</span></button></div>
-          <div class="legend" id="field-legend" hidden><div class="legend-heading"><span id="legend-title"></span><span id="legend-unit"></span></div><div class="colormap"></div><div class="range-ticks"><span id="legend-min">—</span><span id="legend-max">—</span></div></div>
-          <div class="section-separator"></div>
-          <h3 data-i18n="adjustment">可视化调整</h3>
-          <div class="range-field"><label for="cutaway-range"><span data-i18n="cutaway">剖开角度</span><output id="cutaway-value">80°</output></label><input id="cutaway-range" type="range" min="0" max="180" step="20" data-state="cutaway"></div>
-          <div class="dual-ranges"><div class="range-field"><label for="explode-range"><span data-i18n="explode">装配爆炸</span><output id="explode-value">0%</output></label><input id="explode-range" type="range" min="0" max="1" step="0.05" data-state="explode"></div><div class="range-field"><label for="opacity-range"><span data-i18n="opacity">不透明度</span><output id="opacity-value">100%</output></label><input id="opacity-range" type="range" min="0.1" max="1" step="0.05" data-state="opacity"></div></div>
-          <label class="switch-label"><span data-i18n="fieldLines">叠加磁力线</span><input type="checkbox" id="fieldlines-toggle"><span class="switch-track"></span></label>
-        </section>
-      </div>
-
-      <div id="compare-panel" hidden>
-        <section class="panel compare-settings"><h2 data-i18n="compareTitle">工况对比</h2><p class="muted-small" data-i18n="compareDescription">比较参考工况与当前工况的热管理响应。</p><div class="comparison-head"><div><span data-i18n="baseline">参考工况</span><strong data-i18n="nominal">额定运行</strong></div><span class="comparison-arrow">→</span><div><span data-i18n="candidate">当前工况</span><strong id="compare-candidate">—</strong></div></div><div id="comparison-results"></div><p class="muted-small source-note" data-i18n="compareNote">同一几何模型 · 同一数据生成方法</p></section>
-        <section class="panel"><h2 data-i18n="differenceField">三维差值场</h2><div class="viz-grid"><button class="outline-button" data-mode="delta_temperature" data-i18n="deltaTemperature">温度差</button><button class="outline-button" data-mode="delta_heatflux" data-i18n="deltaHeatflux">热流差</button></div><p class="muted-small" data-i18n="differenceNote">当前工况减参考工况，使用相同几何与磁平衡。</p></section>
-        <section class="panel"><h2 data-i18n="trendTitle">时间历程</h2><div id="history-chart" class="history-chart"></div><div class="chart-caption"><span data-i18n="surfaceTemperature">峰值表面温度</span><span>°C</span></div></section>
-      </div>
-
-      <section class="panel readouts-panel"><div class="readout-title"><h2 data-i18n="readouts">计算结果</h2><span class="tiny-tag" id="compute-badge">—</span></div><div class="readout-grid"><div><span data-i18n="peakTemperature">峰值温度</span><strong id="kpi-temperature">—</strong><small>°C</small></div><div><span data-i18n="peakHeatflux">峰值热流</span><strong id="kpi-heatflux">—</strong><small>MW/m²</small></div><div><span data-i18n="outletTemperature">出口温度</span><strong id="kpi-outlet">—</strong><small>°C</small></div><div><span data-i18n="coolingMargin">温度裕量</span><strong id="kpi-margin">—</strong><small>°C</small></div></div><div class="compute-line"><span data-i18n="fieldCompute">场计算</span><span id="gpu-time">—</span></div></section>
-      <section class="panel budget-panel"><h2 data-i18n="powerBalance">功率收支</h2><div id="power-budget" aria-live="polite"></div></section>
-      <div class="export-row"><button class="outline-button" id="export-button"><svg viewBox="0 0 20 20"><path d="M10 2v10m-4-4 4 4 4-4M3 13v4h14v-4"/></svg><span data-i18n="export">导出工况</span></button><button class="outline-button" id="screenshot-button"><svg viewBox="0 0 20 20"><path d="M2 6h4l2-3h4l2 3h4v11H2z"/><circle cx="10" cy="11" r="3"/></svg><span data-i18n="screenshot">截图</span></button></div>
-    </aside>
-
-    <section class="view-caption"><span class="eyebrow">EU-DEMO / TOKAMAK</span><h2 id="view-title">—</h2><p id="view-subtitle"></p></section>
-
-    <section class="timeline panel" aria-label="Quasi-steady load scan"><button class="play-button" id="play-button" data-title="play"><svg class="play-symbol" viewBox="0 0 20 20"><path d="m6 3 11 7-11 7Z"/></svg><svg class="pause-symbol" viewBox="0 0 20 20"><path d="M6 3v14M14 3v14"/></svg></button><div class="timeline-content"><div class="timeline-heading"><div><span data-i18n="discharge">负荷扫描</span><small data-i18n="demoTimeline">准稳态 · 合成工况</small></div><span id="phase-value">0%</span></div><input type="range" id="phase-range" min="0" max="1" step="0.01" data-state="phase" aria-label="Load scan position"><div class="timeline-labels"><span data-i18n="rampUp">低负荷</span><span data-i18n="flatTop">中间负荷</span><span data-i18n="rampDown">名义负荷</span></div></div></section>
-
-    <footer class="statusbar"><div><span class="nvidia-accent"></span><strong>NVIDIA</strong><span>OMNIVERSE RTX</span><span class="status-divider">|</span><span>OpenUSD</span><span class="status-divider">|</span><span id="gpu-label">GPU —</span></div><button id="provenance-button"><span class="data-dot"></span><span data-i18n="dataProvenance">数据来源与模型说明</span></button></footer>
-
-    <div class="loading-state panel" id="loading-state"><div class="spinner"></div><h2 data-i18n="initializing">正在准备工程场景</h2><p id="loading-detail" data-i18n="initializingDetail">加载 EU-DEMO 装配与 RTX 渲染器</p></div>
-    <div class="toast" id="toast" role="status" hidden></div>
-
-    <dialog id="measure-dialog" class="info-dialog"><div class="panel-title"><h2 data-i18n="dimensions">工程尺寸</h2><button class="icon-button" data-dialog-close aria-label="Close">×</button></div><div id="measurement-content"></div></dialog>
-    <dialog id="provenance-dialog" class="info-dialog"><div class="panel-title"><h2 data-i18n="dataProvenance">数据来源与模型说明</h2><button class="icon-button" data-dialog-close aria-label="Close">×</button></div><div class="provenance-content"><div class="provenance-row"><span class="tiny-tag">CAD</span><div><h3>bluemira / EU-DEMO</h3><p data-i18n="cadProvenance">公开概念设计生成的反应堆装配。保留部件层级、材料和源模型信息。</p><a href="https://github.com/Fusion-Power-Plant-Framework/bluemira-eudemo" target="_blank" rel="noreferrer">bluemira-eudemo ↗</a></div></div><div class="provenance-row"><span class="tiny-tag">FIELD</span><div><h3 data-i18n="engineeringDemo">工程演示数据</h3><div id="source-description"></div><p data-i18n="fieldProvenance">预制或简化模型生成的场数据用于交互展示；工况、单位和计算参数随导出文件提供。</p></div></div><div class="provenance-row"><span class="tiny-tag">RTX</span><div><h3>NVIDIA Omniverse</h3><p data-i18n="renderProvenance">OpenUSD 场景通过本机 Kit 渲染，WebRTC 传输交互画面。</p></div></div><div id="source-downloads"></div></div></dialog>
-  </main>
-  <script src="/vendor/fusion-streamer.js" defer></script>
-  <script src="/app.js" type="module"></script>
-</body>
-</html>
+    <dialog id="measure-dialog" class="info-dialog"><div class="panel-title"><h2 data-i18n="dimensions">工程尺寸</h2><button class="icon-button" data-dialog-close data-title="close">×</button></div><div id="measurement-content"></div></dialog>
+    <dialog id="provenance-dialog" class="info-dialog"><div class="panel-title"><h2 data-i18n="dataProvenance">数据来源与模型说明</h2><button class="icon-button" data-dialog-close data-title="close">×</button></div><div class="provenance-content"><div class="provenance-row"><span class="tiny-tag">CAD</span><div><h3>bluemira / EU-DEMO</h3><p data-i18n="cadProvenance">公开概念设计生成的反应堆装配。保留部件层级、材料和源模型信息。</p><a href="https://github.com/Fusion-Power-Plant-Framework/bluemira-eudemo" target="_blank" rel="noreferrer">bluemira-eudemo ↗</a></div></div><div class="provenance-row"><span class="tiny-tag">FIELD</span><div><h3 data-i18n="engineeringDemo">工程演示数据</h3><div id="source-description"></div><p data-i18n="fieldProvenance">预制或简化模型生成的场数据用于交互展示；工况、单位和计算参数随导出文件提供。</p></div></div><div class="provenance-row"><span class="tiny-tag">RTX</span><div><h3>NVIDIA Omniverse</h3><p data-i18n="renderProvenance">OpenUSD 场景通过本机 Kit 渲染，WebRTC 传输交互画面。</p></div></div><div id="source-downloads"></div></div></dialog>
+</main><script src="/vendor/fusion-streamer.js" defer></script><script src="/app.js" type="module"></script></body></html>

@@ -1,627 +1,3436 @@
 {
-  "schema_version": 1,
-  "accepted_at": "2026-10-11T23:55:30.728118+00:00",
-  "scope": "Windows engineering visualization demo; synthetic_demo; not physical validation",
-  "hardware": {
-    "gpu": "NVIDIA GeForce RTX 5070 Ti",
-    "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-    "video_resolution": [
-      2560,
-      1440
+  "schema_version": 2,
+  "status": "accepted_local_demo",
+  "updated_at": "2026-10-12T04:22:25.432883+00:00",
+  "scope": "Windows engineering visualization demo; synthetic_demo; numerical consistency is not physical validation",
+  "current": {
+    "model_version": "pfc-aux-neon-budget-v3.0",
+    "accepted_at": "2026-10-12T04:22:25.432883+00:00",
+    "status": "accepted_local_demo",
+    "changes": [
+      "20/35/50/65 MW auxiliary heating; shared-control conventional/LongLeg and Ne off/on comparison",
+      "Closed power ledger with explicit synthetic radiation and spreading assumptions",
+      "80 versioned presets; fixed log/linear heat-flux and source-field-strength colors",
+      "Tokamak hall, MDL surfaces, native RTX view/design thumbnails and bilingual main/engineering UI",
+      "128x128x112 NanoVDB; illustrative plasma and fixed-range temperature transfer functions",
+      "Standard RTWT set_state validation/rollback and superseded volume publication recovery",
+      "Batched CUDA history evaluation and result reuse; Git LFS and checked QA archive utility"
     ],
-    "render_mode": "RealTimePathTracing"
-  },
-  "unit": {
-    "passed": true,
-    "count": 108,
-    "seconds": 17.968,
-    "path": "runtime/unit-tests.log",
-    "sha256": "75b3fe7fecb5bd928f32ff2d80c25c632642d8613c5141701f232c7ee52f571c"
-  },
-  "functional": {
-    "passed": true,
-    "count": 36,
-    "checks": [
-      "explicit conventional/reference nominal starting state",
-      "real RTX WebRTC 2560x1440",
-      "English localization",
-      "CAD component selection",
-      "component hide",
-      "component show",
-      "component isolation",
-      "CAD dimensions dialog",
-      "restore default assembly",
-      "CAD sector cutaway",
-      "CAD exploded assembly",
-      "reset transformations",
-      "temperature surface mode",
-      "high thermal load scenario",
-      "real CUDA scenario response",
-      "comparison tab",
-      "reference/current delta",
-      "exploration restore",
-      "equilibrium magnetic lines mode",
-      "plasma section mode and camera",
-      "heat flux surface mode",
-      "load scan starts at a defined position",
-      "quasi-steady load scan play",
-      "quasi-steady load scan advances across wraparound",
-      "quasi-steady load scan pause",
-      "scenario JSON download matches applied field",
-      "completed native RTX capture downloaded at renderer resolution",
-      "data provenance disclosure",
-      "CAD complete asset ZIP",
-      "USD complete asset ZIP",
-      "invalid state rejected",
-      "default view restored",
-      "final renderer settled to RT2 detail",
-      "fixed steady window presents at least 24fps",
-      "complete functional workflow presents at least 24fps with at most 5% drops",
-      "no browser JavaScript errors"
-    ],
-    "full_workflow": {
-      "seconds": 17.6665,
-      "presentedFps": 30.00028302153794,
-      "presentedFrames": 530,
-      "totalVideoFrames": 530,
-      "totalVideoFramesFps": 30.00028302153794,
-      "dropped": 0,
-      "droppedRate": 0,
-      "start": {
-        "width": 2560,
-        "height": 1440,
-        "time": 3644,
-        "presented": 76,
-        "frames": 78,
-        "dropped": 1
-      },
-      "end": {
-        "width": 2560,
-        "height": 1440,
-        "time": 21310.5,
-        "presented": 606,
-        "frames": 608,
-        "dropped": 1
-      },
-      "diagnosticOnly": false,
-      "targetPresentedFps": 24,
-      "maxDroppedRate": 0.05,
-      "excludedIntervals": [],
-      "workload": "All functional checks, mode switches, shader compilation, geometry selection/hide/isolate/cutaway/explode, optional UI screenshots, native capture and exports"
+    "cpu_checks": {
+      "status": "passed_recorded_runs",
+      "evidence_type": "agent_tool_output; no standalone log saved for these two runs",
+      "runs": [
+        {
+          "tests": [
+            "test_compute.AtomicPublicationTests",
+            "test_compute.ComputeTests",
+            "test_physics.PhysicsTests",
+            "test_baked_scenarios"
+          ],
+          "passed": true,
+          "count": 37,
+          "seconds": 4.729,
+          "baked_directory": "staging/scenarios-v3-cpu"
+        },
+        {
+          "tests": [
+            "test_physics.PhysicsTests.test_auxiliary_heating_adds_power_only_to_the_plasma_channel"
+          ],
+          "passed": true,
+          "count": 1,
+          "seconds": 0.076
+        }
+      ],
+      "note": "Separate targeted CPU runs, not a full integrated release suite."
     },
-    "steady_fps": 30.09143807148795,
-    "errors": [],
-    "failed_requests": [],
-    "evidence": {
-      "path": "runtime/qa/acceptance-release-complete.json",
-      "sha256": "57125a87d08e8de2a52ac3e978f9309c7ef759b57942c91395c0ee218027e0e4"
-    }
-  },
-  "visual_functional": {
-    "passed": true,
-    "count": 35,
-    "errors": [],
-    "evidence": {
-      "path": "runtime/qa/acceptance-release-visual.json",
-      "sha256": "a3f09f7e8584db1ba702bca3a227a83b190c88c60f19c195a92f7b2a690f08a4"
-    }
-  },
-  "reliability": {
-    "passed": true,
-    "count": 18,
-    "names": [
-      "versioned_fields_applied",
-      "continuous_slider_submits_before_release_and_applies_final",
-      "state_transport_race_retry_recovery_and_rejection",
-      "burst_100_actions_and_retry",
-      "view_changes_reuse_physics",
-      "design_equilibrium_conventional_reference",
-      "design_equilibrium_conventional_rampup",
-      "design_equilibrium_conventional_sof",
-      "design_equilibrium_conventional_eof",
-      "design_equilibrium_conventional_rampdown",
-      "design_equilibrium_longleg_reference",
-      "design_equilibrium_longleg_rampup",
-      "design_equilibrium_longleg_sof",
-      "design_equilibrium_longleg_eof",
-      "design_equilibrium_longleg_rampdown",
-      "difference_field",
-      "bilingual_new_controls",
-      "export_matches_context"
+    "presets": {
+      "path": "assets/scenarios/manifest.json",
+      "model_version": "pfc-aux-neon-budget-v3.0",
+      "count": 80,
+      "axes": {
+        "design": [
+          "conventional",
+          "longleg"
+        ],
+        "equilibrium": [
+          "reference",
+          "rampup",
+          "sof",
+          "eof",
+          "rampdown"
+        ],
+        "heating": [
+          20,
+          35,
+          50,
+          65
+        ],
+        "neon": [
+          false,
+          true
+        ]
+      },
+      "phase": 1.0,
+      "source_cpu_staging": "staging/scenarios-v3-cpu",
+      "source_cpu_check": {
+        "passed": true,
+        "count": 80,
+        "max_heatflux_MW_m2": 57.978,
+        "max_ledger_residual_MW": 2.3803181647963356e-13,
+        "field_line_B_T_range": [
+          4.231166839599609,
+          7.63641881942749
+        ],
+        "heatflux_above_color_max_count": 0,
+        "magnetic_clipping_count": 0,
+        "evidence_type": "agent_tool_output; CPU staging packets inspected; no GPU inference"
+      },
+      "delivery_checks": {
+        "passed": true,
+        "count": 80,
+        "history_points": 2480,
+        "scope": "Delivered NPZ identities, independent surface integration, ledger and coolant KPI",
+        "evidence": {
+          "path": "runtime/qa/unit-v3-release.txt",
+          "sha256": "755cb479c1c34686b2c5cec22c8b25a7e433f0643a277637ceda0036929d6898"
+        }
+      }
+    },
+    "gpu_parity": {
+      "status": "passed",
+      "static_review": "passed",
+      "path": "tests/test_compute.py",
+      "class": "DeviceConsistencyTests",
+      "tests": [
+        "test_cpu_and_cuda_thermal_results_agree",
+        "test_returned_cpu_fields_survive_a_following_solve",
+        "test_all_equilibrium_traces_stay_in_domain_and_agree_between_devices",
+        "test_cuda_history_batch_matches_all_independent_surface_samples"
+      ],
+      "thermal_combinations": 80,
+      "thermal_axes": {
+        "designs": 2,
+        "equilibria": 5,
+        "presets": [
+          "nominal",
+          "highload"
+        ],
+        "neon": [
+          false,
+          true
+        ],
+        "heating_MW": [
+          20,
+          65
+        ]
+      },
+      "thermal_phase": 0.41,
+      "temperature_tolerance": {
+        "atol_C": 0.001,
+        "rtol": 1e-05
+      },
+      "heatflux_tolerance": {
+        "atol_MW_m2": 1e-05,
+        "rtol": 1e-05
+      },
+      "magnetic_contexts": 10,
+      "magnetic_max_position_error_m": 0.002,
+      "note": "Executed in the full Python run on cuda:0; not inferred from static review",
+      "evidence": {
+        "path": "runtime/qa/unit-v3-release.txt",
+        "sha256": "755cb479c1c34686b2c5cec22c8b25a7e433f0643a277637ceda0036929d6898"
+      },
+      "history_independent_surface_samples": 496
+    },
+    "pending": [],
+    "code_sha256": {
+      "app/fusion_twin/__init__.py": "7aa4b5c1a7b98699be5796be37e09f621613d398a7d212bc83f2725b0f0b183e",
+      "app/fusion_twin/compute.py": "3949b74fc84fed1a0482eab5757d7359b16d83d9249d70a4c3778d43e1bbc8b6",
+      "app/fusion_twin/field_cache.py": "3563f33fdcc8848ebde067536532780ab1b6cb4e288762e7f71960a9d6d44e34",
+      "app/fusion_twin/geometry.py": "6cae406eeb3b14133555d67f7ffc94da1143d782c93042f093fcd39db5579856",
+      "app/fusion_twin/pfc.py": "5cc287fb5c311529ab58d9d315069f3a2e38d13706ca14e78bf1352dae50751e",
+      "app/fusion_twin/physics.py": "0df84c15a932734a8a07090c76b3533867d24043f80a71c9a00a1eb7ce97d9c5",
+      "app/fusion_twin/protocol.py": "713d52e0cc60617b2d80753952efc5f3e9a3da9a76e8689a6bcbd763ad1e4d3c",
+      "app/fusion_twin/server.py": "e22d7514cd4b06b184c439eb7212e23a5329e349cfd534203c10672b1ef061ba",
+      "assets/scenarios/manifest.json": "51a966223ae5347edc54758965719484d36511e4e8d269828d4989bb8c35d01a",
+      "assets/scene/fusion.usda": "071464527b73fd02d93c74fe1b588e04674cd21949437556af831c75e54fd6a6",
+      "assets/ui/manifest.json": "b95bd298d82e1437a19a182d559fc0e76d95f1659cc6e052804f4c806b98e2e5",
+      "docs/data-contract.md": "5ada0a1494b7ca2bf7e3f82a66e3fbacaa1d5b515d712b79dffcf8b6e3f53cf7",
+      "docs/physics-model.md": "ef4a6e8255ebd39120e13983d351fa2a614d9fede7fa5b1f85ca1b4adf4307e2",
+      "docs/verification.md": "a50cff716709e8f4e41dcfb63c6562790ff32053e8f8d4043150a8dbba64a1b0",
+      "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/__init__.py": "20c769b59c817a6c992af86d894e4cee31ff1c6d5460dfa5520fa75070849ddb",
+      "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/extension.py": "0ebdfcd0ebeba8c67646c075f96261fd3803fec273d419c80071c5bf41bca962",
+      "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/geometry.py": "20a0b7249bbef63bbb5cefa4bf415fa2015b7e7b5bc391efd85080aac2268de9",
+      "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/nvidia_workflow.py": "d066b5bddf7e9773296ff6b9071c26ee05c6eb7e197adc5f50e82c32aef356c7",
+      "kit/workflow/workflow.toml": "b1794f19d05b8f5978a6ed30c4cafef5b64e0b8831b7d2058e7e329ba5c9915c",
+      "README.md": "41d7395e80093c584cf90f00fcebc12b0d81f56894113e78c28b73083f385f3f",
+      "tests/test_archive_qa.py": "2bc18d80e592f17cde7be1d95fdd3d2d1229494ef5c87c065b8bdac86997b134",
+      "tests/test_assets.py": "c358c25430dd5172409eaaf416fc191c2baa7bdd37a0fada541be7c973f2eb82",
+      "tests/test_baked_scenarios.py": "4647ee1dbac0f469a8625d0268a1d880910c49f28c60d695ac46024953667536",
+      "tests/test_bridge.py": "bbf602f03a88abac34750aed34ce9f6c973e2a80250a673399e0ea6406d4512e",
+      "tests/test_compute.py": "301eec83ffae3058e0052607d9f83b5cadc0175347e6a5ff54d3865cfbce8fc0",
+      "tests/test_field_cache.py": "bbdefd15318380df7ae91dbe795c8497ce4912aea279f5386f319903644c14d1",
+      "tests/test_geometry.py": "913566225d1f610b1ccbfed22da655a3a07c5e988981ba3d35ec163c9d8af9de",
+      "tests/test_http_concurrency.py": "f69a9cc64f1319cfc9063af2955b28be312fd65aca93515df278a53ff2beeef5",
+      "tests/test_nvidia_workflow.py": "8a4598f06701dc3bac5f65aab0bd97ddb503dfc9682c9bcd98e30dea006961b1",
+      "tests/test_physics.py": "a2a6da77fc137728d9c6a0d738e9af62d50e53439dfa4c9271cb02904b3cb2a2",
+      "tests/test_protocol.py": "87ace0593bb36d14ac56aa7dc4f430e2f547e1af11173364453e33e3c1608330",
+      "tests/test_rtwt_controls.py": "eee3a765284c39dd48d17ad5db2322cd82650f5b10e0a5920fadbf362cf69a07",
+      "tests/test_runtime.py": "19749af6546cf634858515e22cfcd19d13483a1b9baa2448e6a26b77e9dea01e",
+      "tests/test_server_reliability.py": "d276722916f3726e43cdc4d1e2351b2a99590a6e64bdcc09fbc13a685781c195",
+      "tests/test_state.py": "96c9bcc69513432c97c53a6f0122c8ef7dd23e88e8b1f512d6086c50c7691aeb",
+      "tests/test_web_ui.py": "612d29f38cbed46dd7d712b059a1ddeaed0b6c562f61db34ac3132fc860b126b",
+      "tests/web_ui_state.mjs": "2a73f81ced58bf7e15a422bf6d477c61a129fbe86943336786a2da9360afacca",
+      "tools/build_scene.py": "3884d33c72e59f36e117a6587d07b6a8b8d7fb39ad38d469d2f32cbf93424838",
+      "web/app.js": "466daa115b322be6b1ba3e7ec2dbc994da546b73364669921c7612396f84409a",
+      "web/index.html": "cca24eceba58230606e149545f5d34c15946de3ed1652ab75ce00136b008318e",
+      "web/style.css": "797f9032334cae28d6d785007ea5298b4064a1d3674a12bfbdcc495bc62329f7"
+    },
+    "limitations": [
+      "Synthetic reduced-order thermal/Ne model; no impurity transport, measured detachment or physical validation",
+      "LongLeg peak superiority is not assumed for every source equilibrium",
+      "Illustrative plasma transfer is distinct from the fixed-range synthetic keV display; direction markers are not particle speeds",
+      "Axisymmetric magnetic field without TF ripple, sensor telemetry, AI agent or Triton inference",
+      "Performance and portability measured on this Windows machine; motion renders at 1080p and streams QHD",
+      "Restart checks cover the implemented protocol; not a proof of exactly-once behavior across arbitrary crashes"
     ],
-    "evidence": {
+    "hardware": {
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "engine": "Kit 110.1.3 / RTX Real-Time 2.0",
+      "video_resolution": [
+        2560,
+        1440
+      ],
+      "motion_render_resolution": [
+        1920,
+        1080
+      ],
+      "stationary_render_resolution": [
+        2560,
+        1440
+      ],
+      "browser": "Microsoft Edge, visible, default GPU composition"
+    },
+    "unit": {
+      "passed": true,
+      "executed": 151,
+      "passed_count": 150,
+      "skipped": 1,
+      "seconds": 24.097,
+      "skip_reason": "Windows ordinary symlink creation privilege unavailable; junction tests passed",
+      "path": "runtime/qa/unit-v3-release.txt",
+      "sha256": "755cb479c1c34686b2c5cec22c8b25a7e433f0643a277637ceda0036929d6898"
+    },
+    "frontend_behavior": {
+      "passed": true,
+      "count": 12,
+      "path": "runtime/qa/web-ui-state-v3.txt",
+      "sha256": "f27f8120606f1882b6bafb25d153e1b9e7cff954846a86c4fcdabd5bf982ac30",
+      "python_wrapper": {
+        "path": "runtime/qa/web-ui-wrapper-v3.txt",
+        "sha256": "54c66cdf8433d2d51ba029f0ddf6c4c106afebf013e8247b0ba2439c64657cb1"
+      },
+      "scope": "Measurement generation/context invalidation, comparison focus and camera accessibility"
+    },
+    "functional": {
+      "passed": true,
+      "count": 41,
+      "checks": [
+        "explicit conventional/reference nominal starting state",
+        "real RTX WebRTC 2560x1440",
+        "English localization",
+        "engineering tools visible",
+        "CAD component selection",
+        "component hide",
+        "component show",
+        "component isolation",
+        "CAD dimensions dialog",
+        "restore default assembly",
+        "CAD sector cutaway",
+        "CAD exploded assembly",
+        "reset transformations",
+        "temperature surface mode",
+        "high thermal load scenario",
+        "real CUDA scenario response",
+        "heating and Ne controls visible",
+        "Ne radiation scenario",
+        "comparison tab",
+        "same-design no-Ne delta and four actual cases",
+        "exploration restore",
+        "equilibrium magnetic lines mode",
+        "engineering tools visible",
+        "plasma section mode and camera",
+        "heat flux surface mode",
+        "load scan starts at a defined position",
+        "quasi-steady load scan play",
+        "quasi-steady load scan advances across wraparound",
+        "quasi-steady load scan pause",
+        "scenario JSON download matches applied field",
+        "completed native RTX capture downloaded at renderer resolution",
+        "data provenance disclosure",
+        "CAD complete asset ZIP",
+        "USD complete asset ZIP",
+        "invalid state rejected",
+        "explore page restored",
+        "default view restored",
+        "final renderer settled to RT2 detail",
+        "fixed steady window presents at least 24fps",
+        "complete functional workflow presents at least 24fps with at most 5% drops",
+        "no browser JavaScript errors"
+      ],
+      "path": "runtime/qa/acceptance-v3-final.json",
+      "sha256": "7c2abf9b9b187ee8b14e235dd332a60e7a13c0383c7d89af82cf1f74072ae95b",
+      "full_workflow": {
+        "seconds": 18.964199999928475,
+        "presentedFps": 29.95117115418221,
+        "presentedFrames": 568,
+        "totalVideoFrames": 568,
+        "totalVideoFramesFps": 29.95117115418221,
+        "dropped": 0,
+        "droppedRate": 0,
+        "start": {
+          "width": 2560,
+          "height": 1440,
+          "time": 3657,
+          "presented": 75,
+          "frames": 78,
+          "dropped": 1
+        },
+        "end": {
+          "width": 2560,
+          "height": 1440,
+          "time": 22621.199999928474,
+          "presented": 643,
+          "frames": 646,
+          "dropped": 1
+        },
+        "diagnosticOnly": false,
+        "targetPresentedFps": 24,
+        "maxDroppedRate": 0.05,
+        "excludedIntervals": [],
+        "workload": "All functional checks, mode switches, shader compilation, geometry selection/hide/isolate/cutaway/explode, optional UI screenshots, native capture and exports"
+      },
+      "steady": {
+        "seconds": 6.013799999952316,
+        "presentedFps": 30.097442549043063,
+        "presentedFrames": 181,
+        "totalVideoFrames": 180,
+        "totalVideoFramesFps": 29.93115833606492,
+        "dropped": 0,
+        "droppedRate": 0,
+        "warmupMs": 12000,
+        "windowMs": 6000,
+        "targetPresentedFps": 24,
+        "start": {
+          "width": 2560,
+          "height": 1440,
+          "time": 34645,
+          "presented": 1003,
+          "frames": 1007,
+          "dropped": 1
+        },
+        "end": {
+          "width": 2560,
+          "height": 1440,
+          "time": 40658.799999952316,
+          "presented": 1184,
+          "frames": 1187,
+          "dropped": 1
+        }
+      }
+    },
+    "showcase": {
+      "passed": true,
+      "count": 22,
+      "checks": [
+        {
+          "name": "real_video_connected",
+          "evidence": [
+            2560,
+            1440
+          ]
+        },
+        {
+          "name": "five_camera_and_two_design_native_rtx_images",
+          "evidence": [
+            {
+              "source": "/assets/ui/cameras/overview.png",
+              "dimensions": [
+                2560,
+                1440
+              ],
+              "sha256": "7933ad385fa0d9f6ee248e89f75cb8474e2041233ced12ecf8f395bad97f5f51",
+              "bytes": 3903935,
+              "captureRequestId": "68cf183cfb4a4e9f81e1c207ace7be6f",
+              "fieldKey": "b18b5bf229748cb92a1cc2fc5db5e6c9"
+            },
+            {
+              "source": "/assets/ui/cameras/front.png",
+              "dimensions": [
+                2560,
+                1440
+              ],
+              "sha256": "9f2f4ecf062cef5d5f479bfc243f21bc4d5da50373ca7e2ce4cf97d33607fc69",
+              "bytes": 4421405,
+              "captureRequestId": "d2d77f459f5549f7a9c0f41146d61098",
+              "fieldKey": "b18b5bf229748cb92a1cc2fc5db5e6c9"
+            },
+            {
+              "source": "/assets/ui/cameras/top.png",
+              "dimensions": [
+                2560,
+                1440
+              ],
+              "sha256": "b8fa68a5cbbaeec55d937069b5505761ddba0ca46a6e9a620e751b6070ca2897",
+              "bytes": 4409395,
+              "captureRequestId": "4339f44dc72442ab8444d98e9583adbf",
+              "fieldKey": "b18b5bf229748cb92a1cc2fc5db5e6c9"
+            },
+            {
+              "source": "/assets/ui/cameras/section.png",
+              "dimensions": [
+                2560,
+                1440
+              ],
+              "sha256": "c1a1ccf00d1d5c531088936b6eb49bbec8b2331ae873061a4b23714a511d22aa",
+              "bytes": 4803048,
+              "captureRequestId": "3edf476fa1b54957b8b77c1777947b4d",
+              "fieldKey": "b18b5bf229748cb92a1cc2fc5db5e6c9"
+            },
+            {
+              "source": "/assets/ui/cameras/divertor.png",
+              "dimensions": [
+                2560,
+                1440
+              ],
+              "sha256": "a132595b8f5e4d87032a36f7f64f0074feb51f17d42bdd9847247b2154d3490e",
+              "bytes": 3018928,
+              "captureRequestId": "5c84fbde50da4ce0abc7646f3a0c5487",
+              "fieldKey": "b18b5bf229748cb92a1cc2fc5db5e6c9"
+            },
+            {
+              "source": "/assets/ui/designs/conventional.png",
+              "dimensions": [
+                2560,
+                1440
+              ],
+              "sha256": "cd1b23d8337ffa0420cb979c1ebdc56fa4a05e037d6126c3aff579fbf684374f",
+              "bytes": 3164289,
+              "captureRequestId": "cf4a5fd6b06a407088a8582a69abab4e",
+              "fieldKey": "b18b5bf229748cb92a1cc2fc5db5e6c9"
+            },
+            {
+              "source": "/assets/ui/designs/longleg.png",
+              "dimensions": [
+                2560,
+                1440
+              ],
+              "sha256": "8484dad446ccbc2c22d55cf4afc2cdadd6c02a95b6038d1cd047449dd252dfec",
+              "bytes": 3206470,
+              "captureRequestId": "03e0a8f5638645a3a71fa3104cbf5348",
+              "fieldKey": "c358f137a741645720049eb9d1bd5bc1"
+            }
+          ]
+        },
+        {
+          "name": "layout_zh-assembly",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 530,
+              "scrollHeight": 530,
+              "scrollTop": 0
+            },
+            "controls": 17
+          }
+        },
+        {
+          "name": "layout_zh-heatflux",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 391,
+              "scrollHeight": 391,
+              "scrollTop": 0
+            },
+            "controls": 19
+          }
+        },
+        {
+          "name": "layout_zh-magnetic",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 399,
+              "scrollHeight": 399,
+              "scrollTop": 0
+            },
+            "controls": 19
+          }
+        },
+        {
+          "name": "layout_zh-volume",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 460,
+              "scrollHeight": 460,
+              "scrollTop": 0
+            },
+            "controls": 18
+          }
+        },
+        {
+          "name": "layout_en-assembly",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 533,
+              "scrollHeight": 533,
+              "scrollTop": 0
+            },
+            "controls": 17
+          }
+        },
+        {
+          "name": "layout_en-heatflux",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 398,
+              "scrollHeight": 398,
+              "scrollTop": 0
+            },
+            "controls": 19
+          }
+        },
+        {
+          "name": "layout_en-magnetic",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 404,
+              "scrollHeight": 404,
+              "scrollTop": 0
+            },
+            "controls": 19
+          }
+        },
+        {
+          "name": "layout_en-volume",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 447,
+              "scrollHeight": 447,
+              "scrollTop": 0
+            },
+            "controls": 18
+          }
+        },
+        {
+          "name": "four_heating_inputs_change_actual_fields",
+          "evidence": [
+            {
+              "heating": 20,
+              "peak": 18.566,
+              "field": "1b58d022e4e52ad17904ff64e6ec736d"
+            },
+            {
+              "heating": 35,
+              "peak": 19.229,
+              "field": "171a390276152fab89851ead9ca1b5c0"
+            },
+            {
+              "heating": 50,
+              "peak": 19.892,
+              "field": "b18b5bf229748cb92a1cc2fc5db5e6c9"
+            },
+            {
+              "heating": 65,
+              "peak": 20.555,
+              "field": "10aa20464c8c19b7b2e16a153a2d992f"
+            }
+          ]
+        },
+        {
+          "name": "two_designs_and_neon_cooling",
+          "evidence": [
+            {
+              "design": "conventional",
+              "off": 20.555,
+              "on": 3.248,
+              "relative": -84.198
+            },
+            {
+              "design": "longleg",
+              "off": 16.719,
+              "on": 2.66,
+              "relative": -84.09
+            }
+          ]
+        },
+        {
+          "name": "fixed_linear_legend",
+          "evidence": {
+            "range": [
+              0,
+              200
+            ],
+            "colors": {
+              "name": "inferno_sampled",
+              "positions": [
+                0,
+                0.125,
+                0.25,
+                0.375,
+                0.5,
+                0.625,
+                0.75,
+                0.875,
+                1
+              ],
+              "colors": [
+                [
+                  0.001462,
+                  0.000466,
+                  0.013866
+                ],
+                [
+                  0.129285,
+                  0.047293,
+                  0.290788
+                ],
+                [
+                  0.3415,
+                  0.062325,
+                  0.429425
+                ],
+                [
+                  0.54092,
+                  0.134729,
+                  0.415123
+                ],
+                [
+                  0.735683,
+                  0.215906,
+                  0.330245
+                ],
+                [
+                  0.894305,
+                  0.353399,
+                  0.193584
+                ],
+                [
+                  0.978422,
+                  0.557937,
+                  0.034931
+                ],
+                [
+                  0.974638,
+                  0.797692,
+                  0.206332
+                ],
+                [
+                  0.988362,
+                  0.998364,
+                  0.644924
+                ]
+              ],
+              "zero_color": [
+                0.12,
+                0.14,
+                0.16
+              ]
+            }
+          }
+        },
+        {
+          "name": "fixed_log_legend",
+          "evidence": {
+            "range": [
+              0.01,
+              200
+            ],
+            "colors": {
+              "name": "inferno_sampled",
+              "positions": [
+                0,
+                0.125,
+                0.25,
+                0.375,
+                0.5,
+                0.625,
+                0.75,
+                0.875,
+                1
+              ],
+              "colors": [
+                [
+                  0.001462,
+                  0.000466,
+                  0.013866
+                ],
+                [
+                  0.129285,
+                  0.047293,
+                  0.290788
+                ],
+                [
+                  0.3415,
+                  0.062325,
+                  0.429425
+                ],
+                [
+                  0.54092,
+                  0.134729,
+                  0.415123
+                ],
+                [
+                  0.735683,
+                  0.215906,
+                  0.330245
+                ],
+                [
+                  0.894305,
+                  0.353399,
+                  0.193584
+                ],
+                [
+                  0.978422,
+                  0.557937,
+                  0.034931
+                ],
+                [
+                  0.974638,
+                  0.797692,
+                  0.206332
+                ],
+                [
+                  0.988362,
+                  0.998364,
+                  0.644924
+                ]
+              ],
+              "zero_color": [
+                0.12,
+                0.14,
+                0.16
+              ]
+            }
+          }
+        },
+        {
+          "name": "layout_en-compare",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 398,
+              "scrollHeight": 398,
+              "scrollTop": 0
+            },
+            "controls": 16
+          }
+        },
+        {
+          "name": "layout_zh-compare",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 391,
+              "scrollHeight": 391,
+              "scrollTop": 0
+            },
+            "controls": 16
+          }
+        },
+        {
+          "name": "four_case_cards_match_results_and_keep_controls",
+          "evidence": {
+            "classification": "synthetic_demo",
+            "comparison_controls": {
+              "power": 2000,
+              "flow": 1,
+              "inlet": 300,
+              "hotspot": 1,
+              "heating": 65,
+              "equilibrium": "sof",
+              "phase": 1
+            },
+            "selected_case_id": "longleg/ne_on",
+            "cases": [
+              {
+                "id": "conventional/ne_off",
+                "design": "conventional",
+                "neon": false,
+                "heating": 65,
+                "equilibrium": "sof",
+                "equilibrium_key": "conventional/sof:5d585249a4445973",
+                "source_equilibrium": "assets/source/eudemo/conventional/equilibria/sof.npz",
+                "peak_temperature_C": 1287.4,
+                "peak_heatflux_MW_m2": 20.555,
+                "peak_divertor_heatflux_MW_m2": 20.555,
+                "outlet_temperature_C": 413.46,
+                "cooling_margin_C": -387.4,
+                "limit_temperature_C": 900,
+                "mass_flow_kg_s": 3500,
+                "thermal_power_MW": 2065,
+                "power_budget": {
+                  "definition": "synthetic_base_plus_auxiliary_thermal_budget",
+                  "load_fraction": 1,
+                  "nominal_thermal_MW": 2000,
+                  "base_thermal_MW": 2000,
+                  "nominal_auxiliary_MW": 65,
+                  "auxiliary_absorbed_MW": 65,
+                  "plasma_channel_MW": 465,
+                  "requested_thermal_MW": 2065,
+                  "volume_blanket_MW": 1600,
+                  "radiation_core_MW": 302.25,
+                  "separatrix_MW": 162.75,
+                  "sol_radiation_fraction": 0.3,
+                  "target_requested_MW": 109.04250000000002,
+                  "wall_particle_requested_MW": 4.882499999999999,
+                  "radiation_sol_MW": 48.824999999999996,
+                  "radiation_absorbed_MW": 351.075,
+                  "particle_blanket_MW": 4.882499999999999,
+                  "particle_divertor_MW": 109.04250000000003,
+                  "surface_absorbed_MW": 465,
+                  "volume_absorbed_MW": 1600,
+                  "absorbed_thermal_MW": 2065,
+                  "unresolved_MW": 0,
+                  "closure_residual_MW": 0,
+                  "blanket_absorbed_MW": 1920.85,
+                  "divertor_absorbed_MW": 144.15,
+                  "full_machine_pfc_area_m2": 1724.331979028173
+                },
+                "strike_status": {
+                  "inner": "intersection_model",
+                  "outer": "intersection_model"
+                },
+                "relative_no_neon_percent": 0
+              },
+              {
+                "id": "conventional/ne_on",
+                "design": "conventional",
+                "neon": true,
+                "heating": 65,
+                "equilibrium": "sof",
+                "equilibrium_key": "conventional/sof:5d585249a4445973",
+                "source_equilibrium": "assets/source/eudemo/conventional/equilibria/sof.npz",
+                "peak_temperature_C": 464.86,
+                "peak_heatflux_MW_m2": 3.248,
+                "peak_divertor_heatflux_MW_m2": 3.248,
+                "outlet_temperature_C": 413.46,
+                "cooling_margin_C": 435.14,
+                "limit_temperature_C": 900,
+                "mass_flow_kg_s": 3500,
+                "thermal_power_MW": 2065,
+                "power_budget": {
+                  "definition": "synthetic_base_plus_auxiliary_thermal_budget",
+                  "load_fraction": 1,
+                  "nominal_thermal_MW": 2000,
+                  "base_thermal_MW": 2000,
+                  "nominal_auxiliary_MW": 65,
+                  "auxiliary_absorbed_MW": 65,
+                  "plasma_channel_MW": 465,
+                  "requested_thermal_MW": 2065,
+                  "volume_blanket_MW": 1600,
+                  "radiation_core_MW": 302.25,
+                  "separatrix_MW": 162.75,
+                  "sol_radiation_fraction": 0.8,
+                  "target_requested_MW": 27.667499999999983,
+                  "wall_particle_requested_MW": 4.882499999999999,
+                  "radiation_sol_MW": 130.20000000000002,
+                  "radiation_absorbed_MW": 432.45,
+                  "particle_blanket_MW": 4.882499999999999,
+                  "particle_divertor_MW": 27.667499999999993,
+                  "surface_absorbed_MW": 465,
+                  "volume_absorbed_MW": 1600,
+                  "absorbed_thermal_MW": 2065,
+                  "unresolved_MW": 0,
+                  "closure_residual_MW": 0,
+                  "blanket_absorbed_MW": 1994.0875,
+                  "divertor_absorbed_MW": 70.91249999999998,
+                  "full_machine_pfc_area_m2": 1724.331979028173
+                },
+                "strike_status": {
+                  "inner": "intersection_model",
+                  "outer": "intersection_model"
+                },
+                "relative_no_neon_percent": -84.198
+              },
+              {
+                "id": "longleg/ne_off",
+                "design": "longleg",
+                "neon": false,
+                "heating": 65,
+                "equilibrium": "sof",
+                "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
+                "source_equilibrium": "assets/source/eudemo/longleg/equilibria/sof.npz",
+                "peak_temperature_C": 1108.05,
+                "peak_heatflux_MW_m2": 16.719,
+                "peak_divertor_heatflux_MW_m2": 16.719,
+                "outlet_temperature_C": 413.46,
+                "cooling_margin_C": -208.05,
+                "limit_temperature_C": 900,
+                "mass_flow_kg_s": 3500,
+                "thermal_power_MW": 2065,
+                "power_budget": {
+                  "definition": "synthetic_base_plus_auxiliary_thermal_budget",
+                  "load_fraction": 1,
+                  "nominal_thermal_MW": 2000,
+                  "base_thermal_MW": 2000,
+                  "nominal_auxiliary_MW": 65,
+                  "auxiliary_absorbed_MW": 65,
+                  "plasma_channel_MW": 465,
+                  "requested_thermal_MW": 2065,
+                  "volume_blanket_MW": 1600,
+                  "radiation_core_MW": 302.25,
+                  "separatrix_MW": 162.75,
+                  "sol_radiation_fraction": 0.3,
+                  "target_requested_MW": 109.04250000000002,
+                  "wall_particle_requested_MW": 4.882499999999999,
+                  "radiation_sol_MW": 48.824999999999996,
+                  "radiation_absorbed_MW": 351.07499999999993,
+                  "particle_blanket_MW": 4.882499999999999,
+                  "particle_divertor_MW": 109.04250000000003,
+                  "surface_absorbed_MW": 464.99999999999994,
+                  "volume_absorbed_MW": 1600,
+                  "absorbed_thermal_MW": 2065,
+                  "unresolved_MW": 0,
+                  "closure_residual_MW": 0,
+                  "blanket_absorbed_MW": 1920.85,
+                  "divertor_absorbed_MW": 144.15000000000003,
+                  "full_machine_pfc_area_m2": 1760.2953006405833
+                },
+                "strike_status": {
+                  "inner": "intersection_model",
+                  "outer": "intersection_model"
+                },
+                "relative_no_neon_percent": 0
+              },
+              {
+                "id": "longleg/ne_on",
+                "design": "longleg",
+                "neon": true,
+                "heating": 65,
+                "equilibrium": "sof",
+                "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
+                "source_equilibrium": "assets/source/eudemo/longleg/equilibria/sof.npz",
+                "peak_temperature_C": 437.35,
+                "peak_heatflux_MW_m2": 2.66,
+                "peak_divertor_heatflux_MW_m2": 2.66,
+                "outlet_temperature_C": 413.46,
+                "cooling_margin_C": 462.65,
+                "limit_temperature_C": 900,
+                "mass_flow_kg_s": 3500,
+                "thermal_power_MW": 2065,
+                "power_budget": {
+                  "definition": "synthetic_base_plus_auxiliary_thermal_budget",
+                  "load_fraction": 1,
+                  "nominal_thermal_MW": 2000,
+                  "base_thermal_MW": 2000,
+                  "nominal_auxiliary_MW": 65,
+                  "auxiliary_absorbed_MW": 65,
+                  "plasma_channel_MW": 465,
+                  "requested_thermal_MW": 2065,
+                  "volume_blanket_MW": 1600,
+                  "radiation_core_MW": 302.25,
+                  "separatrix_MW": 162.75,
+                  "sol_radiation_fraction": 0.8,
+                  "target_requested_MW": 27.667499999999983,
+                  "wall_particle_requested_MW": 4.882499999999999,
+                  "radiation_sol_MW": 130.20000000000002,
+                  "radiation_absorbed_MW": 432.44999999999993,
+                  "particle_blanket_MW": 4.882499999999999,
+                  "particle_divertor_MW": 27.66749999999998,
+                  "surface_absorbed_MW": 464.9999999999999,
+                  "volume_absorbed_MW": 1600,
+                  "absorbed_thermal_MW": 2065,
+                  "unresolved_MW": 0,
+                  "closure_residual_MW": 0,
+                  "blanket_absorbed_MW": 1994.0875,
+                  "divertor_absorbed_MW": 70.9125,
+                  "full_machine_pfc_area_m2": 1760.2953006405833
+                },
+                "strike_status": {
+                  "inner": "intersection_model",
+                  "outer": "intersection_model"
+                },
+                "relative_no_neon_percent": -84.09
+              }
+            ],
+            "relative_metric": "peak_divertor_heatflux_MW_m2; 100*(case/same-design-no-neon - 1)",
+            "units": {
+              "heatflux": "MW/m2",
+              "temperature": "degC",
+              "power": "MW",
+              "relative_no_neon": "percent"
+            }
+          }
+        },
+        {
+          "name": "four_independent_source_snapshots",
+          "evidence": [
+            {
+              "equilibrium": "rampup",
+              "source": "assets/source/eudemo/conventional/equilibria/rampup.npz",
+              "key": "longleg/rampup:bdefdbb075703960"
+            },
+            {
+              "equilibrium": "sof",
+              "source": "assets/source/eudemo/conventional/equilibria/sof.npz",
+              "key": "longleg/sof:1d32ff901175dfb4"
+            },
+            {
+              "equilibrium": "eof",
+              "source": "assets/source/eudemo/conventional/equilibria/eof.npz",
+              "key": "longleg/eof:aca4b0c5d1926401"
+            },
+            {
+              "equilibrium": "rampdown",
+              "source": "assets/source/eudemo/conventional/equilibria/rampdown.npz",
+              "key": "longleg/rampdown:c09f8dcc1379cd46"
+            }
+          ]
+        },
+        {
+          "name": "magnetic_direction_semantics_and_cached_field",
+          "evidence": "02352f75b2ee494ee64972f0166805b3"
+        },
+        {
+          "name": "layout_zh-volume-temperature",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 391,
+              "scrollHeight": 391,
+              "scrollTop": 0
+            },
+            "controls": 19
+          }
+        },
+        {
+          "name": "layout_en-volume-temperature",
+          "evidence": {
+            "minimumFont": 12,
+            "sidebar": {
+              "clientHeight": 380,
+              "scrollHeight": 380,
+              "scrollTop": 0
+            },
+            "controls": 19
+          }
+        },
+        {
+          "name": "plasma_illustration_and_quantitative_temperature_legends",
+          "evidence": true
+        }
+      ],
+      "path": "runtime/qa/showcase.json",
+      "sha256": "eb8408d3019640df2d7e841b919259167b33f51e1b834791d92e2e4e933aa730"
+    },
+    "reliability": {
+      "passed": true,
+      "count": 18,
+      "checks": [
+        {
+          "name": "versioned_fields_applied",
+          "evidence": {
+            "path": "fields/1dc7d57ba597cdcd216e004f73bee2f2.npz",
+            "key": "1dc7d57ba597cdcd216e004f73bee2f2",
+            "revision": 1190,
+            "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+            "equilibrium_key": "conventional/reference:85cb41c125e0d344",
+            "schema_version": 2
+          }
+        },
+        {
+          "name": "continuous_slider_submits_before_release_and_applies_final",
+          "evidence": {
+            "sent": [
+              {
+                "transport": "rtwt",
+                "power": 1200,
+                "sentAt": 1703.1999999284744,
+                "accepted": true,
+                "completedAt": 1799
+              },
+              {
+                "transport": "rtwt",
+                "power": 1250,
+                "sentAt": 1805.2999999523163,
+                "accepted": true,
+                "completedAt": 1975.6999999284744
+              },
+              {
+                "transport": "rtwt",
+                "power": 1400,
+                "sentAt": 1983.1999999284744,
+                "accepted": true,
+                "completedAt": 2151.6999999284744
+              },
+              {
+                "transport": "rtwt",
+                "power": 1550,
+                "sentAt": 2158.899999976158,
+                "accepted": true,
+                "completedAt": 2313.1999999284744
+              },
+              {
+                "transport": "rtwt",
+                "power": 1650,
+                "sentAt": 2320.0999999046326,
+                "accepted": true,
+                "completedAt": 2449.6999999284744
+              },
+              {
+                "transport": "rtwt",
+                "power": 1750,
+                "sentAt": 2456.399999976158,
+                "accepted": true,
+                "completedAt": 2581.399999976158
+              },
+              {
+                "transport": "rtwt",
+                "power": 1850,
+                "sentAt": 2587.6999999284744,
+                "accepted": true,
+                "completedAt": 2717.899999976158
+              },
+              {
+                "transport": "rtwt",
+                "power": 1950,
+                "sentAt": 2724,
+                "accepted": true,
+                "completedAt": 2880.5
+              },
+              {
+                "transport": "rtwt",
+                "power": 2200,
+                "sentAt": 2887,
+                "accepted": true,
+                "completedAt": 3030.6999999284744
+              }
+            ],
+            "input": [
+              {
+                "power": 1200,
+                "at": 1700.5999999046326
+              },
+              {
+                "power": 1200,
+                "at": 1722.8999999761581
+              },
+              {
+                "power": 1200,
+                "at": 1745.5
+              },
+              {
+                "power": 1250,
+                "at": 1767.0999999046326
+              },
+              {
+                "power": 1250,
+                "at": 1788.5
+              },
+              {
+                "power": 1250,
+                "at": 1809.5999999046326
+              },
+              {
+                "power": 1300,
+                "at": 1830.2999999523163
+              },
+              {
+                "power": 1300,
+                "at": 1852
+              },
+              {
+                "power": 1300,
+                "at": 1874.0999999046326
+              },
+              {
+                "power": 1350,
+                "at": 1895.5999999046326
+              },
+              {
+                "power": 1350,
+                "at": 1917.0999999046326
+              },
+              {
+                "power": 1350,
+                "at": 1938.6999999284744
+              },
+              {
+                "power": 1400,
+                "at": 1960.1999999284744
+              },
+              {
+                "power": 1400,
+                "at": 1983.2999999523163
+              },
+              {
+                "power": 1400,
+                "at": 2004.7999999523163
+              },
+              {
+                "power": 1450,
+                "at": 2025.8999999761581
+              },
+              {
+                "power": 1450,
+                "at": 2047
+              },
+              {
+                "power": 1450,
+                "at": 2068.399999976158
+              },
+              {
+                "power": 1500,
+                "at": 2090
+              },
+              {
+                "power": 1500,
+                "at": 2111.5999999046326
+              },
+              {
+                "power": 1500,
+                "at": 2133.2999999523163
+              },
+              {
+                "power": 1550,
+                "at": 2155.399999976158
+              },
+              {
+                "power": 1550,
+                "at": 2177.0999999046326
+              },
+              {
+                "power": 1550,
+                "at": 2198.5
+              },
+              {
+                "power": 1600,
+                "at": 2221.7999999523163
+              },
+              {
+                "power": 1600,
+                "at": 2243.1999999284744
+              },
+              {
+                "power": 1600,
+                "at": 2264.5999999046326
+              },
+              {
+                "power": 1650,
+                "at": 2285.6999999284744
+              },
+              {
+                "power": 1650,
+                "at": 2306.6999999284744
+              },
+              {
+                "power": 1650,
+                "at": 2328.2999999523163
+              },
+              {
+                "power": 1700,
+                "at": 2350.2999999523163
+              },
+              {
+                "power": 1700,
+                "at": 2371.7999999523163
+              },
+              {
+                "power": 1700,
+                "at": 2392.7999999523163
+              },
+              {
+                "power": 1750,
+                "at": 2414.5999999046326
+              },
+              {
+                "power": 1750,
+                "at": 2435.899999976158
+              },
+              {
+                "power": 1750,
+                "at": 2457.899999976158
+              },
+              {
+                "power": 1800,
+                "at": 2479.399999976158
+              },
+              {
+                "power": 1800,
+                "at": 2501.399999976158
+              },
+              {
+                "power": 1800,
+                "at": 2522.399999976158
+              },
+              {
+                "power": 1850,
+                "at": 2544.5
+              },
+              {
+                "power": 1850,
+                "at": 2565.6999999284744
+              },
+              {
+                "power": 1850,
+                "at": 2587.899999976158
+              },
+              {
+                "power": 1900,
+                "at": 2608.899999976158
+              },
+              {
+                "power": 1900,
+                "at": 2630.0999999046326
+              },
+              {
+                "power": 1900,
+                "at": 2651.5
+              },
+              {
+                "power": 1950,
+                "at": 2673.5999999046326
+              },
+              {
+                "power": 1950,
+                "at": 2695.6999999284744
+              },
+              {
+                "power": 1950,
+                "at": 2716.5
+              },
+              {
+                "power": 2000,
+                "at": 2739.1999999284744
+              },
+              {
+                "power": 2000,
+                "at": 2760.6999999284744
+              }
+            ],
+            "pending": 0,
+            "startedAt": 1699.5999999046326,
+            "releasedAt": 2782.5,
+            "finalRevision": 1235,
+            "appliedRevision": 1235,
+            "finalFieldKey": "197b36effd935d4be72e0641f3ad9720",
+            "appliedFieldKey": "197b36effd935d4be72e0641f3ad9720"
+          }
+        },
+        {
+          "name": "state_transport_race_retry_recovery_and_rejection",
+          "evidence": {
+            "staleGetPreservedValue": 1300,
+            "transientAttempts": [
+              {
+                "power": 1350,
+                "time": 5961
+              },
+              {
+                "power": 1450,
+                "time": 6215.899999976158
+              },
+              {
+                "power": 1450,
+                "time": 7216.699999928474
+              }
+            ],
+            "boundedAttempts": 3,
+            "recoveredAttempts": 4,
+            "rejectionFeedback": "工况参数被拒绝，请检查输入",
+            "rejectedAttempts": 1
+          }
+        },
+        {
+          "name": "burst_100_actions_and_retry",
+          "evidence": {
+            "completed": 100,
+            "duplicateSeq": 796
+          }
+        },
+        {
+          "name": "view_changes_reuse_physics",
+          "evidence": "2d85f68293f5a9696be2fb176a5cd83c"
+        },
+        {
+          "name": "design_equilibrium_conventional_reference",
+          "evidence": {
+            "fieldKey": "b0899071ae6c725edf30309116a77086",
+            "absorbedMW": 2050,
+            "unresolvedMW": 0,
+            "strikes": {
+              "inner": {
+                "rz_m": [
+                  7.050262092414199,
+                  -5.709117446738314
+                ],
+                "s_m": 0.6739629903680505,
+                "leg": "inner",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              },
+              "outer": {
+                "rz_m": [
+                  7.733189423260616,
+                  -6.181743229091111
+                ],
+                "s_m": 2.2523834617660423,
+                "leg": "outer",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "design_equilibrium_conventional_rampup",
+          "evidence": {
+            "fieldKey": "eeaaa9c0fa1860194e37f7a1c17b2c71",
+            "absorbedMW": 2018.3425,
+            "unresolvedMW": 31.6575,
+            "strikes": {
+              "inner": {
+                "status": "unresolved",
+                "reason": "missing or ambiguous lower-leg intersection or outboard map",
+                "candidate_count": 0
+              },
+              "outer": {
+                "rz_m": [
+                  8.643125487192627,
+                  -6.803327829203799
+                ],
+                "s_m": 3.390570806678603,
+                "leg": "outer",
+                "psi_n_residual": -5.551115123125783e-16,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "design_equilibrium_conventional_sof",
+          "evidence": {
+            "fieldKey": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+            "absorbedMW": 2050,
+            "unresolvedMW": 0,
+            "strikes": {
+              "inner": {
+                "rz_m": [
+                  7.044594310399366,
+                  -5.6900007703576785
+                ],
+                "s_m": 0.6540158365184583,
+                "leg": "inner",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              },
+              "outer": {
+                "rz_m": [
+                  7.632344884020614,
+                  -6.186708107369823
+                ],
+                "s_m": 2.151349928340308,
+                "leg": "outer",
+                "psi_n_residual": -1.1102230246251565e-16,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "design_equilibrium_conventional_eof",
+          "evidence": {
+            "fieldKey": "e243131a2fa4823576c82c9b707df0e5",
+            "absorbedMW": 2050,
+            "unresolvedMW": 0,
+            "strikes": {
+              "inner": {
+                "rz_m": [
+                  6.834996255779166,
+                  -5.474228627500994
+                ],
+                "s_m": 0.335336502134664,
+                "leg": "inner",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              },
+              "outer": {
+                "rz_m": [
+                  7.820982726730134,
+                  -6.188582503820311
+                ],
+                "s_m": 2.340501464945941,
+                "leg": "outer",
+                "psi_n_residual": 2.220446049250313e-16,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "design_equilibrium_conventional_rampdown",
+          "evidence": {
+            "fieldKey": "bf98dd40d32ea5a4c291e1da17e8b80e",
+            "absorbedMW": 2018.3425,
+            "unresolvedMW": 31.6575,
+            "strikes": {
+              "inner": {
+                "status": "unresolved",
+                "reason": "missing or ambiguous lower-leg intersection or outboard map",
+                "candidate_count": 0
+              },
+              "outer": {
+                "rz_m": [
+                  8.739397788138666,
+                  -6.688976142550907
+                ],
+                "s_m": 3.887587467580075,
+                "leg": "outer",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "design_equilibrium_longleg_reference",
+          "evidence": {
+            "fieldKey": "72c71d2eebb0ebbe307df26a6e5fddbf",
+            "absorbedMW": 2050,
+            "unresolvedMW": 0,
+            "strikes": {
+              "inner": {
+                "rz_m": [
+                  6.83141965001437,
+                  -5.694060653362737
+                ],
+                "s_m": 0.4617944952646064,
+                "leg": "inner",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              },
+              "outer": {
+                "rz_m": [
+                  8.01987570173914,
+                  -6.329334472116357
+                ],
+                "s_m": 2.6473427079581415,
+                "leg": "outer",
+                "psi_n_residual": 6.661338147750939e-16,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "design_equilibrium_longleg_rampup",
+          "evidence": {
+            "fieldKey": "b6d323d538bb73ed34834cdfa3c532bc",
+            "absorbedMW": 2018.3425,
+            "unresolvedMW": 31.6575,
+            "strikes": {
+              "inner": {
+                "status": "unresolved",
+                "reason": "missing or ambiguous lower-leg intersection or outboard map",
+                "candidate_count": 0
+              },
+              "outer": {
+                "rz_m": [
+                  8.932415674641913,
+                  -6.873442064530632
+                ],
+                "s_m": 4.478556021180554,
+                "leg": "outer",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "design_equilibrium_longleg_sof",
+          "evidence": {
+            "fieldKey": "c358f137a741645720049eb9d1bd5bc1",
+            "absorbedMW": 2050,
+            "unresolvedMW": 0,
+            "strikes": {
+              "inner": {
+                "rz_m": [
+                  6.900806562338129,
+                  -5.906994886118193
+                ],
+                "s_m": 0.68778762288959,
+                "leg": "inner",
+                "psi_n_residual": 2.220446049250313e-16,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              },
+              "outer": {
+                "rz_m": [
+                  7.786212511722228,
+                  -6.2642596551212
+                ],
+                "s_m": 2.403899365582837,
+                "leg": "outer",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "design_equilibrium_longleg_eof",
+          "evidence": {
+            "fieldKey": "7b38617cc04b67c8b430bcd4dd52cd1a",
+            "absorbedMW": 2050,
+            "unresolvedMW": 0,
+            "strikes": {
+              "inner": {
+                "rz_m": [
+                  6.70760576917686,
+                  -5.558310343699565
+                ],
+                "s_m": 0.2769334806810734,
+                "leg": "inner",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              },
+              "outer": {
+                "rz_m": [
+                  7.785355029900003,
+                  -6.264159572490915
+                ],
+                "s_m": 2.403036062850112,
+                "leg": "outer",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "design_equilibrium_longleg_rampdown",
+          "evidence": {
+            "fieldKey": "afa6febd085c779f8007d57576ce4bf0",
+            "absorbedMW": 2018.3425,
+            "unresolvedMW": 31.6575,
+            "strikes": {
+              "inner": {
+                "status": "unresolved",
+                "reason": "missing or ambiguous lower-leg intersection or outboard map",
+                "candidate_count": 0
+              },
+              "outer": {
+                "rz_m": [
+                  8.956285494302042,
+                  -7.128238856100284
+                ],
+                "s_m": 4.222643588335266,
+                "leg": "outer",
+                "psi_n_residual": 0,
+                "status": "intersection_model",
+                "reason": "source separatrix/cavity crossing; attached synthetic local footprint"
+              }
+            }
+          }
+        },
+        {
+          "name": "difference_field",
+          "evidence": [
+            -1232,
+            1232
+          ]
+        },
+        {
+          "name": "bilingual_new_controls",
+          "evidence": true
+        },
+        {
+          "name": "export_matches_context",
+          "evidence": {
+            "path": "fields/f9788c7e5e9dea92b8afb34c65571a88.npz",
+            "key": "f9788c7e5e9dea92b8afb34c65571a88",
+            "revision": 1263,
+            "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+            "equilibrium_key": "longleg/reference:0619a12f5d50d3e7",
+            "schema_version": 2
+          }
+        }
+      ],
       "path": "runtime/qa/reliability.json",
-      "sha256": "ed1aa68b743dbe43c301bb9a75314fa27004c06bcfa85ac18cf50f09e32a722b"
-    }
-  },
-  "restart": {
-    "passed": true,
-    "count": 3,
-    "names": [
-      "ack_loss_recovery",
-      "kit_restart_cancels_old_session",
-      "server_restart_retains_completion"
-    ],
-    "evidence": {
-      "path": "runtime/qa/restart-reliability.json",
-      "sha256": "2638199be0a8983216a1e3e4fa3c920ae9766e4a181df96f3a92928bf5ef8caa"
-    }
-  },
-  "nvidia": {
-    "passed": true,
-    "count": 7,
-    "names": [
-      "rtwt_manifest_over_webrtc",
-      "ui_rtwt_write_and_index_volume",
-      "cache_hit_and_cutaway_invalidation",
-      "volume_design_switch",
-      "assembly_restores_rt2_detail",
-      "assembly_motion_and_settled_use_rt2",
-      "data_channel_requests_complete"
-    ],
-    "evidence": {
+      "sha256": "3f439d517f4b097d91d83366c666b9e7b86884e84a44fc6a5f8276fe55fb4faf"
+    },
+    "nvidia": {
+      "passed": true,
+      "count": 13,
+      "checks": [
+        {
+          "name": "rtwt_manifest_over_webrtc",
+          "evidence": {
+            "knobs": [
+              {
+                "key": "design",
+                "label": "CAD design",
+                "group": "",
+                "role": "inference",
+                "widget": "select",
+                "unit": null,
+                "visibleWhen": null,
+                "values": [
+                  "conventional",
+                  "longleg"
+                ]
+              },
+              {
+                "key": "equilibrium",
+                "label": "Source magnetic equilibrium",
+                "group": "",
+                "role": "inference",
+                "widget": "select",
+                "unit": null,
+                "visibleWhen": null,
+                "values": [
+                  "reference",
+                  "rampup",
+                  "sof",
+                  "eof",
+                  "rampdown"
+                ]
+              },
+              {
+                "key": "scenario",
+                "label": "",
+                "group": "",
+                "role": "inference",
+                "widget": "select",
+                "unit": null,
+                "visibleWhen": null,
+                "values": [
+                  "nominal",
+                  "ramp",
+                  "lowflow",
+                  "highload"
+                ]
+              },
+              {
+                "key": "power",
+                "label": "Baseline thermal budget (excluding auxiliary heating)",
+                "group": "",
+                "role": "inference",
+                "widget": "slider",
+                "unit": "MW",
+                "visibleWhen": null,
+                "values": {
+                  "min": 500,
+                  "max": 2600,
+                  "step": 50
+                }
+              },
+              {
+                "key": "flow",
+                "label": "",
+                "group": "",
+                "role": "inference",
+                "widget": "slider",
+                "unit": "ratio",
+                "visibleWhen": null,
+                "values": {
+                  "min": 0.4,
+                  "max": 1.4,
+                  "step": 0.05
+                }
+              },
+              {
+                "key": "heating",
+                "label": "Auxiliary heating",
+                "group": "",
+                "role": "inference",
+                "widget": "slider",
+                "unit": "MW",
+                "visibleWhen": null,
+                "values": {
+                  "min": 20,
+                  "max": 65,
+                  "step": 15
+                }
+              },
+              {
+                "key": "neon",
+                "label": "Synthetic neon radiation scenario",
+                "group": "",
+                "role": "inference",
+                "widget": "toggle",
+                "unit": null,
+                "visibleWhen": null
+              },
+              {
+                "key": "heatScale",
+                "label": "",
+                "group": "",
+                "role": "visualization",
+                "widget": "select",
+                "unit": null,
+                "visibleWhen": null,
+                "values": [
+                  "log",
+                  "linear"
+                ]
+              },
+              {
+                "key": "volumeStyle",
+                "label": "",
+                "group": "",
+                "role": "visualization",
+                "widget": "select",
+                "unit": null,
+                "visibleWhen": null,
+                "values": [
+                  "plasma",
+                  "temperature"
+                ]
+              },
+              {
+                "key": "lineMotion",
+                "label": "Magnetic direction markers (illustrative speed)",
+                "group": "",
+                "role": "visualization",
+                "widget": "toggle",
+                "unit": null,
+                "visibleWhen": null
+              },
+              {
+                "key": "inlet",
+                "label": "",
+                "group": "",
+                "role": "inference",
+                "widget": "slider",
+                "unit": "degC",
+                "visibleWhen": null,
+                "values": {
+                  "min": 200,
+                  "max": 400,
+                  "step": 5
+                }
+              },
+              {
+                "key": "phase",
+                "label": "Prescribed load fraction",
+                "group": "",
+                "role": "inference",
+                "widget": "slider",
+                "unit": null,
+                "visibleWhen": null,
+                "values": {
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.01
+                }
+              },
+              {
+                "key": "mode",
+                "label": "",
+                "group": "",
+                "role": "visualization",
+                "widget": "select",
+                "unit": null,
+                "visibleWhen": null,
+                "values": [
+                  "assembly",
+                  "temperature",
+                  "heatflux",
+                  "delta_temperature",
+                  "delta_heatflux",
+                  "magnetic",
+                  "slice",
+                  "volume"
+                ]
+              },
+              {
+                "key": "view",
+                "label": "",
+                "group": "",
+                "role": "view",
+                "widget": "select",
+                "unit": null,
+                "visibleWhen": null,
+                "values": [
+                  "overview",
+                  "front",
+                  "top",
+                  "section",
+                  "divertor"
+                ]
+              },
+              {
+                "key": "cutaway",
+                "label": "",
+                "group": "",
+                "role": "visualization",
+                "widget": "slider",
+                "unit": "deg",
+                "visibleWhen": null,
+                "values": {
+                  "min": 0,
+                  "max": 180,
+                  "step": 20
+                }
+              },
+              {
+                "key": "explode",
+                "label": "",
+                "group": "",
+                "role": "visualization",
+                "widget": "slider",
+                "unit": null,
+                "visibleWhen": null,
+                "values": {
+                  "min": 0,
+                  "max": 1,
+                  "step": 0.05
+                }
+              },
+              {
+                "key": "opacity",
+                "label": "",
+                "group": "",
+                "role": "visualization",
+                "widget": "slider",
+                "unit": null,
+                "visibleWhen": null,
+                "values": {
+                  "min": 0.1,
+                  "max": 1,
+                  "step": 0.05
+                }
+              },
+              {
+                "key": "fieldLines",
+                "label": "",
+                "group": "",
+                "role": "visualization",
+                "widget": "toggle",
+                "unit": null,
+                "visibleWhen": null
+              },
+              {
+                "key": "orbit",
+                "label": "",
+                "group": "",
+                "role": "visualization",
+                "widget": "toggle",
+                "unit": null,
+                "visibleWhen": null
+              },
+              {
+                "key": "playing",
+                "label": "",
+                "group": "",
+                "role": "visualization",
+                "widget": "toggle",
+                "unit": null,
+                "visibleWhen": null
+              }
+            ],
+            "readouts": [],
+            "views": [
+              {
+                "name": "OmniverseKit_Top",
+                "thumbnail": null,
+                "onSelect": null
+              },
+              {
+                "name": "front",
+                "thumbnail": null,
+                "onSelect": null
+              },
+              {
+                "name": "top",
+                "thumbnail": null,
+                "onSelect": null
+              },
+              {
+                "name": "section",
+                "thumbnail": null,
+                "onSelect": null
+              },
+              {
+                "name": "divertor",
+                "thumbnail": null,
+                "onSelect": null
+              },
+              {
+                "name": "OmniverseKit_Front",
+                "thumbnail": null,
+                "onSelect": null
+              },
+              {
+                "name": "OmniverseKit_Right",
+                "thumbnail": null,
+                "onSelect": null
+              },
+              {
+                "name": "OmniverseKit_Persp",
+                "thumbnail": null,
+                "onSelect": null
+              },
+              {
+                "name": "overview",
+                "thumbnail": null,
+                "onSelect": null
+              }
+            ],
+            "features": {
+              "precaching": true
+            }
+          }
+        },
+        {
+          "name": "ui_rtwt_write_and_index_volume",
+          "evidence": {
+            "server_epoch": "a2e653514d12408b86398a3ca0192a33",
+            "renderer_epoch": "af00d239dda34a12b940670f93a4051a",
+            "command_acks": [],
+            "current_command": null,
+            "ready": true,
+            "applied_revision": 1271,
+            "applied_field_key": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+            "apply_timing": {
+              "revision": 1271,
+              "field_key": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+              "packet_load_ms": 0,
+              "snapshot_apply_ms": 2.48,
+              "finished_at": 1791778347.7031076
+            },
+            "render_reset": {
+              "revision": 1271,
+              "field_key": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+              "time": 1791778348.0760193
+            },
+            "dlss_reset_pending": false,
+            "responsive_denoising_supported": true,
+            "responsive_denoising": false,
+            "anti_aliasing": 3,
+            "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+            "equilibrium_key": "conventional/sof:5d585249a4445973",
+            "interaction_key": "225708bb0afb051adda0293215eaed5741bb7a32cb568d409c76f383cd5cc01f",
+            "fps": 29.6,
+            "gpu": "NVIDIA GeForce RTX 5070 Ti",
+            "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+            "render_mode": "RealTimePathTracing",
+            "samples_per_pixel": null,
+            "accumulation_samples": null,
+            "sampling_strategy": "temporal_reconstruction",
+            "rt2_enabled": true,
+            "rt2_cached": true,
+            "auto_exposure": false,
+            "camera_path": "/World/Cameras/overview",
+            "hall_hidden_walls": [],
+            "selected": null,
+            "mode": "volume",
+            "heat_scale": "log",
+            "line_motion": true,
+            "line_marker_vertices": 384,
+            "field_visibility": {
+              "/World/Fields/Surface": {
+                "active": false,
+                "authored": "inherited",
+                "effective": "inherited"
+              },
+              "/World/Fields/Slice": {
+                "active": true,
+                "authored": "invisible",
+                "effective": "invisible"
+              },
+              "/World/Fields/FieldLines": {
+                "active": true,
+                "authored": "inherited",
+                "effective": "inherited"
+              },
+              "/World/Fields/DirectionMarkers": {
+                "active": true,
+                "authored": "inherited",
+                "effective": "inherited"
+              }
+            },
+            "visible": {
+              "tf_coils": true,
+              "pf_coils": true,
+              "cs_coils": true,
+              "coil_structures": true,
+              "vacuum_vessel": true,
+              "blanket": true,
+              "divertor": true,
+              "plasma": false,
+              "thermal_shield": false,
+              "cryostat": false,
+              "radiation_shield": false
+            },
+            "measurement": null,
+            "error": null,
+            "capture_path": "runtime/preview.png",
+            "capture_pending": false,
+            "command_seq": 899,
+            "timestamp": 1791778348.878173,
+            "resolution": [
+              2560,
+              1440
+            ],
+            "render_resolution": [
+              2560,
+              1440
+            ],
+            "quality": "detail",
+            "rtwt_workflow": "fusion-engineering",
+            "rtwt_ready": true,
+            "rtwt_remote_writes": 1,
+            "rtwt_control_count": 20,
+            "rtwt_standard_writes": 0,
+            "control_pending": false,
+            "control_error": null,
+            "volume_pending": false,
+            "pending_volume_field_key": null,
+            "volume_error": null,
+            "applied_volume_field_key": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+            "applied_volume_key": "3836a76c02869045b63371f1cdf3e2a4",
+            "index_native_volume": true,
+            "volume_roundtrip": "exact",
+            "volume_cache_hits": 1,
+            "volume_cache_misses": 0,
+            "volume_units": "keV",
+            "volume_source": "synthetic axisymmetric temperature profile",
+            "volume_colormap": {
+              "positions": [
+                0,
+                0.025,
+                0.1,
+                0.3,
+                0.6,
+                1
+              ],
+              "rgba": [
+                [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0.12,
+                  0.015,
+                  0.32,
+                  0.005
+                ],
+                [
+                  0.35,
+                  0.035,
+                  0.75,
+                  0.025
+                ],
+                [
+                  0.74,
+                  0.1,
+                  0.95,
+                  0.065
+                ],
+                [
+                  1,
+                  0.33,
+                  0.76,
+                  0.15
+                ],
+                [
+                  1,
+                  0.8,
+                  0.95,
+                  0.28
+                ]
+              ],
+              "domain": [
+                0,
+                40
+              ]
+            },
+            "volume_style": "plasma",
+            "volume_spacing_m": [
+              0.21875,
+              0.21875,
+              0.15
+            ],
+            "rtwt_registered": true,
+            "rtwt_state": {
+              "design": "conventional",
+              "equilibrium": "sof",
+              "scenario": "nominal",
+              "power": 2000,
+              "flow": 1,
+              "heating": 50,
+              "neon": false,
+              "heatScale": "log",
+              "volumeStyle": "plasma",
+              "lineMotion": true,
+              "inlet": 300,
+              "phase": 1,
+              "mode": "volume",
+              "view": "overview",
+              "cutaway": 80,
+              "explode": 0,
+              "opacity": 1,
+              "fieldLines": true,
+              "orbit": false,
+              "playing": false
+            },
+            "volume_presentation": "illustrative plasma glow",
+            "volume_grid": [
+              128,
+              128,
+              112
+            ],
+            "volume_range_keV": [
+              0,
+              24.97089195251465
+            ],
+            "rtwt_result_revision": "79c4ab57d3ca4109bb4b9a21a9a9e1b9",
+            "volume_cache_source": "disk",
+            "nanovdb_roundtrip": true,
+            "volume_grid_voxels": 1835008,
+            "volume_mask_angle": 80,
+            "index_fields": [
+              "colors"
+            ],
+            "index_source_field": "Temperature",
+            "index_composite": true,
+            "index_depth_mode": 3,
+            "heartbeat_age_s": 0.01,
+            "state_read_reused": false
+          }
+        },
+        {
+          "name": "volume_style_changes_transfer_only_with_fixed_temperature_legend",
+          "evidence": {
+            "field": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+            "volume": "3836a76c02869045b63371f1cdf3e2a4",
+            "domain": [
+              0,
+              40
+            ],
+            "actualRange": [
+              0,
+              24.97089195251465
+            ],
+            "grid": [
+              128,
+              128,
+              112
+            ],
+            "styles": [
+              "plasma",
+              "temperature"
+            ]
+          }
+        },
+        {
+          "name": "standard_rtwt_set_state_commits_solver_and_native_volume",
+          "evidence": {
+            "request": "set_state",
+            "response": true,
+            "writes": 1,
+            "previousField": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+            "field": "24468a05a351b9a9e70d8a9329af81cc",
+            "previousVolume": "3836a76c02869045b63371f1cdf3e2a4",
+            "volume": "b067ba5d8d7f703a5da131da48384fa1",
+            "inputPowerMW": 2065,
+            "revision": 1274,
+            "appliedRevision": 1274,
+            "resultRevision": "c65611919a7c4002aa1c3b3eb4e404c3"
+          }
+        },
+        {
+          "name": "standard_rtwt_invalid_value_preserves_solver_and_rolls_back_usd",
+          "evidence": {
+            "request": "set_state",
+            "rejectedHeating": 21,
+            "response": true,
+            "error": "ValueError: heating must be one of 20, 35, 50, 65 MW",
+            "revision": 1275,
+            "field": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+            "usdHeating": 50
+          }
+        },
+        {
+          "name": "standard_rtwt_legal_write_clears_error_and_applies_native_field",
+          "evidence": {
+            "error": null,
+            "revision": 1276,
+            "field": "10aa20464c8c19b7b2e16a153a2d992f",
+            "appliedVolumeField": "10aa20464c8c19b7b2e16a153a2d992f",
+            "usdHeating": 65
+          }
+        },
+        {
+          "name": "standard_rtwt_rapid_return_to_committed_value_keeps_last_write",
+          "evidence": {
+            "heatingSequence": [
+              50,
+              65,
+              50
+            ],
+            "responses": [
+              true,
+              true
+            ],
+            "writes": 1,
+            "field": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+            "appliedVolumeField": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+            "revision": 1278,
+            "appliedRevision": 1278,
+            "usdHeating": 50
+          }
+        },
+        {
+          "name": "cache_hit_and_cutaway_invalidation",
+          "evidence": {
+            "key": "3836a76c02869045b63371f1cdf3e2a4",
+            "hits": 10,
+            "misses": 0
+          }
+        },
+        {
+          "name": "volume_design_switch",
+          "evidence": {
+            "field": {
+              "path": "fields/c358f137a741645720049eb9d1bd5bc1.npz",
+              "key": "c358f137a741645720049eb9d1bd5bc1",
+              "revision": 1256,
+              "topology_key": "longleg:pfc-v2:3b815e265486ea7032d0",
+              "equilibrium_key": "longleg/sof:1d32ff901175dfb4",
+              "schema_version": 2
+            },
+            "volume": "1d1fa445cc61d7cd207a4595e498df0d"
+          }
+        },
+        {
+          "name": "assembly_restores_rt2_detail",
+          "evidence": {
+            "mode": "RealTimePathTracing",
+            "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+            "quality": "detail",
+            "spp": null,
+            "totalSpp": null
+          }
+        },
+        {
+          "name": "assembly_motion_and_settled_use_rt2",
+          "evidence": {
+            "moving": {
+              "mode": "RealTimePathTracing",
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "quality": "interaction"
+            },
+            "settled": {
+              "mode": "RealTimePathTracing",
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "quality": "detail"
+            }
+          }
+        },
+        {
+          "name": "new_fields_execute_after_hidden_volume_is_shown",
+          "evidence": [
+            {
+              "design": "conventional",
+              "heating": 20,
+              "field": "1b58d022e4e52ad17904ff64e6ec736d",
+              "volume": "b0a81ef5a25c6eeb0f09056a01f1591f"
+            },
+            {
+              "design": "longleg",
+              "heating": 35,
+              "field": "ab2b69178d2a9c8aeaaa6f3b902946e9",
+              "volume": "84d737f14d77461eda04400ee2d22b3b"
+            },
+            {
+              "design": "conventional",
+              "heating": 50,
+              "field": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+              "volume": "3836a76c02869045b63371f1cdf3e2a4"
+            }
+          ]
+        },
+        {
+          "name": "data_channel_requests_complete",
+          "evidence": {
+            "sent": 25,
+            "received": 25,
+            "timeouts": 0,
+            "lastEvent": "fusion_cache_signal",
+            "pending": 0
+          }
+        }
+      ],
       "path": "runtime/qa/nvidia.json",
-      "sha256": "ebe1f18e636b84df614b6f6ae3fa21c639bbacc27431123224528d0ce968e37e"
-    }
-  },
-  "latency": {
-    "passed": true,
-    "summary": {
-      "debounceMs": {
-        "count": 20,
-        "p50": 2.5,
-        "p95": 2.799999952316284,
-        "max": 3
+      "sha256": "3ef9758d59992b6bca945f2cf1315b4493776e513fe1c95c0a71f37d3e7a2fee"
+    },
+    "ui_regression": {
+      "passed": true,
+      "count": 5,
+      "checks": [
+        "changing equilibrium exits measurement and the next surface click selects",
+        "changing design exits measurement and the next surface click selects",
+        "camera visual and accessible selection agree",
+        "comparison card focus survives multiple state polls",
+        "comparison card retains focus through new results and Enter selects the case"
+      ],
+      "path": "runtime/qa/ui-regression.json",
+      "sha256": "653d7d5b247ca940eca00bff246742f0a03026cebdd69f1697c98f9fa65ca61c"
+    },
+    "motion": {
+      "assembly": {
+        "headless": false,
+        "browser": "155.0.4283.45",
+        "resolution": [
+          2560,
+          1440
+        ],
+        "motionRenderResolution": [
+          1920,
+          1080
+        ],
+        "settledRenderResolution": [
+          2560,
+          1440
+        ],
+        "static": {
+          "seconds": 4.016900000095368,
+          "presentedFps": 29.873783264993154,
+          "dropped": 0,
+          "droppedRate": 0,
+          "receivedFps": 29.624835071118213,
+          "decodedFps": 29.624835071118213,
+          "decodeMsPerFrame": 0.30924369747899155
+        },
+        "motion": {
+          "seconds": 6.016900000095368,
+          "presentedFps": 29.915737339351992,
+          "dropped": 0,
+          "droppedRate": 0,
+          "receivedFps": 29.915737339351992,
+          "decodedFps": 29.915737339351992,
+          "decodeMsPerFrame": 0.31149444444444435
+        },
+        "drag": {
+          "seconds": 4.114100000023842,
+          "presentedFps": 29.897182858775235,
+          "dropped": 0,
+          "droppedRate": 0,
+          "receivedFps": 29.897182858775235,
+          "decodedFps": 29.897182858775235,
+          "decodeMsPerFrame": 0.304471544715447
+        },
+        "captureResolution": [
+          2560,
+          1440
+        ],
+        "codeHashes": {
+          "kit/apps/fusion_twin.kit": "aa7279cf14a1a4cd2b9b0a321f7f896063764d1c4ba01c365bbe04d5d606d948",
+          "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/extension.py": "0ebdfcd0ebeba8c67646c075f96261fd3803fec273d419c80071c5bf41bca962",
+          "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/nvidia_workflow.py": "49b632bb691887a5ce2c0857b1624af98cd1edc61d54a8ef23b327428d4e28b5",
+          "tools/qa/performance.mjs": "00afe06a436d2d9697591e82e412d4f6ea3b523608608420419e3a1b3b8a07f6"
+        },
+        "path": "runtime/qa/performance-v3-assembly.json",
+        "sha256": "a421b5fc8cc6b30ac84f9740ae0555ba31f7503abf4aafd1257074e259482991"
       },
-      "serviceAckMs": {
-        "count": 20,
-        "p50": 163.69999992847443,
-        "p95": 184.19999992847443,
-        "max": 189.19999992847443
-      },
-      "serviceRoundTripMs": {
-        "count": 20,
-        "p50": 161.19999992847443,
-        "p95": 181.39999997615814,
-        "max": 186.19999992847443
-      },
-      "kitObservedMs": {
-        "count": 20,
-        "p50": 367.5,
-        "p95": 428.7999999523163,
-        "max": 435.7999999523163
-      },
-      "videoOnsetMs": {
-        "count": 20,
-        "p50": 254.7999999761596,
-        "p95": 280.4999999761567,
-        "max": 280.7999999046333
-      },
-      "videoEndpointMs": {
-        "count": 20,
-        "p50": 254.7999999761596,
-        "p95": 280.4999999761567,
-        "max": 280.7999999046333
-      },
-      "pixelReadbackMs": {
-        "count": 232,
-        "p50": 4.899999976158142,
-        "p95": 13.899999976158142,
-        "max": 15.300000071525574
-      },
-      "observerHttpRoundTripMs": {
-        "count": 250,
-        "p50": 4.699999928474426,
-        "p95": 6,
-        "max": 7.700000047683716
+      "volume": {
+        "headless": false,
+        "browser": "155.0.4283.45",
+        "resolution": [
+          2560,
+          1440
+        ],
+        "motionRenderResolution": [
+          1920,
+          1080
+        ],
+        "settledRenderResolution": [
+          2560,
+          1440
+        ],
+        "static": {
+          "seconds": 4.005899999976158,
+          "presentedFps": 29.955815172798673,
+          "dropped": 0,
+          "droppedRate": 0,
+          "receivedFps": 29.706183379692018,
+          "decodedFps": 29.706183379692018,
+          "decodeMsPerFrame": 0.29835294117647065
+        },
+        "motion": {
+          "seconds": 6.002199999928474,
+          "presentedFps": 29.989004032212353,
+          "dropped": 0,
+          "droppedRate": 0,
+          "receivedFps": 29.989004032212353,
+          "decodedFps": 29.989004032212353,
+          "decodeMsPerFrame": 0.3029166666666668
+        },
+        "drag": {
+          "seconds": 4.074800000071526,
+          "presentedFps": 29.940119759953497,
+          "dropped": 0,
+          "droppedRate": 0,
+          "receivedFps": 29.694708942248962,
+          "decodedFps": 29.694708942248962,
+          "decodeMsPerFrame": 0.3044628099173557
+        },
+        "captureResolution": [
+          2560,
+          1440
+        ],
+        "codeHashes": {
+          "kit/apps/fusion_twin.kit": "aa7279cf14a1a4cd2b9b0a321f7f896063764d1c4ba01c365bbe04d5d606d948",
+          "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/extension.py": "0ebdfcd0ebeba8c67646c075f96261fd3803fec273d419c80071c5bf41bca962",
+          "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/nvidia_workflow.py": "49b632bb691887a5ce2c0857b1624af98cd1edc61d54a8ef23b327428d4e28b5",
+          "tools/qa/performance.mjs": "00afe06a436d2d9697591e82e412d4f6ea3b523608608420419e3a1b3b8a07f6"
+        },
+        "path": "runtime/qa/performance-v3-volume.json",
+        "sha256": "30261e883270e52ce20a8cddd1cbcee729c69394cc0106acdf1037b374228fb5"
       }
     },
-    "evidence": {
-      "path": "runtime/qa/latency-release-rt2.json",
-      "sha256": "d8e6534e80a57e287ee145398008f346b535193966bc37d7ffe73e1ec32eb286"
-    }
-  },
-  "portability": {
-    "passed": true,
-    "checks": [
-      "HTTP serves the relocated project and its actual PID",
-      "Repeated startup reuses only the matching project process",
-      "UI and USD assets resolve from the relocated directory",
-      "Both designs compute and publish fields inside the relocated runtime",
-      "Another project on the same port is rejected without stopping the owner",
-      "Copied PID files cannot stop the original project",
-      "Relocated CAD and RTWT load with RT2 and a QHD capture",
-      "IndeX adopts the current field; NanoVDB round-trip is exact; volume uses real-time RTX depth mode 3",
-      "Returning to assembly keeps RT2 and matching RTWT state"
-    ],
-    "processes_stopped": true,
-    "stop_seconds": 3.578,
-    "captures": [
-      {
-        "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable 8bdc9bf8d3\\runtime\\qa\\relocated-assembly.png",
-        "sha256": "b97c4955e209dc23e88ea0e3756be653c03e382b7e107fbd892abbe3d34aeff8",
-        "mode": "assembly",
-        "revision": 3,
-        "field_key": "efa9ac650660e6399a0cc521d3dedf74",
-        "render_mode": "RealTimePathTracing"
+    "full_orbit": {
+      "passed": true,
+      "durationSeconds": 66,
+      "metrics": {
+        "seconds": 66.01339999997616,
+        "presentedFrames": 1979,
+        "totalVideoFrames": 1980,
+        "dropped": 0,
+        "presentedFps": 29.97876188774877,
+        "droppedRate": 0
       },
-      {
-        "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable 8bdc9bf8d3\\runtime\\qa\\relocated-volume.png",
-        "sha256": "92f7bd44e0ba5e0e0c8956bb250ba78e3ba9b9a5b5382022675f733de29deea1",
-        "mode": "volume",
-        "revision": 4,
-        "field_key": "efa9ac650660e6399a0cc521d3dedf74",
-        "render_mode": "RealTimePathTracing"
+      "seenWalls": [
+        "BackWall",
+        "SideWall_0",
+        "SideWall_2"
+      ],
+      "restored": true,
+      "path": "runtime/qa/hall-orbit-v3-release.json",
+      "sha256": "3d1a36ad3a9fb22eb6e5c8efedfaa6270c1f515182a466dfc11483aed3849062"
+    },
+    "latency": {
+      "passed": true,
+      "targetMs": 300,
+      "trials": 20,
+      "warmupTrialsExcluded": 2,
+      "summary": {
+        "debounceMs": {
+          "count": 20,
+          "p50": 2.5999999046325684,
+          "p95": 3.0999999046325684,
+          "max": 3.4000000953674316
+        },
+        "serviceAckMs": {
+          "count": 20,
+          "p50": 178.39999997615814,
+          "p95": 184.80000007152557,
+          "max": 186.59999990463257
+        },
+        "serviceRoundTripMs": {
+          "count": 20,
+          "p50": 175.89999997615814,
+          "p95": 181.39999997615814,
+          "max": 183.5
+        },
+        "kitObservedMs": {
+          "count": 20,
+          "p50": 358.90000009536743,
+          "p95": 393.7000000476837,
+          "max": 423.5
+        },
+        "videoOnsetMs": {
+          "count": 20,
+          "p50": 277.9999999761567,
+          "p95": 280.4999999761567,
+          "max": 280.69999995231774
+        },
+        "videoEndpointMs": {
+          "count": 20,
+          "p50": 277.9999999761567,
+          "p95": 280.4999999761567,
+          "max": 280.69999995231774
+        },
+        "pixelReadbackMs": {
+          "count": 221,
+          "p50": 4.199999928474426,
+          "p95": 16.299999952316284,
+          "max": 19.799999952316284
+        },
+        "observerHttpRoundTripMs": {
+          "count": 243,
+          "p50": 4.899999976158142,
+          "p95": 6.200000047683716,
+          "max": 7.5
+        }
       },
-      {
-        "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable 8bdc9bf8d3\\runtime\\qa\\relocated-assembly-restored.png",
-        "sha256": "3307a6f7229395d181de21042b59558165f0aecbe437bfaa725f1f6ba1a71bf5",
-        "mode": "assembly",
-        "revision": 5,
-        "field_key": "efa9ac650660e6399a0cc521d3dedf74",
-        "render_mode": "RealTimePathTracing"
-      }
-    ],
-    "evidence": {
+      "scope": "Actual DOM input to decoded-video pixels; calibrated fixed regions, no threshold relaxation",
+      "path": "runtime/qa/latency-v3-release.json",
+      "sha256": "497a13bb020e5e45a55bf965b28663ba80ad7d399f7d5b0fa6068a23d7d652b7"
+    },
+    "restart": {
+      "passed": true,
+      "count": 3,
+      "checks": [
+        {
+          "name": "ack_loss_recovery",
+          "request_id": "6d2d17fb-d3cf-41a4-8c81-1bc87cda61df",
+          "seq": 896,
+          "sha256": "ad2260d9703a7a2ea0924266dab4f83d998f8f35fb91616708b1a5ea095f1089"
+        },
+        {
+          "name": "kit_restart_cancels_old_session",
+          "old_epoch": "9b4d7c9e7c5044b6849582fa7525c395",
+          "new_epoch": "af00d239dda34a12b940670f93a4051a",
+          "cancelled_request": "39c32ec8-6490-4791-ab86-48b42455f38b"
+        },
+        {
+          "name": "server_restart_retains_completion",
+          "request_id": "bf24760a-1dc9-49de-9fe4-b2bf5d4e201c",
+          "old_epoch": "84e3a52326c34e9c8f71426641ac031e",
+          "new_epoch": "a2e653514d12408b86398a3ca0192a33",
+          "sha256": "45f64a78428cb0a1da761cdf3693f715479e920702fc77703eedb48f2e8b48e0"
+        }
+      ],
+      "path": "runtime/qa/restart-reliability.json",
+      "sha256": "e8ae74c6891893e54ad344df12bc3afbfc9d27e3ae68cfede024dbf14445b56f"
+    },
+    "portability": {
+      "ok": true,
+      "mode": "kit",
+      "project": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable e6c91c1ac6",
+      "source": "D:\\nv聚变",
+      "port": 8766,
+      "checks": [
+        "HTTP serves the relocated project and its actual PID",
+        "Repeated startup reuses only the matching project process",
+        "UI and USD assets resolve from the relocated directory",
+        "Both designs compute and publish fields inside the relocated runtime",
+        "Another project on the same port is rejected without stopping the owner",
+        "Copied PID files cannot stop the original project",
+        "Relocated CAD and RTWT load with RT2 and a QHD capture",
+        "IndeX adopts the current field; NanoVDB round-trip is exact; volume uses real-time RTX depth mode 3",
+        "Returning to assembly keeps RT2 and matching RTWT state"
+      ],
+      "runtime": {
+        "Kit": "D:\\FusionTwinRuntime\\kit-110.1.3\\kit\\kit.exe",
+        "ExtensionFolders": [
+          "D:\\FusionTwinRuntime\\kit-110.1.3\\extscache",
+          "D:\\FusionTwinRuntime\\kit-110.1.3\\exts",
+          "D:\\FusionTwinRuntime\\kit-110.1.3\\kit-cae\\exts",
+          "D:\\FusionTwinRuntime\\kit-110.1.3\\kit-cae\\apps"
+        ],
+        "Python": "D:\\nvcode\\fusion-env\\Scripts\\python.exe"
+      },
+      "processes_stopped": true,
+      "kit_started": true,
+      "runtime_reparse_points": [],
+      "server_pid": 42532,
+      "compute_device": "cuda:0",
+      "kit_pid": 39196,
+      "captures": [
+        {
+          "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable e6c91c1ac6\\runtime\\qa\\relocated-assembly.png",
+          "sha256": "0b04b6d97e7771160c1e656e3cb59f1cdda1f23521902cb43cf24aa558cd5d18",
+          "mode": "assembly",
+          "revision": 4,
+          "field_key": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+          "render_mode": "RealTimePathTracing"
+        },
+        {
+          "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable e6c91c1ac6\\runtime\\qa\\relocated-volume.png",
+          "sha256": "2e52d1825e8b2f6c573d8dda8ff9145ea44c3e0d0ce3452c55067f5b85a85f5d",
+          "mode": "volume",
+          "revision": 5,
+          "field_key": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+          "render_mode": "RealTimePathTracing"
+        },
+        {
+          "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable e6c91c1ac6\\runtime\\qa\\relocated-assembly-restored.png",
+          "sha256": "f48193e2bf2aefe4582b7951ecfd6a26ddefd2b4fc97ab7fc137c9e75db5d296",
+          "mode": "assembly",
+          "revision": 6,
+          "field_key": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+          "render_mode": "RealTimePathTracing"
+        }
+      ],
+      "volume": {
+        "rtwt_ready": true,
+        "rtwt_control_count": 20,
+        "applied_volume_field_key": "b18b5bf229748cb92a1cc2fc5db5e6c9",
+        "applied_volume_key": "3836a76c02869045b63371f1cdf3e2a4",
+        "volume_roundtrip": "exact",
+        "volume_units": "keV",
+        "volume_grid": [
+          128,
+          128,
+          112
+        ],
+        "volume_range_keV": [
+          0.0,
+          24.97089195251465
+        ],
+        "index_native_volume": true,
+        "index_fields": [
+          "colors"
+        ],
+        "index_depth_mode": 3,
+        "render_mode": "RealTimePathTracing",
+        "rt2_enabled": true,
+        "sampling_strategy": "temporal_reconstruction"
+      },
+      "restored_mode": "RealTimePathTracing",
+      "stop_seconds": 3.672,
       "path": "runtime/qa/portability-kit.json",
-      "sha256": "8effe7c29f6d761430fc19f703172f9594f1fd0ad5b380c78ed3777bb9924192"
-    }
-  },
-  "measurement": {
-    "passed": true,
-    "distance_m": 8.5024,
-    "evidence": {
+      "sha256": "f0927beb53b17dbff0eabba25a8735a66f23979e6f8b23e7acf4b06883efcf20"
+    },
+    "measurement": {
+      "passed": true,
+      "base": "http://127.0.0.1:8765",
+      "initial": {
+        "design": "conventional",
+        "equilibrium": "reference",
+        "language": "zh",
+        "view": "overview",
+        "tab": "explore",
+        "mode": "assembly",
+        "scenario": "nominal",
+        "power": 2000,
+        "flow": 1,
+        "inlet": 300,
+        "phase": 0.65,
+        "cutaway": 80,
+        "explode": 0,
+        "opacity": 1,
+        "selected": "",
+        "fieldLines": false,
+        "orbit": false,
+        "playing": false,
+        "visible": {
+          "tf_coils": true,
+          "pf_coils": true,
+          "cs_coils": true,
+          "coil_structures": true,
+          "vacuum_vessel": true,
+          "blanket": true,
+          "divertor": true,
+          "plasma": true,
+          "thermal_shield": false,
+          "cryostat": false,
+          "radiation_shield": false
+        }
+      },
+      "normalizedPoints": [
+        [
+          0.405,
+          0.42
+        ],
+        [
+          0.43,
+          0.5
+        ]
+      ],
+      "distance_m": 7.4034,
+      "points": [
+        [
+          0.5229002237319946,
+          -2.9655046463012695,
+          4.677533149719238
+        ],
+        [
+          -1.0013765096664429,
+          2.1849470138549805,
+          -0.41760826110839844
+        ]
+      ],
+      "field_ref": {
+        "path": "fields/1dc7d57ba597cdcd216e004f73bee2f2.npz",
+        "key": "1dc7d57ba597cdcd216e004f73bee2f2",
+        "revision": 1265,
+        "topology_key": "conventional:pfc-v2:8b9df115b04618c2c313",
+        "equilibrium_key": "conventional/reference:85cb41c125e0d344",
+        "schema_version": 2
+      },
+      "provenance": true,
       "path": "runtime/qa/measurement.json",
-      "sha256": "bee6a3d958ede172993f0e74975ade1cebfa4459d7c80d7270cbd9e5683152ce"
-    }
+      "sha256": "428fd09d59f386633c94ea3edad239ede4063b1ac8e9f24935e6c32218bb6338"
+    },
+    "source_assets": {
+      "unchanged_from_base": "ecb3c1b",
+      "path": "assets/source",
+      "verified_by": "Empty staged and unstaged source-asset Git diff; independent geometry tests"
+    },
+    "repository": {
+      "lfs_patterns": [
+        "assets/scene/**/*.usdc",
+        "assets/scenarios/fields/*.npz",
+        "assets/downloads/*.zip",
+        "assets/ui/**/*.png"
+      ],
+      "history_rewritten": false,
+      "qa_archive_executed": false,
+      "note": "Existing git-lfs used; no production dependency added; historical Git objects retained"
+    },
+    "validation_sequence": [
+      "Latency and motion evidence predates final publish-key invalidation; that fix changes only superseded/failed volume publication",
+      "Final publication fix passed targeted A-B-A/failure CPU tests, full Python regression and subsequent live NVIDIA, restart and relocation checks",
+      "Final measurement/focus/accessibility changes passed 12 CPU behavior cases, wrapper, 5 live UI regressions and final full browser acceptance"
+    ]
   },
-  "performance": {
-    "assembly": {
-      "motion": {
-        "seconds": 6.005699999928474,
-        "presentedFps": 29.971527049660114,
-        "dropped": 0,
-        "droppedRate": 0,
-        "receivedFps": 29.638510082441666,
-        "decodedFps": 29.638510082441666,
-        "decodeMsPerFrame": 0.303185393258427
+  "history": [
+    {
+      "schema_version": 1,
+      "accepted_at": "2026-10-11T23:55:30.728118+00:00",
+      "scope": "Windows engineering visualization demo; synthetic_demo; not physical validation",
+      "hardware": {
+        "gpu": "NVIDIA GeForce RTX 5070 Ti",
+        "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+        "video_resolution": [
+          2560,
+          1440
+        ],
+        "render_mode": "RealTimePathTracing"
       },
-      "drag": {
-        "seconds": 4.138300000071526,
-        "presentedFps": 29.96399487660556,
-        "dropped": 0,
-        "droppedRate": 0,
-        "receivedFps": 29.96399487660556,
-        "decodedFps": 29.96399487660556,
-        "decodeMsPerFrame": 0.2976290322580645
+      "unit": {
+        "passed": true,
+        "count": 108,
+        "seconds": 17.968,
+        "path": "runtime/unit-tests.log",
+        "sha256": "75b3fe7fecb5bd928f32ff2d80c25c632642d8613c5141701f232c7ee52f571c"
       },
-      "static": {
-        "seconds": 4.003599999904632,
-        "presentedFps": 29.973024278863637,
-        "dropped": 0,
-        "droppedRate": 0,
-        "receivedFps": 30.2227994811875,
-        "decodedFps": 30.2227994811875,
-        "decodeMsPerFrame": 0.3056115702479338
-      },
-      "resolution": [
-        2560,
-        1440
-      ],
-      "motionRenderResolution": [
-        1920,
-        1080
-      ],
-      "settledRenderResolution": [
-        2560,
-        1440
-      ],
-      "captureResolution": [
-        2560,
-        1440
-      ],
-      "engines": {
-        "initial": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "detail",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            2560,
-            1440
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
+      "functional": {
+        "passed": true,
+        "count": 36,
+        "checks": [
+          "explicit conventional/reference nominal starting state",
+          "real RTX WebRTC 2560x1440",
+          "English localization",
+          "CAD component selection",
+          "component hide",
+          "component show",
+          "component isolation",
+          "CAD dimensions dialog",
+          "restore default assembly",
+          "CAD sector cutaway",
+          "CAD exploded assembly",
+          "reset transformations",
+          "temperature surface mode",
+          "high thermal load scenario",
+          "real CUDA scenario response",
+          "comparison tab",
+          "reference/current delta",
+          "exploration restore",
+          "equilibrium magnetic lines mode",
+          "plasma section mode and camera",
+          "heat flux surface mode",
+          "load scan starts at a defined position",
+          "quasi-steady load scan play",
+          "quasi-steady load scan advances across wraparound",
+          "quasi-steady load scan pause",
+          "scenario JSON download matches applied field",
+          "completed native RTX capture downloaded at renderer resolution",
+          "data provenance disclosure",
+          "CAD complete asset ZIP",
+          "USD complete asset ZIP",
+          "invalid state rejected",
+          "default view restored",
+          "final renderer settled to RT2 detail",
+          "fixed steady window presents at least 24fps",
+          "complete functional workflow presents at least 24fps with at most 5% drops",
+          "no browser JavaScript errors"
+        ],
+        "full_workflow": {
+          "seconds": 17.6665,
+          "presentedFps": 30.00028302153794,
+          "presentedFrames": 530,
+          "totalVideoFrames": 530,
+          "totalVideoFramesFps": 30.00028302153794,
+          "dropped": 0,
+          "droppedRate": 0,
+          "start": {
+            "width": 2560,
+            "height": 1440,
+            "time": 3644,
+            "presented": 76,
+            "frames": 78,
+            "dropped": 1
+          },
+          "end": {
+            "width": 2560,
+            "height": 1440,
+            "time": 21310.5,
+            "presented": 606,
+            "frames": 608,
+            "dropped": 1
+          },
+          "diagnosticOnly": false,
+          "targetPresentedFps": 24,
+          "maxDroppedRate": 0.05,
+          "excludedIntervals": [],
+          "workload": "All functional checks, mode switches, shader compilation, geometry selection/hide/isolate/cutaway/explode, optional UI screenshots, native capture and exports"
         },
-        "orbit": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "interaction",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            1920,
-            1080
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
-        },
-        "settledAfterOrbit": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "detail",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            2560,
-            1440
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
-        },
-        "drag": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "interaction",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            1920,
-            1080
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
-        },
-        "settledAfterDrag": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "detail",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            2560,
-            1440
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
+        "steady_fps": 30.09143807148795,
+        "errors": [],
+        "failed_requests": [],
+        "evidence": {
+          "path": "runtime/qa/acceptance-release-complete.json",
+          "sha256": "57125a87d08e8de2a52ac3e978f9309c7ef759b57942c91395c0ee218027e0e4"
         }
       },
-      "evidence": {
-        "path": "runtime/qa/performance-release-assembly.json",
-        "sha256": "6706bc892297be6d7efa020a7d438f3b347d2ecf0c48163d95314f04167dc2aa"
-      }
-    },
-    "volume": {
-      "motion": {
-        "seconds": 6.0081999999284745,
-        "presentedFps": 30.12549515697792,
-        "dropped": 0,
-        "droppedRate": 0,
-        "receivedFps": 30.291934356740228,
-        "decodedFps": 30.291934356740228,
-        "decodeMsPerFrame": 0.3098901098901099
-      },
-      "drag": {
-        "seconds": 4.106899999976158,
-        "presentedFps": 29.949597019823724,
-        "dropped": 0,
-        "droppedRate": 0,
-        "receivedFps": 30.193089678521478,
-        "decodedFps": 30.193089678521478,
-        "decodeMsPerFrame": 0.31387096774193507
-      },
-      "static": {
-        "seconds": 4.018299999952316,
-        "presentedFps": 30.112236518287798,
-        "dropped": 0,
-        "droppedRate": 0,
-        "receivedFps": 30.112236518287798,
-        "decodedFps": 30.112236518287798,
-        "decodeMsPerFrame": 0.31314876033057853
-      },
-      "resolution": [
-        2560,
-        1440
-      ],
-      "motionRenderResolution": [
-        1920,
-        1080
-      ],
-      "settledRenderResolution": [
-        2560,
-        1440
-      ],
-      "captureResolution": [
-        2560,
-        1440
-      ],
-      "engines": {
-        "initial": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "detail",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            2560,
-            1440
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
-        },
-        "orbit": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "interaction",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            1920,
-            1080
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
-        },
-        "settledAfterOrbit": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "detail",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            2560,
-            1440
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
-        },
-        "drag": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "interaction",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            1920,
-            1080
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
-        },
-        "settledAfterDrag": {
-          "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
-          "renderMode": "RealTimePathTracing",
-          "quality": "detail",
-          "rt2Enabled": true,
-          "samplingStrategy": "temporal_reconstruction",
-          "spp": null,
-          "totalSpp": null,
-          "renderResolution": [
-            2560,
-            1440
-          ],
-          "appliedFieldKey": "a0402887453839428e88c4086348026a"
+      "visual_functional": {
+        "passed": true,
+        "count": 35,
+        "errors": [],
+        "evidence": {
+          "path": "runtime/qa/acceptance-release-visual.json",
+          "sha256": "a3f09f7e8584db1ba702bca3a227a83b190c88c60f19c195a92f7b2a690f08a4"
         }
       },
-      "evidence": {
-        "path": "runtime/qa/performance-release-volume.json",
-        "sha256": "b51b8157452433da61eb222c8ea2d195ae8b5b2001f37e37daa8429973f3719e"
+      "reliability": {
+        "passed": true,
+        "count": 18,
+        "names": [
+          "versioned_fields_applied",
+          "continuous_slider_submits_before_release_and_applies_final",
+          "state_transport_race_retry_recovery_and_rejection",
+          "burst_100_actions_and_retry",
+          "view_changes_reuse_physics",
+          "design_equilibrium_conventional_reference",
+          "design_equilibrium_conventional_rampup",
+          "design_equilibrium_conventional_sof",
+          "design_equilibrium_conventional_eof",
+          "design_equilibrium_conventional_rampdown",
+          "design_equilibrium_longleg_reference",
+          "design_equilibrium_longleg_rampup",
+          "design_equilibrium_longleg_sof",
+          "design_equilibrium_longleg_eof",
+          "design_equilibrium_longleg_rampdown",
+          "difference_field",
+          "bilingual_new_controls",
+          "export_matches_context"
+        ],
+        "evidence": {
+          "path": "runtime/qa/reliability.json",
+          "sha256": "ed1aa68b743dbe43c301bb9a75314fa27004c06bcfa85ac18cf50f09e32a722b"
+        }
+      },
+      "restart": {
+        "passed": true,
+        "count": 3,
+        "names": [
+          "ack_loss_recovery",
+          "kit_restart_cancels_old_session",
+          "server_restart_retains_completion"
+        ],
+        "evidence": {
+          "path": "runtime/qa/restart-reliability.json",
+          "sha256": "2638199be0a8983216a1e3e4fa3c920ae9766e4a181df96f3a92928bf5ef8caa"
+        }
+      },
+      "nvidia": {
+        "passed": true,
+        "count": 7,
+        "names": [
+          "rtwt_manifest_over_webrtc",
+          "ui_rtwt_write_and_index_volume",
+          "cache_hit_and_cutaway_invalidation",
+          "volume_design_switch",
+          "assembly_restores_rt2_detail",
+          "assembly_motion_and_settled_use_rt2",
+          "data_channel_requests_complete"
+        ],
+        "evidence": {
+          "path": "runtime/qa/nvidia.json",
+          "sha256": "ebe1f18e636b84df614b6f6ae3fa21c639bbacc27431123224528d0ce968e37e"
+        }
+      },
+      "latency": {
+        "passed": true,
+        "summary": {
+          "debounceMs": {
+            "count": 20,
+            "p50": 2.5,
+            "p95": 2.799999952316284,
+            "max": 3
+          },
+          "serviceAckMs": {
+            "count": 20,
+            "p50": 163.69999992847443,
+            "p95": 184.19999992847443,
+            "max": 189.19999992847443
+          },
+          "serviceRoundTripMs": {
+            "count": 20,
+            "p50": 161.19999992847443,
+            "p95": 181.39999997615814,
+            "max": 186.19999992847443
+          },
+          "kitObservedMs": {
+            "count": 20,
+            "p50": 367.5,
+            "p95": 428.7999999523163,
+            "max": 435.7999999523163
+          },
+          "videoOnsetMs": {
+            "count": 20,
+            "p50": 254.7999999761596,
+            "p95": 280.4999999761567,
+            "max": 280.7999999046333
+          },
+          "videoEndpointMs": {
+            "count": 20,
+            "p50": 254.7999999761596,
+            "p95": 280.4999999761567,
+            "max": 280.7999999046333
+          },
+          "pixelReadbackMs": {
+            "count": 232,
+            "p50": 4.899999976158142,
+            "p95": 13.899999976158142,
+            "max": 15.300000071525574
+          },
+          "observerHttpRoundTripMs": {
+            "count": 250,
+            "p50": 4.699999928474426,
+            "p95": 6,
+            "max": 7.700000047683716
+          }
+        },
+        "evidence": {
+          "path": "runtime/qa/latency-release-rt2.json",
+          "sha256": "d8e6534e80a57e287ee145398008f346b535193966bc37d7ffe73e1ec32eb286"
+        }
+      },
+      "portability": {
+        "passed": true,
+        "checks": [
+          "HTTP serves the relocated project and its actual PID",
+          "Repeated startup reuses only the matching project process",
+          "UI and USD assets resolve from the relocated directory",
+          "Both designs compute and publish fields inside the relocated runtime",
+          "Another project on the same port is rejected without stopping the owner",
+          "Copied PID files cannot stop the original project",
+          "Relocated CAD and RTWT load with RT2 and a QHD capture",
+          "IndeX adopts the current field; NanoVDB round-trip is exact; volume uses real-time RTX depth mode 3",
+          "Returning to assembly keeps RT2 and matching RTWT state"
+        ],
+        "processes_stopped": true,
+        "stop_seconds": 3.578,
+        "captures": [
+          {
+            "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable 8bdc9bf8d3\\runtime\\qa\\relocated-assembly.png",
+            "sha256": "b97c4955e209dc23e88ea0e3756be653c03e382b7e107fbd892abbe3d34aeff8",
+            "mode": "assembly",
+            "revision": 3,
+            "field_key": "efa9ac650660e6399a0cc521d3dedf74",
+            "render_mode": "RealTimePathTracing"
+          },
+          {
+            "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable 8bdc9bf8d3\\runtime\\qa\\relocated-volume.png",
+            "sha256": "92f7bd44e0ba5e0e0c8956bb250ba78e3ba9b9a5b5382022675f733de29deea1",
+            "mode": "volume",
+            "revision": 4,
+            "field_key": "efa9ac650660e6399a0cc521d3dedf74",
+            "render_mode": "RealTimePathTracing"
+          },
+          {
+            "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\Fusion Twin Portable 8bdc9bf8d3\\runtime\\qa\\relocated-assembly-restored.png",
+            "sha256": "3307a6f7229395d181de21042b59558165f0aecbe437bfaa725f1f6ba1a71bf5",
+            "mode": "assembly",
+            "revision": 5,
+            "field_key": "efa9ac650660e6399a0cc521d3dedf74",
+            "render_mode": "RealTimePathTracing"
+          }
+        ],
+        "evidence": {
+          "path": "runtime/qa/portability-kit.json",
+          "sha256": "8effe7c29f6d761430fc19f703172f9594f1fd0ad5b380c78ed3777bb9924192"
+        }
+      },
+      "measurement": {
+        "passed": true,
+        "distance_m": 8.5024,
+        "evidence": {
+          "path": "runtime/qa/measurement.json",
+          "sha256": "bee6a3d958ede172993f0e74975ade1cebfa4459d7c80d7270cbd9e5683152ce"
+        }
+      },
+      "performance": {
+        "assembly": {
+          "motion": {
+            "seconds": 6.005699999928474,
+            "presentedFps": 29.971527049660114,
+            "dropped": 0,
+            "droppedRate": 0,
+            "receivedFps": 29.638510082441666,
+            "decodedFps": 29.638510082441666,
+            "decodeMsPerFrame": 0.303185393258427
+          },
+          "drag": {
+            "seconds": 4.138300000071526,
+            "presentedFps": 29.96399487660556,
+            "dropped": 0,
+            "droppedRate": 0,
+            "receivedFps": 29.96399487660556,
+            "decodedFps": 29.96399487660556,
+            "decodeMsPerFrame": 0.2976290322580645
+          },
+          "static": {
+            "seconds": 4.003599999904632,
+            "presentedFps": 29.973024278863637,
+            "dropped": 0,
+            "droppedRate": 0,
+            "receivedFps": 30.2227994811875,
+            "decodedFps": 30.2227994811875,
+            "decodeMsPerFrame": 0.3056115702479338
+          },
+          "resolution": [
+            2560,
+            1440
+          ],
+          "motionRenderResolution": [
+            1920,
+            1080
+          ],
+          "settledRenderResolution": [
+            2560,
+            1440
+          ],
+          "captureResolution": [
+            2560,
+            1440
+          ],
+          "engines": {
+            "initial": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "detail",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                2560,
+                1440
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            },
+            "orbit": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "interaction",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                1920,
+                1080
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            },
+            "settledAfterOrbit": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "detail",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                2560,
+                1440
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            },
+            "drag": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "interaction",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                1920,
+                1080
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            },
+            "settledAfterDrag": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "detail",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                2560,
+                1440
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            }
+          },
+          "evidence": {
+            "path": "runtime/qa/performance-release-assembly.json",
+            "sha256": "6706bc892297be6d7efa020a7d438f3b347d2ecf0c48163d95314f04167dc2aa"
+          }
+        },
+        "volume": {
+          "motion": {
+            "seconds": 6.0081999999284745,
+            "presentedFps": 30.12549515697792,
+            "dropped": 0,
+            "droppedRate": 0,
+            "receivedFps": 30.291934356740228,
+            "decodedFps": 30.291934356740228,
+            "decodeMsPerFrame": 0.3098901098901099
+          },
+          "drag": {
+            "seconds": 4.106899999976158,
+            "presentedFps": 29.949597019823724,
+            "dropped": 0,
+            "droppedRate": 0,
+            "receivedFps": 30.193089678521478,
+            "decodedFps": 30.193089678521478,
+            "decodeMsPerFrame": 0.31387096774193507
+          },
+          "static": {
+            "seconds": 4.018299999952316,
+            "presentedFps": 30.112236518287798,
+            "dropped": 0,
+            "droppedRate": 0,
+            "receivedFps": 30.112236518287798,
+            "decodedFps": 30.112236518287798,
+            "decodeMsPerFrame": 0.31314876033057853
+          },
+          "resolution": [
+            2560,
+            1440
+          ],
+          "motionRenderResolution": [
+            1920,
+            1080
+          ],
+          "settledRenderResolution": [
+            2560,
+            1440
+          ],
+          "captureResolution": [
+            2560,
+            1440
+          ],
+          "engines": {
+            "initial": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "detail",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                2560,
+                1440
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            },
+            "orbit": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "interaction",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                1920,
+                1080
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            },
+            "settledAfterOrbit": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "detail",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                2560,
+                1440
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            },
+            "drag": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "interaction",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                1920,
+                1080
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            },
+            "settledAfterDrag": {
+              "engine": "NVIDIA Omniverse Kit 110.1.3 / RTX Real-Time 2.0",
+              "renderMode": "RealTimePathTracing",
+              "quality": "detail",
+              "rt2Enabled": true,
+              "samplingStrategy": "temporal_reconstruction",
+              "spp": null,
+              "totalSpp": null,
+              "renderResolution": [
+                2560,
+                1440
+              ],
+              "appliedFieldKey": "a0402887453839428e88c4086348026a"
+            }
+          },
+          "evidence": {
+            "path": "runtime/qa/performance-release-volume.json",
+            "sha256": "b51b8157452433da61eb222c8ea2d195ae8b5b2001f37e37daa8429973f3719e"
+          }
+        }
+      },
+      "code_sha256": {
+        "app/fusion_twin/__init__.py": "7aa4b5c1a7b98699be5796be37e09f621613d398a7d212bc83f2725b0f0b183e",
+        "app/fusion_twin/compute.py": "baf5d82d68009bea76051011c2f2083ac091e1f5a9b5c1e7b83ec26dcbb2be1e",
+        "app/fusion_twin/field_cache.py": "3563f33fdcc8848ebde067536532780ab1b6cb4e288762e7f71960a9d6d44e34",
+        "app/fusion_twin/geometry.py": "6cae406eeb3b14133555d67f7ffc94da1143d782c93042f093fcd39db5579856",
+        "app/fusion_twin/pfc.py": "5cc287fb5c311529ab58d9d315069f3a2e38d13706ca14e78bf1352dae50751e",
+        "app/fusion_twin/physics.py": "162809feb8dce9d4f7ae2465705301f3e437b273e517ace27dcc223ae96ea77e",
+        "app/fusion_twin/protocol.py": "713d52e0cc60617b2d80753952efc5f3e9a3da9a76e8689a6bcbd763ad1e4d3c",
+        "app/fusion_twin/server.py": "8877c5370d22d5ebedff4ec7bac4cb0cc735dfb7f54a4cce6e7d8c003200a5a9",
+        "kit/apps/fusion_twin.kit": "aa7279cf14a1a4cd2b9b0a321f7f896063764d1c4ba01c365bbe04d5d606d948",
+        "kit/apps/fusion_workflow_probe.kit": "ab5a83394006d09c0a66c56f2c74704b08b0c468260c190ffa9847823f4d8687",
+        "kit/extensions/fusion.twin.bridge/config/extension.toml": "6335ebf9b696fac4881bb7fba6448504d891111ce5f4a7e99516bb41df8f9892",
+        "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/__init__.py": "20c769b59c817a6c992af86d894e4cee31ff1c6d5460dfa5520fa75070849ddb",
+        "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/extension.py": "c5a146693699db85189b3357d5cb8b531a8ebdda89f815d570c56a41c3af45b6",
+        "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/geometry.py": "20a0b7249bbef63bbb5cefa4bf415fa2015b7e7b5bc391efd85080aac2268de9",
+        "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/nvidia_workflow.py": "a638a5279320f629c78cd339c9cca4b1ae18077db061e1322cb4c8204244a464",
+        "kit/extensions/fusion.twin.schema/config/extension.toml": "3949394d91364b8b522028a510248f9899bb64e26347749a9e0a8ad0a8d20894",
+        "kit/extensions/fusion.twin.schema/fusion/twin/schema/__init__.py": "0bfb7c96b5bc2d20f7b34d41e3709d085568e02a5d55695919bc761447d87c33",
+        "kit/extensions/fusion.twin.schema/resources/generatedSchema.usda": "b594ec62eb965e270bfc3e8df6323f780b66d970d0541b76089cacfd053ece52",
+        "kit/extensions/fusion.twin.schema/resources/plugInfo.json": "e2a07b7fa13b4e340628efbc9b380fbe5c963739274f7ecd22e996903c2dfbe6",
+        "kit/workflow/workflow.toml": "db593fae74c7f0e3051863ea92ad842d0bd4a43597d5c9b9aa25be0ba25069ce",
+        "web/app.js": "a4bcfeb48a91a1f1bb9e7de9a7bfb31219ecdf9077b6fd80fd3f042da151561f",
+        "web/index.html": "af89f357237709f21cbc8cef8af5a45538b8e2308726d8edb23896a1b38ae1c7",
+        "web/streamer/index.js": "aafc6bdfe5ebbb4017767a0551b6fa9cc9f819ec2a0b1d6e19a78d26d55ef1de",
+        "web/streamer/vite.config.js": "8c581c7912479dc7c0cfde9949d3fe72ab4cacba4f27e5e42b4b7847f8366719",
+        "web/style.css": "a36b6f0759dd886f290a9e6f6a40f05bb186cf76cfe25f6a85b05f6a7053a812",
+        "web/vendor/fusion-streamer.js": "b919bb1694e14a2290cb152aa0e9354e4b1590a6dfc727dcd54417416f6b91d1",
+        "tools/bake_scenarios.py": "4743eca1fa229e94cd27288f103b465fa8d8dd0f0eb561ddb37dc7eff14c8216",
+        "tools/build_scene.py": "463f95a8db3807fdcc9d40e0e8a9f64f4dbc9d8623904b068fb08e55f7cb80d9",
+        "tools/import_runtime.py": "a60aab8c21def0bfbb4b8271c0d6843f143a876858e0477c4d9910df5f3528f3",
+        "tools/launch_kit.ps1": "09efde58c440fe4baddd72d4aee32540b1a11f772871ebcf523b37a62ff404b1",
+        "tools/prepare_exports.py": "2941535a0ec4c09f53110ede2b0637d35b3cf0029cdc7f60731861e0d1ddd983",
+        "tools/probe_kit.py": "cd576186ac42334fa6756f4055e0eae0d40249470c45fd1a8d09828ee1d57b63",
+        "tools/publish_geometry.py": "eb24d8450bf3ddca9664b6da0437ea9555c8ddfcec99e4e79597115b3365c86b",
+        "tools/qa/acceptance.mjs": "9b88ac6295f7b641c867a5adc78cdc63192b1990979948e863ca43b5e9f1ef0f",
+        "tools/qa/api.mjs": "fa4549add0f9c783c4a38f50fbd1c1851252b88b17d2cf44d526239de6b8db0e",
+        "tools/qa/clarity.mjs": "6760cf592d886a114e41f08f2e9299b963647b3c7f2969d62abb701306ca14f7",
+        "tools/qa/field-roundtrip.mjs": "dce8aa1a50b6852cde42e7e20fd82c8f3d33209e4d407858b94a8dfff7cde1f3",
+        "tools/qa/latency.mjs": "da064f6ee3f69db20a6c261cd3d6d31b745f709fa9b853a0ca77b2c83ddd3939",
+        "tools/qa/measurement.mjs": "fac87e501ea928ebd87f1986ce12199587dc044090c90f4309674566aa5fc85a",
+        "tools/qa/nvidia.mjs": "88829a0e8ce5f6a535ac113fae1e78689439c0de37779f50dbbfe730802ea873",
+        "tools/qa/package-lock.json": "c68da1ef5d3fb4ae1f17e50088df5587e44c6f042cc3164dcd57956b0f2cd9ff",
+        "tools/qa/package.json": "e69ceb55902aeea8669e16d9c45b143ad265522b59e8d7fa23aa21871f77043b",
+        "tools/qa/performance.mjs": "00afe06a436d2d9697591e82e412d4f6ea3b523608608420419e3a1b3b8a07f6",
+        "tools/qa/portability.py": "0021fe3054cbf08b2ea32e4a10210dd45e4c9ccec4c4208383640a37378538d4",
+        "tools/qa/presentation.mjs": "5d6147ba956171eb6a65a843ef3ee242b8fd8ee60a63113f9ebad4b00b7f7e4f",
+        "tools/qa/probe_depth.py": "9ba57b63187a0ee1eebdc5a6eda0ebe1ed35569970bbfe0e21febb8525830c63",
+        "tools/qa/probe_nvidia_stack.py": "447729b1d8153c24ea22ecaf465b74f187e35b581d062529e3be696fa307ec3d",
+        "tools/qa/probe_workflow.py": "82dbc31266165f3b0c5c63ae22815992ef0795c620f7d1fb08c6b98ec9f6addb",
+        "tools/qa/readback-probe.mjs": "68198f9210de465d81bea1237b01b4f2f51efcfc75c98a18dcb588b054647a4a",
+        "tools/qa/reliability.mjs": "55aaa5d88156a0e44c4603e2e80b63c280cb73edb19cf50b3f0ab72a0f477c83",
+        "tools/qa/restart_reliability.py": "d9c06db5f891aaeed8d8034a10e48e6a7f88338a7f5e6d1d863abab89d658861",
+        "tools/qa/run_depth_probe.ps1": "b1f8fa0e837d29e9aa7e82294ad5c25ea3dc2fcabd61c3acec3b11c8223ae5e3",
+        "tools/qa/run_workflow_probe.ps1": "8f85b675518358a2c3804061db04d83e6f0e88ee242b8112c22c3bc8c070d431",
+        "tools/qa/smoke.mjs": "2edb907cc841f05885d7b9e22fe93ff83e073f31c82a238c4718d9a077592ab9",
+        "tools/runtime.ps1": "a20e41cf2dc29394eeb998e6737c3ec1aea72988953720a6e25df4ec3a330c29",
+        "tests/test_assets.py": "c358c25430dd5172409eaaf416fc191c2baa7bdd37a0fada541be7c973f2eb82",
+        "tests/test_baked_scenarios.py": "5ed25208942d7e3d1bf9022d335f71cf7ebf66fbc923a621ff2b0718c66f2d8b",
+        "tests/test_bridge.py": "f2afb7526061e24f85254aad7cf340b22c0dc384e986d61cabcf367b214cb543",
+        "tests/test_compute.py": "80f7cca50b075174e786c5a7777d2f81731d5e69c21a32d0c01356f0421ada8f",
+        "tests/test_field_cache.py": "bbdefd15318380df7ae91dbe795c8497ce4912aea279f5386f319903644c14d1",
+        "tests/test_geometry.py": "913566225d1f610b1ccbfed22da655a3a07c5e988981ba3d35ec163c9d8af9de",
+        "tests/test_http_concurrency.py": "f69a9cc64f1319cfc9063af2955b28be312fd65aca93515df278a53ff2beeef5",
+        "tests/test_nvidia_workflow.py": "27a10396b163fb780e8cdb000bdbd547fd212d4cf5541e1334e801013d04e1e3",
+        "tests/test_physics.py": "a71b38921ed6565fa0c634227f4fb00df5bce051f55f5f1db94f6160fca992c3",
+        "tests/test_protocol.py": "87ace0593bb36d14ac56aa7dc4f430e2f547e1af11173364453e33e3c1608330",
+        "tests/test_runtime.py": "19749af6546cf634858515e22cfcd19d13483a1b9baa2448e6a26b77e9dea01e",
+        "tests/test_server_reliability.py": "ba01fc5fa9d1251d84d70398f4adb194b4bfd2efd5985ad1f9f7fab6bb78fa9f",
+        "tests/test_state.py": "a3d5620a2a176f3b75390a184c12ea8522b427608eb2fac89f74fa3eabd05d41",
+        "start-demo.ps1": "06527a1b20b5e674e98e805c1b086bb7d5f34f3292de03fcbde54a93d45f8e6b",
+        "stop-demo.ps1": "fc19f538a7496c1b95e293f24ba4f83c63a0975bfe811c997638757dfe80bfb8",
+        "pyproject.toml": "9579a7c3121e0643fcb7ae64d7c0d2c0ee14958dd0e0c30f7d3808929f9766da",
+        "package.json": "675eb1b254714717b9ce05a76084d425c9a9d6643b7e5f610684e9bc81c984f6",
+        "package-lock.json": "e5da85a1a68e161bf556177a8ba15f79fc228486c46de12ed2f364d8cb9483ef"
+      },
+      "known_failed_run": {
+        "evidence": {
+          "path": "runtime/qa/acceptance-release-rt2.json",
+          "sha256": "8e324e981fdeb7f5ec4e153ca0e372f862137aeb4e958175a4e60cf871c39128"
+        },
+        "error": "ERR_NO_BUFFER_SPACE",
+        "system_event": {
+          "provider": "Tcpip",
+          "event_id": 4231,
+          "record_id": 139798,
+          "local_time": "2026-10-12T07:42:55.598+08:00"
+        },
+        "interpretation": "Global ephemeral TCP port allocation failed during this run; subsequent run passed. No project socket leak established."
+      },
+      "limitations": [
+        "Synthetic quasisteady physics, no validated transient transport or telemetry.",
+        "Motion viewport is 1920x1080 with 2560x1440 stream output; all RT2 modes use DLSS Quality.",
+        "Performance applies to this Windows host and a single visible Edge stream session.",
+        "Restart behavior cancels unfinished commands; not arbitrary-crash exactly-once GPU execution."
+      ],
+      "geometry_rebuild": {
+        "passed": true,
+        "elapsed_s": 1.781,
+        "source_file_count": 212,
+        "source_hashes_unchanged": true,
+        "evidence": {
+          "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\fusion-default-build-qxepl25k\\verification.json",
+          "sha256": "25801e32c253eecf0e89e8ca5c72ef6bf8833ad435fe5264715bda5cfb0ee570"
+        }
       }
     }
-  },
-  "code_sha256": {
-    "app/fusion_twin/__init__.py": "7aa4b5c1a7b98699be5796be37e09f621613d398a7d212bc83f2725b0f0b183e",
-    "app/fusion_twin/compute.py": "baf5d82d68009bea76051011c2f2083ac091e1f5a9b5c1e7b83ec26dcbb2be1e",
-    "app/fusion_twin/field_cache.py": "3563f33fdcc8848ebde067536532780ab1b6cb4e288762e7f71960a9d6d44e34",
-    "app/fusion_twin/geometry.py": "6cae406eeb3b14133555d67f7ffc94da1143d782c93042f093fcd39db5579856",
-    "app/fusion_twin/pfc.py": "5cc287fb5c311529ab58d9d315069f3a2e38d13706ca14e78bf1352dae50751e",
-    "app/fusion_twin/physics.py": "162809feb8dce9d4f7ae2465705301f3e437b273e517ace27dcc223ae96ea77e",
-    "app/fusion_twin/protocol.py": "713d52e0cc60617b2d80753952efc5f3e9a3da9a76e8689a6bcbd763ad1e4d3c",
-    "app/fusion_twin/server.py": "8877c5370d22d5ebedff4ec7bac4cb0cc735dfb7f54a4cce6e7d8c003200a5a9",
-    "kit/apps/fusion_twin.kit": "aa7279cf14a1a4cd2b9b0a321f7f896063764d1c4ba01c365bbe04d5d606d948",
-    "kit/apps/fusion_workflow_probe.kit": "ab5a83394006d09c0a66c56f2c74704b08b0c468260c190ffa9847823f4d8687",
-    "kit/extensions/fusion.twin.bridge/config/extension.toml": "6335ebf9b696fac4881bb7fba6448504d891111ce5f4a7e99516bb41df8f9892",
-    "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/__init__.py": "20c769b59c817a6c992af86d894e4cee31ff1c6d5460dfa5520fa75070849ddb",
-    "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/extension.py": "c5a146693699db85189b3357d5cb8b531a8ebdda89f815d570c56a41c3af45b6",
-    "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/geometry.py": "20a0b7249bbef63bbb5cefa4bf415fa2015b7e7b5bc391efd85080aac2268de9",
-    "kit/extensions/fusion.twin.bridge/fusion/twin/bridge/nvidia_workflow.py": "a638a5279320f629c78cd339c9cca4b1ae18077db061e1322cb4c8204244a464",
-    "kit/extensions/fusion.twin.schema/config/extension.toml": "3949394d91364b8b522028a510248f9899bb64e26347749a9e0a8ad0a8d20894",
-    "kit/extensions/fusion.twin.schema/fusion/twin/schema/__init__.py": "0bfb7c96b5bc2d20f7b34d41e3709d085568e02a5d55695919bc761447d87c33",
-    "kit/extensions/fusion.twin.schema/resources/generatedSchema.usda": "b594ec62eb965e270bfc3e8df6323f780b66d970d0541b76089cacfd053ece52",
-    "kit/extensions/fusion.twin.schema/resources/plugInfo.json": "e2a07b7fa13b4e340628efbc9b380fbe5c963739274f7ecd22e996903c2dfbe6",
-    "kit/workflow/workflow.toml": "db593fae74c7f0e3051863ea92ad842d0bd4a43597d5c9b9aa25be0ba25069ce",
-    "web/app.js": "a4bcfeb48a91a1f1bb9e7de9a7bfb31219ecdf9077b6fd80fd3f042da151561f",
-    "web/index.html": "af89f357237709f21cbc8cef8af5a45538b8e2308726d8edb23896a1b38ae1c7",
-    "web/streamer/index.js": "aafc6bdfe5ebbb4017767a0551b6fa9cc9f819ec2a0b1d6e19a78d26d55ef1de",
-    "web/streamer/vite.config.js": "8c581c7912479dc7c0cfde9949d3fe72ab4cacba4f27e5e42b4b7847f8366719",
-    "web/style.css": "a36b6f0759dd886f290a9e6f6a40f05bb186cf76cfe25f6a85b05f6a7053a812",
-    "web/vendor/fusion-streamer.js": "b919bb1694e14a2290cb152aa0e9354e4b1590a6dfc727dcd54417416f6b91d1",
-    "tools/bake_scenarios.py": "4743eca1fa229e94cd27288f103b465fa8d8dd0f0eb561ddb37dc7eff14c8216",
-    "tools/build_scene.py": "463f95a8db3807fdcc9d40e0e8a9f64f4dbc9d8623904b068fb08e55f7cb80d9",
-    "tools/import_runtime.py": "a60aab8c21def0bfbb4b8271c0d6843f143a876858e0477c4d9910df5f3528f3",
-    "tools/launch_kit.ps1": "09efde58c440fe4baddd72d4aee32540b1a11f772871ebcf523b37a62ff404b1",
-    "tools/prepare_exports.py": "2941535a0ec4c09f53110ede2b0637d35b3cf0029cdc7f60731861e0d1ddd983",
-    "tools/probe_kit.py": "cd576186ac42334fa6756f4055e0eae0d40249470c45fd1a8d09828ee1d57b63",
-    "tools/publish_geometry.py": "eb24d8450bf3ddca9664b6da0437ea9555c8ddfcec99e4e79597115b3365c86b",
-    "tools/qa/acceptance.mjs": "9b88ac6295f7b641c867a5adc78cdc63192b1990979948e863ca43b5e9f1ef0f",
-    "tools/qa/api.mjs": "fa4549add0f9c783c4a38f50fbd1c1851252b88b17d2cf44d526239de6b8db0e",
-    "tools/qa/clarity.mjs": "6760cf592d886a114e41f08f2e9299b963647b3c7f2969d62abb701306ca14f7",
-    "tools/qa/field-roundtrip.mjs": "dce8aa1a50b6852cde42e7e20fd82c8f3d33209e4d407858b94a8dfff7cde1f3",
-    "tools/qa/latency.mjs": "da064f6ee3f69db20a6c261cd3d6d31b745f709fa9b853a0ca77b2c83ddd3939",
-    "tools/qa/measurement.mjs": "fac87e501ea928ebd87f1986ce12199587dc044090c90f4309674566aa5fc85a",
-    "tools/qa/nvidia.mjs": "88829a0e8ce5f6a535ac113fae1e78689439c0de37779f50dbbfe730802ea873",
-    "tools/qa/package-lock.json": "c68da1ef5d3fb4ae1f17e50088df5587e44c6f042cc3164dcd57956b0f2cd9ff",
-    "tools/qa/package.json": "e69ceb55902aeea8669e16d9c45b143ad265522b59e8d7fa23aa21871f77043b",
-    "tools/qa/performance.mjs": "00afe06a436d2d9697591e82e412d4f6ea3b523608608420419e3a1b3b8a07f6",
-    "tools/qa/portability.py": "0021fe3054cbf08b2ea32e4a10210dd45e4c9ccec4c4208383640a37378538d4",
-    "tools/qa/presentation.mjs": "5d6147ba956171eb6a65a843ef3ee242b8fd8ee60a63113f9ebad4b00b7f7e4f",
-    "tools/qa/probe_depth.py": "9ba57b63187a0ee1eebdc5a6eda0ebe1ed35569970bbfe0e21febb8525830c63",
-    "tools/qa/probe_nvidia_stack.py": "447729b1d8153c24ea22ecaf465b74f187e35b581d062529e3be696fa307ec3d",
-    "tools/qa/probe_workflow.py": "82dbc31266165f3b0c5c63ae22815992ef0795c620f7d1fb08c6b98ec9f6addb",
-    "tools/qa/readback-probe.mjs": "68198f9210de465d81bea1237b01b4f2f51efcfc75c98a18dcb588b054647a4a",
-    "tools/qa/reliability.mjs": "55aaa5d88156a0e44c4603e2e80b63c280cb73edb19cf50b3f0ab72a0f477c83",
-    "tools/qa/restart_reliability.py": "d9c06db5f891aaeed8d8034a10e48e6a7f88338a7f5e6d1d863abab89d658861",
-    "tools/qa/run_depth_probe.ps1": "b1f8fa0e837d29e9aa7e82294ad5c25ea3dc2fcabd61c3acec3b11c8223ae5e3",
-    "tools/qa/run_workflow_probe.ps1": "8f85b675518358a2c3804061db04d83e6f0e88ee242b8112c22c3bc8c070d431",
-    "tools/qa/smoke.mjs": "2edb907cc841f05885d7b9e22fe93ff83e073f31c82a238c4718d9a077592ab9",
-    "tools/runtime.ps1": "a20e41cf2dc29394eeb998e6737c3ec1aea72988953720a6e25df4ec3a330c29",
-    "tests/test_assets.py": "c358c25430dd5172409eaaf416fc191c2baa7bdd37a0fada541be7c973f2eb82",
-    "tests/test_baked_scenarios.py": "5ed25208942d7e3d1bf9022d335f71cf7ebf66fbc923a621ff2b0718c66f2d8b",
-    "tests/test_bridge.py": "f2afb7526061e24f85254aad7cf340b22c0dc384e986d61cabcf367b214cb543",
-    "tests/test_compute.py": "80f7cca50b075174e786c5a7777d2f81731d5e69c21a32d0c01356f0421ada8f",
-    "tests/test_field_cache.py": "bbdefd15318380df7ae91dbe795c8497ce4912aea279f5386f319903644c14d1",
-    "tests/test_geometry.py": "913566225d1f610b1ccbfed22da655a3a07c5e988981ba3d35ec163c9d8af9de",
-    "tests/test_http_concurrency.py": "f69a9cc64f1319cfc9063af2955b28be312fd65aca93515df278a53ff2beeef5",
-    "tests/test_nvidia_workflow.py": "27a10396b163fb780e8cdb000bdbd547fd212d4cf5541e1334e801013d04e1e3",
-    "tests/test_physics.py": "a71b38921ed6565fa0c634227f4fb00df5bce051f55f5f1db94f6160fca992c3",
-    "tests/test_protocol.py": "87ace0593bb36d14ac56aa7dc4f430e2f547e1af11173364453e33e3c1608330",
-    "tests/test_runtime.py": "19749af6546cf634858515e22cfcd19d13483a1b9baa2448e6a26b77e9dea01e",
-    "tests/test_server_reliability.py": "ba01fc5fa9d1251d84d70398f4adb194b4bfd2efd5985ad1f9f7fab6bb78fa9f",
-    "tests/test_state.py": "a3d5620a2a176f3b75390a184c12ea8522b427608eb2fac89f74fa3eabd05d41",
-    "start-demo.ps1": "06527a1b20b5e674e98e805c1b086bb7d5f34f3292de03fcbde54a93d45f8e6b",
-    "stop-demo.ps1": "fc19f538a7496c1b95e293f24ba4f83c63a0975bfe811c997638757dfe80bfb8",
-    "pyproject.toml": "9579a7c3121e0643fcb7ae64d7c0d2c0ee14958dd0e0c30f7d3808929f9766da",
-    "package.json": "675eb1b254714717b9ce05a76084d425c9a9d6643b7e5f610684e9bc81c984f6",
-    "package-lock.json": "e5da85a1a68e161bf556177a8ba15f79fc228486c46de12ed2f364d8cb9483ef"
-  },
-  "known_failed_run": {
-    "evidence": {
-      "path": "runtime/qa/acceptance-release-rt2.json",
-      "sha256": "8e324e981fdeb7f5ec4e153ca0e372f862137aeb4e958175a4e60cf871c39128"
-    },
-    "error": "ERR_NO_BUFFER_SPACE",
-    "system_event": {
-      "provider": "Tcpip",
-      "event_id": 4231,
-      "record_id": 139798,
-      "local_time": "2026-10-12T07:42:55.598+08:00"
-    },
-    "interpretation": "Global ephemeral TCP port allocation failed during this run; subsequent run passed. No project socket leak established."
-  },
-  "limitations": [
-    "Synthetic quasisteady physics, no validated transient transport or telemetry.",
-    "Motion viewport is 1920x1080 with 2560x1440 stream output; all RT2 modes use DLSS Quality.",
-    "Performance applies to this Windows host and a single visible Edge stream session.",
-    "Restart behavior cancels unfinished commands; not arbitrary-crash exactly-once GPU execution."
-  ],
-  "geometry_rebuild": {
-    "passed": true,
-    "elapsed_s": 1.781,
-    "source_file_count": 212,
-    "source_hashes_unchanged": true,
-    "evidence": {
-      "path": "C:\\Users\\admin\\AppData\\Local\\Temp\\fusion-default-build-qxepl25k\\verification.json",
-      "sha256": "25801e32c253eecf0e89e8ca5c72ef6bf8833ad435fe5264715bda5cfb0ee570"
-    }
-  }
+  ]
 }

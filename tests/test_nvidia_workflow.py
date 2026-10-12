@@ -42,7 +42,8 @@ class WorkflowTests(unittest.TestCase):
         path=ROOT/"kit/extensions/fusion.twin.bridge/fusion/twin/bridge/nvidia_workflow.py"
         source=ast.parse(path.read_text(encoding="utf-8"))
         function=next(node for node in source.body if isinstance(node,ast.FunctionDef) and node.name=="_sample_volume")
-        namespace={"np":np,"GRID_ORIGIN":(-32,-32,-28),"GRID_SPACING":(28/64,28/64,.3)}
+        namespace={"np":np,"GRID_ORIGIN":(-64,-64,-56),"GRID_SPACING":(28/128,28/128,.15),
+                   "GRID_DIMENSIONS":(128,128,112)}
         exec(compile(ast.Module(body=[function],type_ignores=[]),str(path),"exec"),namespace)
         radius,height=np.linspace(2,4,9),np.linspace(-1,1,7)
         r,z=np.meshgrid(radius,height,indexing="ij")
@@ -52,7 +53,7 @@ class WorkflowTests(unittest.TestCase):
         data={"slice_points":points,"slice_triangles":triangles,
               "slice_temperature_keV":np.full(r.size,12.,dtype=np.float32)}
         values,origin,spacing=namespace["_sample_volume"](data,0)
-        self.assertEqual(values.shape,(64,64,56))
+        self.assertEqual(values.shape,(128,128,112))
         self.assertAlmostEqual(float(values.max()),12)
         np.testing.assert_allclose(values,values[::-1,:,:],atol=1e-5)
         np.testing.assert_allclose(values,values[:,::-1,:],atol=1e-5)
@@ -60,7 +61,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertLess(np.count_nonzero(cut),np.count_nonzero(values))
         self.assertAlmostEqual(float(cut.max()),12)
         self.assertTrue(np.all(cut>=0))
-        np.testing.assert_allclose(np.asarray(origin)+np.asarray(spacing)*(np.asarray(values.shape)-1),(13.78125,13.78125,8.25))
+        np.testing.assert_allclose(np.asarray(origin)+np.asarray(spacing)*(np.asarray(values.shape)-1),(13.890625,13.890625,8.325))
         z_coordinates=origin[2]+np.arange(values.shape[2])*spacing[2]
         self.assertFalse(np.any(values[:,:,np.abs(z_coordinates)>1]))
 

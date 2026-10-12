@@ -57,6 +57,12 @@ try {
   await page.waitForFunction(() => document.querySelector('video').readyState === 4, {}, { timeout: 30000 });
   await uiCommand('reset_camera', () => page.locator('#reset-view-button').click());
   await until(s => s.state.mode === 'assembly' && s.state.selected === '' && !s.renderer.selected, 'overview camera and selection reset');
+  await page.locator('[data-tab="engineering"]').click();
+  await page.locator('#measure-button').evaluate(element => {
+    for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+      if (parent.tagName === 'DETAILS') parent.open = true;
+    }
+  });
   await page.locator('#measure-button').click();
   await uiCommand('measure_start', () => page.locator('#start-measure-button').click());
   await page.locator('#measure-dialog').waitFor({ state: 'hidden' });

@@ -1,6 +1,6 @@
 """Conservative, explicitly synthetic quasi-steady demonstration heat budget.
 
-The input is effective thermal power, not a solved fusion source. Fractions,
+The inputs are a base thermal budget and auxiliary heating, not a solved fusion source. Fractions,
 Eich widths, radiation deposition and thermal resistances are demo assumptions.
 Equilibria and wall profiles retain their source provenance.
 """
@@ -17,7 +17,18 @@ from .pfc import sample_polyline
 
 DESIGNS = ("conventional", "longleg")
 EQUILIBRIA = ("reference", "rampup", "sof", "eof", "rampdown")
+HEATING_LEVELS = (20, 35, 50, 65)
 EICH_REFERENCE = "https://doi.org/10.1103/PhysRevLett.107.215001"
+
+
+def exhaust_assumptions(design, neon=False, hotspot=1.0):
+    """Authored radiation and spreading hypotheses, not a detachment solution."""
+    return {"sol_radiation_fraction": 0.80 if neon else 0.30,
+            "wall_particle_fraction": 0.03, "core_radiation_fraction": 0.65,
+            "lambda_q_m": 0.006 * (1.5 if neon else 1.0) / hotspot,
+            "spread_m": 0.002 * (1.35 if design == "longleg" else 1.0) * (2.0 if neon else 1.0) / hotspot,
+            "neon": bool(neon), "design": design,
+            "classification": "synthetic_radiation_and_spreading_hypothesis"}
 
 
 def load_fraction(phase):
@@ -107,10 +118,11 @@ class HeatPattern:
     strikes: dict
 
 
-def heat_pattern(mesh, eq, hotspot=1.0):
+def heat_pattern(mesh, eq, hotspot=1.0, neon=False):
     """Per-MW patterns whose 18-sector integrals are one or unresolved zero."""
     weights = mesh.vertex_area * 18
     n = len(weights)
+    model = exhaust_assumptions(eq.key.split("/", 1)[0], neon, hotspot)
 
     def normalize(values):
         power = float(np.dot(values, weights))
@@ -139,7 +151,7 @@ def heat_pattern(mesh, eq, hotspot=1.0):
             s = mapped[mask] - eq.r_sep
             field_omp = eq.field(np.array([[eq.r_sep, 0.0, eq.axis[1]]]))
             b_omp = float(np.linalg.norm(field_omp[0]))
-            shape[mask] = eich_profile(s, 0.006 / hotspot, 0.002 / hotspot) * incidence[mask] * magnitude[mask] / b_omp
+            shape[mask] = eich_profile(s, model["lambda_q_m"], model["spread_m"]) * incidence[mask] * magnitude[mask] / b_omp
             shape = normalize(shape)
             resolved = bool(np.any(shape > 0))
             strikes[leg] = {**strike, "status": "intersection_model" if resolved else "unresolved",
@@ -151,14 +163,18 @@ def heat_pattern(mesh, eq, hotspot=1.0):
     return HeatPattern(radiation, particle_wall, shapes["inner"], shapes["outer"], strikes)
 
 
-def prescribed_loads(mesh, pattern, power, phase):
+def prescribed_loads(mesh, pattern, power, phase, heating=50.0, neon=False):
     """Close the thermal ledger without forcing unresolved power onto surfaces."""
-    requested = float(power) * load_fraction(phase)
-    volume = 0.80 * requested
-    plasma_channel = 0.20 * requested
+    fraction = load_fraction(phase)
+    base = float(power) * fraction
+    auxiliary = float(heating) * fraction
+    requested = base + auxiliary
+    volume = 0.80 * base
+    plasma_channel = 0.20 * base + auxiliary
     core_rad = 0.65 * plasma_channel
     sep = plasma_channel - core_rad
-    sol_rad = 0.70 * sep
+    sol_fraction = 0.80 if neon else 0.30
+    sol_rad = sol_fraction * sep
     wall_particle = 0.03 * sep
     target = sep - sol_rad - wall_particle
     radiation = (core_rad + sol_rad) * pattern.radiation
@@ -172,9 +188,13 @@ def prescribed_loads(mesh, pattern, power, phase):
     surface = rad_abs + wall_abs + div_abs
     blanket = volume + float(np.dot((radiation + particle)[mask], weights[mask]))
     divertor = float(np.dot((radiation + particle)[~mask], weights[~mask]))
-    budget = {"definition": "synthetic_quasi_steady_thermal_budget", "load_fraction": load_fraction(phase),
-              "nominal_thermal_MW": float(power), "requested_thermal_MW": requested,
+    budget = {"definition": "synthetic_base_plus_auxiliary_thermal_budget", "load_fraction": fraction,
+              "nominal_thermal_MW": float(power), "base_thermal_MW": base,
+              "nominal_auxiliary_MW": float(heating), "auxiliary_absorbed_MW": auxiliary,
+              "plasma_channel_MW": plasma_channel, "requested_thermal_MW": requested,
               "volume_blanket_MW": volume, "radiation_core_MW": core_rad, "separatrix_MW": sep,
+              "sol_radiation_fraction": sol_fraction, "target_requested_MW": target,
+              "wall_particle_requested_MW": wall_particle,
               "radiation_sol_MW": sol_rad, "radiation_absorbed_MW": rad_abs,
               "particle_blanket_MW": wall_abs, "particle_divertor_MW": div_abs,
               "surface_absorbed_MW": surface, "volume_absorbed_MW": volume,
