@@ -2,8 +2,6 @@
 
 基于 Bluemira EU-DEMO-like 概念设计的工程演示：OpenUSD 装配、Warp CUDA 计算、NVIDIA Omniverse RTX 实时渲染，经 WebRTC 推流到浏览器。
 
-> 几何与磁平衡来自 Bluemira 开源概念设计；热场、功率分配、Ne 效应与等离子体温度均为**合成演示模型**，不可用于反应堆设计、安全或制造评定。
-
 ## 快速开始
 
 需要：Windows、NVIDIA RTX 显卡、Python 3.12（依赖见 `pyproject.toml`）、Omniverse Kit 110.1.3 运行时。
