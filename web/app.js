@@ -9,7 +9,7 @@ const translations = {
     colorScale: '色标', logScale: '对数', linearScale: '线性', volumeDisplay: '体场显示', plasmaStyle: '等离子体', temperatureStyle: '温度', lineMotion: '方向示意动画',
     targetPeak: '靶板峰值热流', relativeNoNe: '相对同方案无 Ne 情景', equilibriumStages: '磁平衡快照', snapshotHint: '独立源快照 · 非连续瞬态',
     neOn: '有 Ne', neOff: '无 Ne', magneticStrength: '磁场强度', magneticHint: '箭头仅示意磁场方向，不表示粒子速度。', plasmaStyleHint: '粉紫色为等离子体展示示意；切换温度可查看合成 keV 场。', temperatureStyleHint: '源磁通形状约束的合成温度场，未经等离子体输运求解。',
-    logHint: '零值中性灰 · 低于下限的正值取最低色阶', fixedScale: '四工况共用固定色标', sourceGeometry: '源 CAD', syncing: '同步中', synchronized: '已同步', close: '关闭', positiveChange: '增加', negativeChange: '降低', versusNoNe: '相对无 Ne',
+    logHint: '零值中性灰 · 低于下限的正值取最低色阶', importedHint: '导入数据：{label} · 覆盖 {coverage}% · 灰色为无数据', fixedScale: '四工况共用固定色标', sourceGeometry: '源 CAD', syncing: '同步中', synchronized: '已同步', close: '关闭', positiveChange: '增加', negativeChange: '降低', versusNoNe: '相对无 Ne',
     stateRetrying: '正在重试工况更新', stateUnsaved: '工况尚未保存，点击重试', stateRejected: '工况参数被拒绝，请检查输入',
     volume: '等离子体', volumeError: '体积场生成失败，请切换模式后重试', volumePreparing: '体积渲染正在准备', plasmaHidden: '科学场模式下隐藏等离子体边界实体',
     design: '反应堆方案', conventional: '常规偏滤器', longleg: '长腿偏滤器', equilibrium: '磁平衡状态', eqRampup: '电流爬升', eqSof: '平顶开始', eqEof: '平顶结束', eqRampdown: '电流下降',
@@ -37,7 +37,7 @@ const translations = {
     colorScale: 'Color scale', logScale: 'Log', linearScale: 'Linear', volumeDisplay: 'Volume display', plasmaStyle: 'Plasma', temperatureStyle: 'Temperature', lineMotion: 'Direction animation',
     targetPeak: 'Peak divertor heat flux', relativeNoNe: 'vs. same-design, no-Ne case', equilibriumStages: 'EQUILIBRIUM SNAPSHOTS', snapshotHint: 'Independent source snapshots · No transient solution',
     neOn: 'Ne ON', neOff: 'Ne OFF', magneticStrength: 'Magnetic strength', magneticHint: 'Direction only · Animation does not represent speed.', plasmaStyleHint: 'Pink-purple color is illustrative. Select Temperature for the synthetic keV field.', temperatureStyleHint: 'Synthetic temperature shaped by source flux; no plasma transport solve.',
-    logHint: 'Zero: gray · Positive values below scale: lowest color', fixedScale: 'One fixed scale for all four cases', sourceGeometry: 'SOURCE CAD', syncing: 'Syncing', synchronized: 'Synced', close: 'Close', positiveChange: 'increase', negativeChange: 'reduction', versusNoNe: 'vs. no Ne',
+    logHint: 'Zero: gray · Positive values below scale: lowest color', importedHint: 'Imported: {label} · {coverage}% coverage · gray = no data', fixedScale: 'One fixed scale for all four cases', sourceGeometry: 'SOURCE CAD', syncing: 'Syncing', synchronized: 'Synced', close: 'Close', positiveChange: 'increase', negativeChange: 'reduction', versusNoNe: 'vs. no Ne',
     stateRetrying: 'Retrying scenario update', stateUnsaved: 'Scenario not saved. Click to retry.', stateRejected: 'Scenario parameters were rejected. Check the input.',
     volume: 'Plasma volume', volumeError: 'Volume generation failed. Switch modes to retry.', volumePreparing: 'Volume rendering is preparing', plasmaHidden: 'The plasma boundary solid is hidden in field modes',
     design: 'Reactor design', conventional: 'Conventional divertor', longleg: 'Long-leg divertor', equilibrium: 'Magnetic equilibrium', eqRampup: 'Current ramp-up', eqSof: 'Start of flat-top', eqEof: 'End of flat-top', eqRampdown: 'Current ramp-down',
@@ -127,12 +127,7 @@ function renderCameras() {
 
 function getDimensions(component) {
   const bounds = component?.bounds_m;
-  if (!bounds) return null;
-  if (bounds.min && bounds.max) return bounds.max.map((value, index) => Math.abs(value - bounds.min[index]));
-  if (Array.isArray(bounds) && bounds.length === 2 && Array.isArray(bounds[0])) return bounds[1].map((value, index) => Math.abs(value - bounds[0][index]));
-  if (Array.isArray(bounds) && bounds.length === 6) return bounds.slice(3).map((value, index) => Math.abs(value - bounds[index]));
-  if (bounds.size) return bounds.size;
-  return null;
+  return bounds ? bounds[1].map((value, index) => Math.abs(value - bounds[0][index])) : null;
 }
 
 function renderComponents() {
@@ -156,12 +151,7 @@ function renderProperties() {
 }
 
 function renderDownloads() {
-  const downloads = manifest.downloads || {};
   const links = [];
-  if (downloads.step) links.push([t('downloadStep'), downloads.step]);
-  if (downloads.usd) links.push([t('downloadUsd'), downloads.usd]);
-  if (manifest.step_url) links.push([t('downloadStep'), manifest.step_url]);
-  if (manifest.usd_url) links.push([t('downloadUsd'), manifest.usd_url]);
   if (manifest.stage) links.push([t('downloadUsd'), '/api/download/usd.zip']);
   if ((manifest.components || []).some((component) => component.source_step)) links.push([t('sourceCad'), '/api/download/cad.zip']);
   $('#source-downloads').innerHTML = links.length ? `<div class="source-downloads">${links.map(([label, url]) => `<a class="outline-button" href="${esc(url)}" download>${esc(label)}</a>`).join('')}</div>` : '';
@@ -186,7 +176,7 @@ function renderConnection() {
   $('#loading-state').hidden = streamLive || previewReady;
   const rendererStatus = String(renderer.status || '').toLowerCase();
   $('#loading-detail').textContent = renderer.error || rendererStatus.includes('error') ? t('rendererError') : t(serviceReady ? 'renderPending' : 'initializingDetail');
-  const gpu = result.gpu_name || renderer.gpu_name || renderer.gpu || renderer.device || result.device || result.gpu_device;
+  const gpu = result.gpu_name || renderer.gpu;
   $('#gpu-label').textContent = typeof gpu === 'string' ? gpu : 'GPU —';
 }
 
@@ -209,9 +199,10 @@ function renderLegend() {
   $('#volume-options').hidden = mode !== 'volume';
   $('#magnetic-options').hidden = mode !== 'magnetic';
   $('#field-legend').hidden = !showLegend;
-  const note = mode === 'magnetic' ? 'magneticHint' : mode === 'volume' ? (state.volumeStyle === 'plasma' ? 'plasmaStyleHint' : 'temperatureStyleHint') : mode === 'slice' ? 'temperatureStyleHint' : mode === 'heatflux' && state.heatScale === 'log' ? 'logHint' : null;
+  const imported = result.imported_surface?.mode === mode ? result.imported_surface : null;
+  const note = imported ? 'importedHint' : mode === 'magnetic' ? 'magneticHint' : mode === 'volume' ? (state.volumeStyle === 'plasma' ? 'plasmaStyleHint' : 'temperatureStyleHint') : mode === 'slice' ? 'temperatureStyleHint' : mode === 'heatflux' && state.heatScale === 'log' ? 'logHint' : null;
   $('#mode-note').hidden = !note;
-  $('#mode-note').textContent = note ? t(note) : '';
+  $('#mode-note').textContent = imported ? t(note).replace('{label}', imported.label).replace('{coverage}', number(imported.coverage * 100)) : note ? t(note) : '';
   $$('[data-heat-scale]').forEach(button => { button.classList.toggle('active', button.dataset.heatScale === state.heatScale); button.setAttribute('aria-pressed', button.dataset.heatScale === state.heatScale); });
   $$('[data-volume-style]').forEach(button => { button.classList.toggle('active', button.dataset.volumeStyle === state.volumeStyle); button.setAttribute('aria-pressed', button.dataset.volumeStyle === state.volumeStyle); });
   if (!showLegend) return;
@@ -251,9 +242,8 @@ function renderResults() {
   const outputs = { 'kpi-temperature': ['peak_temperature_C', 0], 'kpi-heatflux': ['peak_heatflux_MW_m2', 2], 'kpi-outlet': ['outlet_temperature_C', 0], 'kpi-margin': ['cooling_margin_C', 0] };
   for (const [id, [key, decimals]] of Object.entries(outputs)) $(`#${id}`).textContent = number(result[key], decimals);
   $('#kpi-margin').style.color = result.cooling_margin_C < 0 ? '#e2a08c' : '';
-  const backend = result.compute_backend || result.backend || result.engine || '';
-  $('#compute-badge').textContent = backend || (result.gpu_ms != null ? 'CUDA / Warp' : '—');
-  $('#gpu-time').textContent = result.gpu_ms != null ? `${number(result.gpu_ms, 2)} ms` : result.cpu_ms != null ? `${number(result.cpu_ms, 2)} ms · CPU` : '—';
+  $('#compute-badge').textContent = result.compute_backend || '—';
+  $('#gpu-time').textContent = result.gpu_ms != null ? `${number(result.gpu_ms, 2)} ms` : '—';
   const sourceLabel = ['synthetic_thermal_bluemira_equilibrium', 'synthetic_demo_source_geometry_equilibrium'].includes(result.source_label) ? (language === 'zh' ? '合成热预算与简化传热模型 / Bluemira 概念几何与磁平衡' : 'Synthetic thermal budget and reduced heat-transfer model / Bluemira concept geometry and equilibrium') : result.source_label || manifest.source_label || t('dataPending');
   const assumptions = result.assumptions || {};
   const assumptionLabels = { thermal: ['传热模型', 'Thermal model'], coolant: ['冷却回路', 'Coolant'], budget: ['功率预算', 'Power budget'], radiation: ['辐射沉积', 'Radiation deposition'], target: ['靶板热流', 'Target heat flux'], history: ['扫描坐标', 'Scan coordinate'], limit: ['演示阈值', 'Demonstration threshold'], magnetics: ['磁平衡', 'Magnetic equilibrium'], plasma_slice: ['等离子体截面', 'Plasma section'], neon: ['Ne 情景', 'Ne scenario'], color: ['色标', 'Color scales'] };
@@ -333,7 +323,7 @@ function renderCameraSelection() {
 function renderHistory() {
   const history = result.history;
   const chart = $('#history-chart');
-  const entries = Array.isArray(history) ? history.map((item, index) => ({ x: Number(item.phase ?? item.time ?? index), y: Number(item.peak_temperature_C ?? item.temperature_C ?? item.temperature) })).filter((item) => Number.isFinite(item.x) && Number.isFinite(item.y)) : [];
+  const entries = (history || []).map((item) => ({ x: item.phase, y: item.peak_temperature_C }));
   if (entries.length < 2) { chart.innerHTML = `<span class="empty-chart">${t('noHistory')}</span>`; return; }
   const xs = entries.map((item) => item.x), ys = entries.map((item) => item.y);
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
@@ -570,7 +560,7 @@ function renderMeasurement() {
   const component = selectedComponent();
   const dimensions = renderer.measurement?.type === 'bounds' && renderer.measurement.component === component?.id ? renderer.measurement.dimensions_m : getDimensions(component);
   const measurement = renderer.measurement;
-  const distance = measurement?.distance_m ?? measurement?.distance;
+  const distance = measurement?.distance_m;
   $('#measurement-content').innerHTML = `<h3>${esc(component ? componentName(component) : t('dimensions'))}</h3>${dimensions ? `<p>${t('dimensionsHint')}</p><div class="dimension-cards">${dimensions.map((value, index) => `<div><span>${t(['dimensionX', 'dimensionY', 'dimensionZ'][index])}</span><strong>${number(value, 2)}</strong> <small>m</small></div>`).join('')}</div>` : `<p>${t(component ? 'noBounds' : 'selectComponent')}</p>`}${distance != null ? `<p>${t('measuredDistance')}</p><div class="measure-result">${number(distance, 3)} <small>m</small></div>` : ''}<p>${t('measureHint')}</p><div class="measurement-actions"><button class="outline-button" id="start-measure-button">${t('startMeasure')}</button><button class="outline-button" id="clear-measure-button">${t('clearMeasure')}</button></div>`;
 }
 
@@ -649,7 +639,11 @@ document.addEventListener('click', async (event) => {
   if (componentRow && !event.target.matches('input')) setState({ selected: componentRow.dataset.component });
   if (!button) return;
   if (button.dataset.lang) { language = button.dataset.lang; localStorage.setItem('fusion-language', language); applyLanguage(); }
-  if (button.dataset.view) setState({ view: button.dataset.view, orbit: false });
+  if (button.dataset.view) {
+    // Dragging the viewport moves the preset camera itself, so re-selecting a view restores its pose.
+    setState({ view: button.dataset.view, orbit: false });
+    if (renderer.ready) action('reset_camera', { view: button.dataset.view });
+  }
   if (button.dataset.mode) {
     const mode = button.dataset.mode;
     setState({ mode, selected: '' });

@@ -1,9 +1,4 @@
-"""Conservative, explicitly synthetic quasi-steady demonstration heat budget.
-
-The inputs are a base thermal budget and auxiliary heating, not a solved fusion source. Fractions,
-Eich widths, radiation deposition and thermal resistances are demo assumptions.
-Equilibria and wall profiles retain their source provenance.
-"""
+"""Synthetic quasi-steady heat budget on source equilibria; not a solved fusion source."""
 
 from dataclasses import dataclass
 import hashlib
@@ -22,7 +17,6 @@ EICH_REFERENCE = "https://doi.org/10.1103/PhysRevLett.107.215001"
 
 
 def exhaust_assumptions(design, neon=False, hotspot=1.0):
-    """Authored radiation and spreading hypotheses, not a detachment solution."""
     return {"sol_radiation_fraction": 0.80 if neon else 0.30,
             "wall_particle_fraction": 0.03, "core_radiation_fraction": 0.65,
             "lambda_q_m": 0.006 * (1.5 if neon else 1.0) / hotspot,
@@ -32,17 +26,11 @@ def exhaust_assumptions(design, neon=False, hotspot=1.0):
 
 
 def load_fraction(phase):
-    """A prescribed load scan, not elapsed-time thermal evolution."""
     return 0.22 + 0.78 * float(phase)
 
 
 def eich_profile(s, lambda_q=0.006, spread=0.002):
-    """Exponential convolved with Gaussian, in upstream-midplane metres.
-
-    Eich et al., Phys. Rev. Lett. 107, 215001 (2011). The shape is used here
-    with synthetic widths, not as a validated detached-divertor solution.
-    The log-normal-CDF form avoids overflow in the private-flux tail.
-    """
+    """Eich et al. 2011 profile in upstream-midplane metres; log form avoids private-flux overflow."""
     a = spread / (2 * lambda_q)
     log_shape = a * a - np.asarray(s) / lambda_q + log_ndtr(-np.sqrt(2) * (a - np.asarray(s) / spread))
     return np.exp(np.clip(log_shape, -745, 50))
@@ -65,9 +53,7 @@ class MagneticEquilibrium:
         self.xpoint = lower[np.argmin(np.abs(lower[:, 2] - float(d["psi_bndry"])))][:2] if len(lower) else None
         rr = np.linspace(self.axis[0] + 0.01, self.r[-1] - 0.01, 6000)
         pn = self.psin(np.column_stack((rr, np.full(len(rr), self.axis[1]))))
-        # Keep the first monotonic outboard branch. Never silently extrapolate.
-        # The gridded minimum may lie a fraction of one cell beyond the stored
-        # refined O-point; start at that local minimum before testing monotonicity.
+        # Outboard midplane map: first monotonic branch from the gridded psi minimum, no extrapolation.
         near_axis = max(2, int(np.searchsorted(rr, self.axis[0] + 0.5)))
         start = int(np.argmin(pn[:near_axis]))
         rr, pn = rr[start:], pn[start:]
@@ -84,13 +70,12 @@ class MagneticEquilibrium:
         r = np.linalg.norm(points[:, :2], axis=1)
         rz = np.column_stack((r, points[:, 2]))
         br, bz = self.br(rz), self.bz(rz)
-        # Same Bphi=fvac/R approximation as the published magnetic line tracer.
         bphi = float(self.data["fvac"]) / r
         c, s = points[:, 0] / r, points[:, 1] / r
         return np.column_stack((br * c - bphi * s, br * s + bphi * c, bz))
 
     def intersections(self, profile):
-        """Actual psi=psi_boundary intersections with the supplied cavity skin."""
+        """Separatrix (psi_n=1) crossings of the divertor profile below the X-point."""
         points, arc = sample_polyline(profile, 0.005)
         delta = self.psin(points) - 1
         roots = []
@@ -119,7 +104,7 @@ class HeatPattern:
 
 
 def heat_pattern(mesh, eq, hotspot=1.0, neon=False):
-    """Per-MW patterns whose 18-sector integrals are one or unresolved zero."""
+    """Per-MW deposition patterns; each integrates to 1 over 18 sectors, or 0 if unresolved."""
     weights = mesh.vertex_area * 18
     n = len(weights)
     model = exhaust_assumptions(eq.key.split("/", 1)[0], neon, hotspot)
@@ -144,8 +129,6 @@ def heat_pattern(mesh, eq, hotspot=1.0, neon=False):
         shape = np.zeros(n)
         if len(candidates) == 1 and eq.r_sep is not None:
             strike = candidates[0]
-            # A local attached-leg model. A geometrical crossing alone does not
-            # establish 3D shadowing, detachment or global SOL connectivity.
             mask = div & (np.abs(mesh.poloidal_s - strike["s_m"]) <= 0.75) & np.isfinite(mapped)
             mask &= (rz[:, 0] < eq.xpoint[0]) if leg == "inner" else (rz[:, 0] >= eq.xpoint[0])
             s = mapped[mask] - eq.r_sep
@@ -164,7 +147,7 @@ def heat_pattern(mesh, eq, hotspot=1.0, neon=False):
 
 
 def prescribed_loads(mesh, pattern, power, phase, heating=50.0, neon=False):
-    """Close the thermal ledger without forcing unresolved power onto surfaces."""
+    """Power ledger; target power at an unresolved strike point is reported, not deposited."""
     fraction = load_fraction(phase)
     base = float(power) * fraction
     auxiliary = float(heating) * fraction

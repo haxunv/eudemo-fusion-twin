@@ -1,8 +1,4 @@
-"""Reproducible demonstration fields and equilibrium tracing on NVIDIA Warp.
-
-The CAD and equilibrium are source data. Thermal loading, coolant flow and
-temperature limits are explicitly authored demonstration assumptions.
-"""
+"""Warp field solver: synthetic thermal loads on source CAD and equilibria."""
 
 from __future__ import annotations
 
@@ -97,14 +93,13 @@ def trace_kernel(
 
 
 def colormap(values: np.ndarray, low: float, high: float) -> np.ndarray:
-    """Fixed scientific legend shared with the web interface."""
     stops = np.array([[0.10, 0.18, 0.58], [0.00, 0.55, 0.85], [0.05, 0.80, 0.67], [0.88, 0.91, 0.17], [1.00, 0.43, 0.06], [0.75, 0.03, 0.07]])
     t = np.clip((values - low) / (high - low), 0, 1)
     return np.stack([np.interp(t, np.linspace(0, 1, len(stops)), stops[:, j]) for j in range(3)], axis=-1).astype(np.float32)
 
 
 def atomic_replace(source: Path, destination: Path) -> None:
-    """Allow a Windows reader's short file lock to clear before publication."""
+    # Windows readers briefly lock files; retry instead of failing the publication.
     for attempt in range(11):
         try:
             os.replace(source, destination)
@@ -123,7 +118,6 @@ def atomic_json(path: Path, payload: dict) -> None:
 
 
 def write_npz(path: Path, arrays: dict, *, compressed=False) -> None:
-    """Runtime packets favor latency; shipped presets use compact archives."""
     compression = zipfile.ZIP_DEFLATED if compressed else zipfile.ZIP_STORED
     with zipfile.ZipFile(path, "w", compression=compression, compresslevel=1 if compressed else None) as archive:
         for name, values in arrays.items():
@@ -144,7 +138,6 @@ RESULT_CACHE_SIZE = 8
 HEATFLUX_RANGE = [0.0, 200.0]
 HEATFLUX_LOG_RANGE = [0.01, 200.0]
 MAGNETIC_RANGE = [2.0, 12.0]
-# Samples of the Matplotlib inferno / viridis tables, stored without a plotting dependency.
 INFERNO = [[0.001462, 0.000466, 0.013866], [0.129285, 0.047293, 0.290788],
            [0.341500, 0.062325, 0.429425], [0.540920, 0.134729, 0.415123],
            [0.735683, 0.215906, 0.330245], [0.894305, 0.353399, 0.193584],
@@ -154,6 +147,29 @@ VIRIDIS = [[0.267004, 0.004874, 0.329415], [0.229739, 0.322361, 0.545706],
            [0.127568, 0.566949, 0.550556], [0.369214, 0.788888, 0.382914],
            [0.993248, 0.906157, 0.143936]]
 ZERO_COLOR = [0.12, 0.14, 0.16]
+HELIUM_CP = 5200.0
+NOMINAL_MASS_FLOW = 3500.0
+CIRCUITS = {"blanket_absorbed_MW": 0.85, "divertor_absorbed_MW": 0.15}
+ASSUMPTIONS = {
+    "thermal": "Synthetic quasi-steady wall resistance; prescribed load scan, no time-dependent heat transport or qualified material model",
+    "coolant": "Absorbed surface plus assumed blanket volume heat only; helium cp=5200 J/(kg K), 3500 kg/s times flow, 85/15% circuit split; unresolved power excluded",
+    "budget": "power is the base thermal budget excluding auxiliary heating. At scan fraction L: total=(power+heating)*L; blanket volume=.8*power*L; plasma=(.2*power+heating)*L. Core radiation=.65*plasma; SOL radiation=.30 (Ne off) or .80 (Ne on) of separatrix power, wall particles=.03, targets receive the remainder, inner/outer 30/70%. All heating is assumed absorbed; no solved fusion source",
+    "radiation": "Uniform area deposition split 90/10% wall/divertor; no photon transport or neutron transport calculation",
+    "target": "Synthetic Eich widths: lambda_q=6 mm, S=2 mm, both divided by hotspot. Ne-on multipliers 1.5/2; longleg S multiplier 1.35. Flux mapping and incidence at source psi=1 intersections, local +/-0.75 m footprint; no 3D shadowing or detached SOL solution",
+    "neon": "Boolean radiation/spreading hypothesis; no injection rate, impurity transport, radiation-front solve or measured detachment claim. Four cases share all controls except design/neon; differences use same design/equilibrium/controls with neon off",
+    "color": "Fixed linear heatflux 0..200 and log10 0.01..200 MW/m2. Nonpositive/no-data samples are neutral; positive log values below minimum clamp to lower color. Out-of-range counts are explicit; no per-case autoscaling",
+    "limit": "900 degC demonstration threshold; not a material qualification limit",
+    "magnetics": "Selected Bluemira axisymmetric equilibrium, Bphi=fvac/R approximation; cached per equilibrium; no discrete TF ripple",
+    "plasma_slice": "Synthetic source-flux-shaped core profile: 25 keV * (.2*power+heating)/450 * load_fraction, with a prescribed .95 multiplier for Ne on; 193x225 RZ sampling, not a plasma transport solution",
+    "history": "Dimensionless quasi-steady load scan, phase in [0,1]; no elapsed-time coordinate; equilibria are independently selected snapshots"}
+
+
+def circuit_temperature(budget, circuit, flow, inlet):
+    return inlet + budget[circuit] * 1e6 / (2 * NOMINAL_MASS_FLOW * CIRCUITS[circuit] * flow * HELIUM_CP)
+
+
+def outlet_temperature(budget, flow, inlet):
+    return inlet + budget["absorbed_thermal_MW"] * 1e6 / (NOMINAL_MASS_FLOW * flow * HELIUM_CP)
 
 
 def scientific_colors(values, bounds, *, logarithmic=False, magnetic=False):
@@ -192,7 +208,6 @@ class FieldEngine:
         self._meshes, self._equilibria, self._magnetics, self._patterns = {}, {}, {}, {}
         self._thermal_buffers = {}
         self._results, self._histories, self._stories = OrderedDict(), OrderedDict(), OrderedDict()
-        self.last_signature = None
         self.last_result = None
         self._context = None
         self._select_context("conventional", "reference")
@@ -279,8 +294,8 @@ class FieldEngine:
         flux, radiation, particle, budget = prescribed_loads(self.mesh, pattern, parameters["power"], phase,
                                                             parameters.get("heating", 50.0), neon)
         flow, inlet = float(parameters["flow"]), float(parameters["inlet"])
-        blanket_mean = inlet + budget["blanket_absorbed_MW"] * 1e6 / (2 * 3500 * 0.85 * flow * 5200)
-        divertor_mean = inlet + budget["divertor_absorbed_MW"] * 1e6 / (2 * 3500 * 0.15 * flow * 5200)
+        blanket_mean = circuit_temperature(budget, "blanket_absorbed_MW", flow, inlet)
+        divertor_mean = circuit_temperature(budget, "divertor_absorbed_MW", flow, inlet)
         gpu_flux = wp.array(flux.astype(np.float32), dtype=float, device=self.device)
         started = time.perf_counter()
         wp.launch(thermal_kernel, dim=len(self.points), inputs=[gpu_flux, self.wp_regions, flow,
@@ -292,8 +307,8 @@ class FieldEngine:
 
     def metrics(self, temperature, heatflux, parameters, budget=None):
         budget = self._last_budget if budget is None else budget
-        mass_flow = 3500 * parameters["flow"]
-        outlet = parameters["inlet"] + budget["absorbed_thermal_MW"] * 1e6 / (mass_flow * 5200)
+        mass_flow = NOMINAL_MASS_FLOW * parameters["flow"]
+        outlet = outlet_temperature(budget, parameters["flow"], parameters["inlet"])
         peak = float(np.max(temperature))
         return {"peak_temperature_C": round(peak, 2), "peak_heatflux_MW_m2": round(float(np.max(heatflux)), 3),
                 "peak_divertor_heatflux_MW_m2": round(float(np.max(heatflux[self.regions == 1])), 3),
@@ -302,7 +317,6 @@ class FieldEngine:
                 "thermal_power_MW": budget["absorbed_thermal_MW"]}
 
     def _solve_history(self, parameters):
-        """Solve every phase, batching the exact two-region temperature maxima."""
         pattern = self._pattern(parameters.get("hotspot", 1.0), parameters.get("neon", False))
         phases = np.linspace(0, 1, 31)
         region_masks = (self.regions == 0, self.regions == 1)
@@ -314,11 +328,9 @@ class FieldEngine:
                                                   parameters.get("heating", 50.0), parameters.get("neon", False))
             budgets.append(budget)
             peak_flux[i] = [float(np.max(flux[mask])) for mask in region_masks]
-            coolant[i, 0] = inlet + budget["blanket_absorbed_MW"] * 1e6 / (2 * 3500 * 0.85 * flow * 5200)
-            coolant[i, 1] = inlet + budget["divertor_absorbed_MW"] * 1e6 / (2 * 3500 * 0.15 * flow * 5200)
-        # Within each region, coolant and positive thermal resistance are constant.
-        # Its hottest vertex is therefore its maximum-flux vertex, at every phase.
-        # Use the same float32 inputs and Warp arithmetic as the full surface solve.
+            coolant[i] = [circuit_temperature(budget, circuit, flow, inlet) for circuit in CIRCUITS]
+        # Coolant and wall resistance are constant per region, so its hottest vertex is
+        # its peak-flux vertex; only two values per phase go through the thermal kernel.
         output = wp.empty(peak_flux.shape, dtype=float, device=self.device)
         wp.launch(thermal_history_kernel, dim=peak_flux.shape,
                   inputs=[wp.array(peak_flux.astype(np.float32), device=self.device),
@@ -395,12 +407,11 @@ class FieldEngine:
         if signature in self._results:
             result, arrays, metadata = self._results[signature]
             self._results.move_to_end(signature)
-            # The service may have reclaimed an old published packet while its
-            # bounded in-memory result is still reusable. Republish its arrays.
+            # The field cache may have reclaimed the packet; republish it from memory.
             reference = result["field_ref"]
             if not (self.runtime / reference["path"]).is_file():
                 result["field_ref"] = self._publish(key, reference["revision"], arrays, metadata)
-            self.last_signature, self.last_result = signature, result
+            self.last_result = result
             self._last_budget = result["power_budget"]
             self._last_radiation, self._last_particle = arrays["surface_heatflux_radiation_MW_m2"], arrays["surface_heatflux_particle_MW_m2"]
             return result
@@ -423,7 +434,7 @@ class FieldEngine:
             series_t, series_q, series_budgets = self._solve_history(parameters)
             history = []
             for t, peak_t, peak_q, series_budget in zip(np.linspace(0, 1, 31), series_t, series_q, series_budgets):
-                outlet = parameters["inlet"] + series_budget["absorbed_thermal_MW"] * 1e6 / (3500 * parameters["flow"] * 5200)
+                outlet = outlet_temperature(series_budget, parameters["flow"], parameters["inlet"])
                 history.append({"phase": float(t), "load_fraction": load_fraction(t),
                                 "heatflux": round(float(peak_q), 3),
                                 "temperature": round(float(peak_t), 2),

@@ -1,10 +1,9 @@
-"""RTWT control requests and a real SimData / NanoVDB / IndeX result pipeline."""
+"""RTWT controls and the plasma volume pipeline: SimData -> NanoVDB -> Kit-CAE -> IndeX."""
 
 import asyncio
 from collections import OrderedDict
 import hashlib
 import json
-import math
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -20,7 +19,6 @@ from omni.cae.core import cache
 from omni.cae.core.commands import execute_command
 from omni.cae.schema import viz as cae_viz
 from omni.cae.simdata import GetField
-from omni.cae.viz import Controller
 from omni.cae.viz.controller import EVT_OPERATOR_COMPLETE
 from omni.cae.viz.listener import Listener
 from omni.rtwt.controller import control_registry, web_api
@@ -49,7 +47,7 @@ def _volume_visibility(state):
 
 @web_api.app.request
 async def fusion_set_state(state: dict):
-    """SDK writes pass through the same validated, serialized HTTP coordinator."""
+    """RTWT writes go through the same validated HTTP coordinator as the browser."""
     if _active is None:
         return {"accepted": False, "error": "Fusion workflow is unavailable"}
     def post():
@@ -77,7 +75,7 @@ def fusion_get_cache():
 
 
 def _sample_volume(data, cutaway):
-    """Revolve the committed synthetic keV profile; do not infer new physics."""
+    """Revolve the R-Z keV slice into the voxel grid, masking the cutaway wedge."""
     points = data["slice_points"]
     radii, heights = np.unique(points[:,0]), np.unique(points[:,2])
     temperatures = data["slice_temperature_keV"].copy()
@@ -87,8 +85,7 @@ def _sample_volume(data, cutaway):
     profile = temperatures.reshape(len(radii),len(heights))
     dimensions = GRID_DIMENSIONS
     spacing = GRID_SPACING
-    # The stock CAE XAC shader samples p / voxel_size - 0.5. Keep the same
-    # world-space voxel centres in the profile, NanoVDB and ImageData metadata.
+    # The CAE shader samples at p / voxel_size - 0.5; offset origins so voxel centres agree.
     origin = tuple((GRID_ORIGIN[i]+.5)*spacing[i] for i in range(3))
     x,y,z = np.meshgrid(*(origin[i]+np.arange(dimensions[i])*spacing[i] for i in range(3)),indexing="ij")
     r = np.sqrt(x*x+y*y)
@@ -106,7 +103,7 @@ def _sample_volume(data, cutaway):
 
 
 class NvidiaWorkflow:
-    """submit is non-blocking; status reports volume completion independently."""
+    """submit() is non-blocking; status reports when the volume actually reaches IndeX."""
 
     def __init__(self, stage, root):
         global _active
@@ -193,7 +190,7 @@ class NvidiaWorkflow:
         CallbackRegistry.unregister("fusion.engineering.volume_visibility")
 
     def _controls_changed(self, notice, stage):
-        """Standard RTWT set_state and USD edits enter the same validated solver."""
+        """Standard RTWT set_state writes USD; forward the change to the validated coordinator."""
         if self.closed or self.syncing_controls or not self.committed_controls:
             return
         for path in notice.GetChangedInfoOnlyPaths():
@@ -287,8 +284,7 @@ class NvidiaWorkflow:
             self.status["volume_cache_source"] = source
             self._apply_transfer(state)
             return key,source
-        # Publishing replaces the dataset before its GPU completion is known.
-        # A superseding request or failure must not reuse the previous applied key.
+        # The dataset is replaced before IndeX finishes; never reuse the old key after this point.
         self.volume_key = None
         dimensions = tuple(int(x) for x in payload["dimensions"])
         image = OmniSciVtk.ImageDataAPI.Apply(self.dataset)
@@ -343,8 +339,7 @@ class NvidiaWorkflow:
                                                      and k not in self.requested_controls and k not in self.inflight_controls})
                 if accepted is not True:
                     raise RuntimeError("RTWT did not accept committed application state")
-                # CAE skips invisible operators and then clears their dirty fields.
-                # Commit the visibility binding before publishing a new dataset.
+                # CAE skips invisible operators and drops their pending updates: settle visibility first.
                 expected_visibility = "inherited" if state.get("mode") == "volume" else "invisible"
                 for _ in range(200):
                     await omni.kit.app.get_app().next_update_async()
@@ -365,8 +360,7 @@ class NvidiaWorkflow:
                 prior_native = cache.get(native_cache_key,timeCode=Usd.TimeCode.EarliestTime())
                 if state.get("mode") == "volume":
                     key,_ = await self._publish(state,data,reference)
-                # USD/Fabric population and the CAE listener run on subsequent Kit updates.
-                # Wait for the actual binding/output, not merely for set_state to return.
+                # CAE runs on later Kit updates; wait for its operator output, not for set_state.
                 for _ in range(200):
                     await omni.kit.app.get_app().next_update_async()
                     if self.latest is not None:
@@ -386,11 +380,9 @@ class NvidiaWorkflow:
                 if key is not None:
                     dataset = cache.get(f"[viz:index_volume]::{VOLUME}",timeCode=Usd.TimeCode.EarliestTime())
                     volume = self.stage.GetPrimAtPath(VOLUME)
-                    # FieldSelectionAPI:colors maps the source Temperature to its instance name.
                     if dataset is None or "colors" not in dataset.get_field_names():
                         names = dataset.get_field_names() if dataset is not None else None
                         raise RuntimeError(f"IndeX did not publish selected colors; available fields: {names}")
-                    # CAE skips voxelization (and cae_mask) when the source is already NanoVDB.
                     if not isinstance(dataset.get_field("colors").get_data(),wp.Volume):
                         raise RuntimeError("IndeX did not retain the NanoVDB field")
                     if not volume.GetAttribute("nvindex:composite").Get():

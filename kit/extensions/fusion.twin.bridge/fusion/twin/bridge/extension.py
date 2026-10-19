@@ -1,4 +1,4 @@
-"""Native USD/RTX controller; all edits live in the session layer."""
+"""Kit renderer bridge: applies service snapshots to USD (session layer only) and runs commands."""
 
 import asyncio
 import hashlib
@@ -56,7 +56,6 @@ class FusionTwinExtension(omni.ext.IExt):
         self.command_seq = 0
         self.command_task = None
         self.applied_field_key = None
-        self.field_reference = None
         self.field_data = None
         self.nvidia_workflow = None
         self.gpu_name = None
@@ -73,11 +72,11 @@ class FusionTwinExtension(omni.ext.IExt):
         self.last_frame = time.perf_counter()
         self.fps = 0.0
         self.components = {}
-        self.sectors = []
         self.materials = {}
         self.camera_transforms = {}
         self.hall_walls = []
         self.hall_hidden_walls = []
+        self.hall_camera_pose = None
         self.hall_explode = None
         self.field_topology_loaded = False
         self.original_bindings = {}
@@ -87,7 +86,6 @@ class FusionTwinExtension(omni.ext.IExt):
         self.error = None
         self.capture_path = None
         self.capture_pending = False
-        self.capture_task = None
         self.reset_task = None
         self.orbit_angle = 0.0
         self.alive = True
@@ -181,13 +179,15 @@ class FusionTwinExtension(omni.ext.IExt):
         if pose != self.last_camera_pose:
             self.last_camera_pose = pose
             self.last_camera_motion = now
-        if pose != getattr(self, "hall_camera_pose", None) or self.state.get("explode", 0) != getattr(self, "hall_explode", None):
+        if pose != self.hall_camera_pose or self.state.get("explode", 0) != self.hall_explode:
             self.hall_camera_pose = pose
             self.hall_explode = self.state.get("explode", 0)
             self._update_hall_visibility(UsdGeom.Xformable(camera).ComputeLocalToWorldTransform(Usd.TimeCode.Default()).ExtractTranslation())
         interacting = self.state.get("orbit") or self.state.get("playing") or now - self.last_camera_motion < self.settle_seconds
         self.quality = "interaction" if interacting and not self.capture_pending else "detail"
         resolution = self.interactive_resolution if self.quality == "interaction" else self.render_resolution
+        # Each resize rebuilds the Hydra engine; repeated rebuilds deadlock Kit 110.1.3.
+        # The shipped config keeps both sizes equal, so this assignment never fires.
         if tuple(viewport.resolution) != resolution:
             viewport.resolution = resolution
         settings = carb.settings.get_settings()
@@ -195,7 +195,6 @@ class FusionTwinExtension(omni.ext.IExt):
             settings.set("/rtx/rendermode", "RealTimePathTracing")
 
     def _collect_hall_walls(self):
-        """Resolve the three authored facility segments once, outside the frame loop."""
         self.hall_walls = []
         self.hall_hidden_walls = []
         self.hall_camera_pose = None
@@ -220,8 +219,7 @@ class FusionTwinExtension(omni.ext.IExt):
         axis, plane = int(rule["axis"]), float(rule["plane"])
         if (eye[axis] - plane) * rule["outsideSign"] <= .75:
             return False
-        # Project a conservative CAD inspection envelope to the wall plane. This
-        # catches walls covering a machine edge even when its centre stays visible.
+        # Project the machine's bounding envelope onto the wall plane, not just its centre.
         radius = 22. + 6. * float(explode)
         tangents, heights = [], []
         for x in (-radius, radius):
@@ -240,7 +238,7 @@ class FusionTwinExtension(omni.ext.IExt):
 
     def _update_hall_visibility(self, eye):
         hidden_names = []
-        for wall in getattr(self, "hall_walls", ()):
+        for wall in self.hall_walls:
             hidden = self._wall_obscures_machine(eye, wall["rule"], self.state.get("explode", 0))
             if hidden != wall["hidden"]:
                 value = "invisible" if hidden else "inherited"
@@ -312,10 +310,8 @@ class FusionTwinExtension(omni.ext.IExt):
                     or self.state.get("heatScale") != previous.get("heatScale")):
                 self._apply_fields(reference, data)
                 if self.state.get("mode") in ("temperature", "heatflux", "delta_temperature", "delta_heatflux", "slice"):
-                    # Let the pending reset consume the latest colours during continuous input.
                     if self.reset_task is None or self.reset_task.done():
                         self.reset_task = asyncio.ensure_future(self._reset_renderer(settle_frames=1))
-            self.field_reference = reference
             self.field_data = data
             self.applied_field_key = reference["key"]
             if design_changed or any(self.state.get(key) != previous.get(key) for key in ("mode", "visible", "cutaway", "explode", "fieldLines", "lineMotion", "selected")):
@@ -330,12 +326,9 @@ class FusionTwinExtension(omni.ext.IExt):
             raise
 
     def _collect_components(self):
-        self.components, self.sectors, self.original_bindings = {}, [], {}
+        self.components, self.original_bindings = {}, {}
         for component in self.stage.GetPrimAtPath("/World/Machine").GetChildren():
             self.components[component.GetName()] = component
-            for sector in component.GetChildren():
-                if sector.GetName().startswith("sector_"):
-                    self.sectors.append((component.GetName(), int(sector.GetName().rsplit("_", 1)[1]), sector))
             for prim in Usd.PrimRange(component):
                 if prim.IsA(UsdGeom.Mesh):
                     material, _ = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial()
@@ -370,7 +363,7 @@ class FusionTwinExtension(omni.ext.IExt):
         if view != previous.get("view"):
             self._set_camera(view)
         if any(state.get(key) != previous.get(key) for key in ("design", "visible", "cutaway", "explode")):
-            self._apply_geometry_visibility()
+            self.geometry_controller.apply(self.state)
         selected = state.get("selected")
         if selected != previous.get("selected"):
             self._select(selected)
@@ -380,9 +373,6 @@ class FusionTwinExtension(omni.ext.IExt):
             if self.reset_task:
                 self.reset_task.cancel()
             self.reset_task = asyncio.ensure_future(self._reset_renderer())
-
-    def _apply_geometry_visibility(self):
-        self.geometry_controller.apply(self.state)
 
     async def _reset_renderer(self, settle_frames=3):
         app = omni.kit.app.get_app()
@@ -398,10 +388,8 @@ class FusionTwinExtension(omni.ext.IExt):
     def _set_camera(self, name):
         viewport = get_active_viewport()
         camera_path = f"/World/Cameras/{name}"
-        if viewport and self.stage.GetPrimAtPath(camera_path):
-            if str(viewport.camera_path) != camera_path:
-                viewport.camera_path = camera_path
-            self.camera_view = name
+        if viewport and self.stage.GetPrimAtPath(camera_path) and str(viewport.camera_path) != camera_path:
+            viewport.camera_path = camera_path
 
     def _orbit(self):
         camera = UsdGeom.Camera.Get(self.stage, "/World/Cameras/overview")
@@ -477,7 +465,7 @@ class FusionTwinExtension(omni.ext.IExt):
 
     def _command_context_matches(self, context):
         values = {**self.state, "topology_key": self.topology_key, "interaction_key": self.interaction_key(self.state)}
-        # field_key retains the accepted packet for GC; thermal changes do not move pick geometry.
+        # field_key only pins the packet for GC; thermal changes do not move pick geometry.
         return all(values.get(key) == value for key, value in context.items() if key != "field_key")
 
     async def _command(self, command, context):
@@ -541,11 +529,9 @@ class FusionTwinExtension(omni.ext.IExt):
         return material
 
     def _apply_materials(self):
-        mode = self.state.get("mode", "assembly")
         opacity = float(self.state.get("opacity", 1.0))
-        for index, (name, component) in enumerate(self.components.items()):
-            color = (0.48, 0.57, 0.65)
-            material = self._analysis_material(name, color, opacity) if opacity < 0.999 else None
+        for name, component in self.components.items():
+            material = self._analysis_material(name, (0.48, 0.57, 0.65), opacity) if opacity < 0.999 else None
             component_binding = UsdShade.MaterialBindingAPI.Apply(component)
             if material:
                 component_binding.Bind(material, UsdShade.Tokens.strongerThanDescendants)
@@ -660,9 +646,8 @@ class FusionTwinExtension(omni.ext.IExt):
         self.equilibrium_key = reference["equilibrium_key"]
 
     def _animate_field_lines(self, now, force=False):
-        """Update at most 384 marker vertices at 15 Hz; traced field geometry stays fixed."""
         import numpy as np
-        lines = getattr(self, "line_points", None)
+        lines = self.line_points
         if lines is None or len(lines) == 0:
             return
         enabled = self.state.get("lineMotion", True) and (self.state.get("fieldLines") or self.state.get("mode") == "magnetic")
@@ -674,7 +659,6 @@ class FusionTwinExtension(omni.ext.IExt):
         count, length = len(lines), lines.shape[1]
         marker_ids = np.arange(min(count * 4, 96))
         line_ids = marker_ids % count
-        # No end-to-start connector: each marker remains on its own nonperiodic line.
         head = ((marker_ids // count) / 4 + self.line_motion_time / 14) % 1
         span = min(5., max(0., length - 1.))
         samples = head[:, None] * max(0., length - 1 - span) + np.array([0., .58, .72, 1.]) * span
@@ -754,7 +738,7 @@ class FusionTwinExtension(omni.ext.IExt):
             if viewport:
                 viewport.resolution = self.render_resolution
                 target = self.runtime / "preview.png"
-                # NVIDIA's image writer does not accept this workspace's Unicode directory.
+                # Kit's image writer rejects non-ASCII paths such as this project directory.
                 with tempfile.TemporaryDirectory(prefix="fusion-rtx-") as temporary:
                     capture_file = Path(temporary) / "preview.png"
                     capture = capture_viewport_to_file(viewport, str(capture_file))
@@ -808,8 +792,8 @@ class FusionTwinExtension(omni.ext.IExt):
             "ready": bool(self.scene_ready and self.stage and get_active_viewport() and self.applied_field_key is not None and not self.error),
             "applied_revision": self.revision,
             "applied_field_key": self.applied_field_key,
-            "apply_timing": getattr(self, "apply_timing", None),
-            "render_reset": getattr(self, "render_reset", None),
+            "apply_timing": self.apply_timing,
+            "render_reset": self.render_reset,
             "dlss_reset_pending": settings.get("/rtx-transient/post/dlss/forceParamReset"),
             "responsive_denoising_supported": settings.get("/rtx-transient/dldenoiser/responsiveDenoisingSupported"),
             "responsive_denoising": settings.get("/rtx/dldenoiser/responsiveDenoising"),
@@ -828,12 +812,12 @@ class FusionTwinExtension(omni.ext.IExt):
             "rt2_cached": settings.get("/rtx/rtpt/cached/enabled"),
             "auto_exposure": settings.get("/rtx/post/histogram/enabled"),
             "camera_path": str(viewport.camera_path) if viewport else None,
-            "hall_hidden_walls": getattr(self, "hall_hidden_walls", []),
+            "hall_hidden_walls": self.hall_hidden_walls,
             "selected": self.selected,
             "mode": self.state.get("mode"),
             "heat_scale": self.state.get("heatScale", "log"),
             "line_motion": self.state.get("lineMotion", True),
-            "line_marker_vertices": min(len(self.line_points) * 4, 96) * 4 if getattr(self, "line_points", None) is not None else 0,
+            "line_marker_vertices": min(len(self.line_points) * 4, 96) * 4 if self.line_points is not None else 0,
             "field_visibility": field_visibility,
             "visible": {name: UsdGeom.Imageable(prim).ComputeVisibility() != UsdGeom.Tokens.invisible for name, prim in self.components.items()},
             "measurement": self.measurement,
@@ -864,8 +848,6 @@ class FusionTwinExtension(omni.ext.IExt):
             self.command_task.cancel()
         if self.reset_task:
             self.reset_task.cancel()
-        if self.capture_task:
-            self.capture_task.cancel()
         if self.task:
             self.task.cancel()
         self.sub = None

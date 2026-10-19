@@ -1,9 +1,4 @@
-"""Analysis skins reconstructed from the CAD-generating poloidal profiles.
-
-Only the first wall and divertor cavity boundary are revolved. Solid backs,
-breeding-zone/manifold interfaces and toroidal end caps are not analysis faces.
-The result is an axisymmetric analysis approximation of the segmented CAD.
-"""
+"""Axisymmetric first-wall and divertor analysis mesh, revolved from the CAD source profiles."""
 
 from dataclasses import dataclass
 import hashlib
@@ -25,7 +20,7 @@ def sample_polyline(poly, spacing):
 
 
 def project_to_polyline(points, poly):
-    """Closest R,Z projection, returning distance and poloidal arclength."""
+    """Return (distance, arclength) of each point's closest projection onto poly."""
     edge = np.diff(poly, axis=0)
     length = np.linalg.norm(edge, axis=1)
     delta = np.asarray(points)[:, None, :] - poly[None, :-1, :]
@@ -43,7 +38,6 @@ def trim_polyline(poly, start, end):
 
 
 def clip_radial(poly, low, high):
-    """Clip a continuous first-wall profile to a source part's radial bounds."""
     output = []
     for a, b in zip(poly[:-1], poly[1:]):
         cuts = [0.0, 1.0]
@@ -77,8 +71,7 @@ class PFCMesh:
 def build_pfc(source: Path, spacing_scale=1.0):
     machine = json.loads((source / "machine.json").read_text(encoding="utf-8"))
     manifest = json.loads((source / "cad/manifest.json").read_text(encoding="utf-8"))
-    # These panel vertices generate the actual planar FW panels; the smooth
-    # fw_inner_boundary is the design envelope, not the final panel face.
+    # Panel points are the real FW faces; fw_inner_boundary is only the design envelope.
     wall = np.asarray(machine["blanket_panel_points"], dtype=float)[[0, 2]].T
     divertor = np.asarray(machine["div_internal_boundary"], dtype=float)[[0, 2]].T
     _, junction = project_to_polyline(wall[[0, -1]], divertor)
@@ -105,8 +98,7 @@ def build_pfc(source: Path, spacing_scale=1.0):
             edges = np.diff(profile, axis=0)
             edges /= np.linalg.norm(edges, axis=1)[:, None]
             tangent = np.vstack([edges[0], edges[:-1] + edges[1:], edges[-1]])
-            # FW runs up the inner wall and down the outer wall; divertor runs
-            # inner-to-outer underneath the plasma. Both normals face the cavity.
+            # The profiles run in opposite poloidal directions; flip so both normals face the plasma.
             normal_rz = np.column_stack((tangent[:, 1], -tangent[:, 0]))
             if component == "divertor":
                 normal_rz *= -1

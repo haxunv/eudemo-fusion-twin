@@ -1,9 +1,4 @@
-"""Build an inspectable OpenUSD assembly from harvested Bluemira EU-DEMO CAD.
-
-The source CAD is retained unchanged. Render geometry is assembled in metres,
-Z-up; continuous PF/CS and plasma surfaces are revolved from their source RZ
-sections. Original CAD assets remain unchanged.
-"""
+"""Build the OpenUSD scene (metres, Z-up) from the Bluemira EU-DEMO CAD in assets/source."""
 
 from __future__ import annotations
 
@@ -44,7 +39,6 @@ COMPONENTS = {
     "radiation_shield": ("Biological shield", "辐射屏蔽", "concrete", False),
 }
 
-# Color choices aid component inspection; CAD source material names remain metadata.
 MATERIALS = {
     "steel": ((0.53, 0.60, 0.66), 0.90, 0.25),
     "vessel": ((0.42, 0.49, 0.54), 0.86, 0.32),
@@ -149,7 +143,7 @@ def xform(prim, position=None, rotation=None, scale=None):
 
 
 def write_material_assets(scene_dir):
-    """Small deterministic surface data; no CAD edits or external image assets."""
+    """Seeded procedural normal maps and the FusionPBR MDL wrapper around Kit's OmniPBR."""
     directory = scene_dir / "materials"
     directory.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(1842)
@@ -166,8 +160,6 @@ def write_material_assets(scene_dir):
         raw = b"".join(b"\x00" + row.tobytes() for row in image)
         png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 256, 256, 8, 2, 0, 0, 0))
         (directory / f"{name}_normal.png").write_bytes(png + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
-    # OmniPBR is supplied with the installed Kit MDL library. The local wrapper
-    # gives USD a portable, resolvable material asset, with a PreviewSurface fallback.
     (directory / "FusionPBR.mdl").write_text('''mdl 1.7;
 import ::OmniPBR::*;
 export material FusionPBR(
@@ -417,7 +409,6 @@ def ring(stage, path, inner, outer, z, thickness, material, n=180, start=0., swe
 
 
 def bars(stage, path, items, material):
-    """Batch repeated facility bars into one mesh, keeping the USD scene light."""
     points, triangles = [], []
     corners = np.array([[-1,-1,-1], [1,-1,-1], [1,1,-1], [-1,1,-1],
                         [-1,-1,1], [1,-1,1], [1,1,1], [-1,1,1]], dtype=float) / 2
@@ -470,7 +461,6 @@ def environment(stage):
     cube(stage, root + "/Floor", (0, 0, -16.4), (108, 108, .6), "floor")
     ring(stage, root + "/Pit/RetainingWall", 22.0, 23.4, -14.8, 1.3, "concrete")
     ring(stage, root + "/Pit/InnerLiner", 21.92, 22.0, -15.0, 1.0, "steel")
-    # The observation quadrant has no tall walls or platform across the CAD cut.
     cube(stage, root + "/Hall/BackWall", (0, 35.0, 4), (72, 1.5, 40), "concrete")
     for side in (-1, 1):
         centre_y, length = (3.5, 63.) if side < 0 else (15., 40.)
@@ -490,8 +480,7 @@ def environment(stage):
     bars(stage, root + "/Hall/LeftColumns", side_columns[-1], "paint_blue")
     bars(stage, root + "/Hall/RightColumns", side_columns[1], "paint_blue")
     bars(stage, root + "/Hall/ConcretePanelJoints", joints, "structure")
-    # Only these illustrative hall pieces are camera-cut. The CAD assembly and
-    # its engineering visibility/selection never participate in this rule.
+    # Walls the renderer may hide when they block the camera; never applied to the CAD assembly.
     for name, axis, plane, tangent_range, sign, linked in (
         ("BackWall", 1, 35., (-36., 36.), 1, ("BackColumns", "ConcretePanelJoints")),
         ("SideWall_0", 0, -35., (-28., 35.), -1, ("LeftColumns",)),
@@ -512,7 +501,6 @@ def environment(stage):
     cube(stage, root + "/Crane/HookBlock", (-21, 11, 8.6), (1.0, .7, .8), "safety_yellow")
     rod(stage, root + "/Crane/Hook", (-21, 11, 8.2), (-20.8, 11, 7.7), .12, "steel")
 
-    # Elevated maintenance deck, 0.15 m grating pitch and 1.1 m fall protection.
     ring(stage, root + "/Platform/InnerGirder", 22.8, 23.05, -8.0, .6, "structure", 120, 10, 225)
     ring(stage, root + "/Platform/OuterGirder", 25.2, 25.45, -8.0, .6, "structure", 120, 10, 225)
     grating, posts = [], []
@@ -568,7 +556,6 @@ def lighting(stage):
     dome = UsdLux.DomeLight.Define(stage, "/World/Lighting/StudioFill")
     dome.CreateIntensityAttr(290)
     dome.CreateColorAttr(Gf.Vec3f(0.85, 0.89, 0.95))
-    # Broad practical hall lighting preserves metal reflections and engineering colours.
     for name, eye, size, intensity, color in (
         ("Key", (18, -26, 28), (20, 14), 2900, (1.0, 0.95, 0.87)),
         ("Left", (-27, -13, 14), (12, 24), 1900, (0.79, 0.87, 1.0)),

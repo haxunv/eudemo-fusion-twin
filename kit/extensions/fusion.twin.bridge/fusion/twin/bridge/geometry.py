@@ -1,11 +1,11 @@
-"""Session-layer CAD cuts, with exposed caps and source topology restoration."""
+"""Cutaway and explode for the CAD assembly, written to the session layer and reversible."""
 
 import math
 import sys
 from pathlib import Path
 
 import numpy as np
-from pxr import Gf, Usd, UsdGeom, Vt
+from pxr import Gf, UsdGeom, Vt
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[6] / "app"))
 from fusion_twin.geometry import angular_bounds, clip_mesh_angular, merge_meshes, revolve_from_endcap
@@ -31,11 +31,7 @@ def _normals(points, triangles):
 
 
 class GeometryController:
-    """Call reset after changing design, then apply with the committed state.
-
-    apply controls component/part visibility and sector explode transforms. CAD
-    source layers stay untouched. Cuts use un-exploded world angles [0,360-cut].
-    """
+    """Call reset() after a design switch, then apply(state). Cuts keep world angles [0, 360-cut]."""
 
     def __init__(self, stage):
         self.stage = stage
@@ -112,7 +108,6 @@ class GeometryController:
             return None
         if sum(b-a for a,b in intervals) >= high-low-1e-4:
             return points,triangles,False
-        # Identical source parts share clipped geometry across toroidal sectors.
         key = (path.split('/')[3],path.rsplit('/',1)[1],
                tuple((round(a,4),round(b,4)) for a,b in intervals))
         if key not in self.cut_cache:

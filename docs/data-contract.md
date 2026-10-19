@@ -26,7 +26,7 @@ Capture results have immutable per-request URLs `/api/captures/<hash>.png`. `GET
 
 ## Rendering and NVIDIA workflow
 
-The output/stream resolution is fixed at 2560×1440 (QHD), targeting 30 FPS with frame generation disabled. `render_resolution` reports the viewport texture: 1920×1080 during camera motion, orbit or playback; it returns to native 2560×1440 viewport dimensions once the camera has settled for 0.75 seconds and orbit/playback are inactive. PNG captures request full QHD detail from the current RTX viewport. The motion stream is QHD output from a 1080p viewport, not native QHD motion rendering. RT2 additionally uses DLSS temporal reconstruction, so viewport dimensions do not imply native per-pixel sampling.
+The output/stream resolution is fixed at 2560×1440 (QHD), targeting 30 FPS with frame generation disabled. `render_resolution` reports the viewport texture, which stays at 2560×1440 during motion and at rest: the interactive size (`/fusion/render/interactiveWidth/Height`) equals the output size because every viewport resize rebuilds the Kit 110.1.3 RTX Hydra engine, and repeated rebuilds deadlocked the main thread in `UsdContext` scheduling. `quality` still reports interaction/detail, but no longer changes the viewport size. PNG captures come from the current RTX viewport. RT2 additionally uses DLSS temporal reconstruction, so viewport dimensions do not imply native per-pixel sampling.
 
 All modes (`assembly`, `magnetic`, `temperature`, `heatflux`, `delta_temperature`, `delta_heatflux`, `slice`, `volume`) use RTX Real-Time 2.0 (`RealTimePathTracing`) for both live video and PNG capture. Camera motion, settling and capture keep the same engine; quality changes adjust viewport resolution only. There is no automatic switch to offline Path Tracing or progressive 256-sample accumulation.
 
@@ -61,3 +61,9 @@ NPZ arrays include surface points/triangles/normals/vertex areas/regions/part ID
 `metadata_json` records `synthetic_demo`, units, design/equilibrium, power budget, strike points, assumptions and PFC provenance. The power ledger, coolant KPI and visualization share the same committed result. Physical interpretation and limitations are documented in [physics-model.md](physics-model.md).
 
 `GET /api/export` includes `manifest_source` and the complete source provenance record with upstream commits, licenses and asset hashes. The source B-rep is a sector asset; CAD ZIP preserves it. USD contains both design variants and the assembled machine.
+
+## Data import
+
+`POST /api/import/scenarios` computes 1–32 partial states (JSON `{"cases": [...], "apply": id}` or CSV with `?apply=id`) on top of the current state and returns per-case metrics and power budgets. Only the case named by `apply` is committed; others do not change `revision`. Each case is validated with the same rules as `POST /api/state`.
+
+`POST /api/import/surface` interpolates `[R, Z, value]` or `[x, y, z, value]` rows (metres, machine frame) onto the analysis mesh with k=4 inverse-distance weighting; vertices farther than `max_distance` from every sample are NaN (neutral colour). The service writes a separate packet derived from the computed one, so the computed packet is never modified, and records the computed packet as `result.source_field_ref`. The import persists across later state changes until `DELETE /api/import/surface`, is reported as `result.imported_surface`, and is not persisted across a service restart. Zero coverage is rejected without a state change.

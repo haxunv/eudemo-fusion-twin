@@ -1,4 +1,4 @@
-"""Transport-independent command and immutable-field protocol."""
+"""Command queue between service and renderer, and immutable field-packet loading."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ ACTION_BINDINGS = {"request_id", "renderer_epoch", "server_epoch", "topology_key
 
 
 def interaction_key(state):
-    """Geometry/view identity, independent of selection, UI text and thermal values."""
+    """Identity of what is on screen; pick/measure commands are rejected if it changes."""
     keys = ("design", "equilibrium", "view", "mode", "cutaway", "explode", "opacity", "visible", "fieldLines")
     encoded = json.dumps({key: state.get(key) for key in keys}, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
@@ -30,7 +30,7 @@ class ProtocolError(ValueError):
 
 
 class TerminalStore:
-    """Small durable completion records; memory retention never permits UUID replay."""
+    """Durable completion records, so an evicted request_id can never be replayed."""
     def __init__(self, directory):
         self.directory = Path(directory)
         self.directory.mkdir(parents=True, exist_ok=True)
@@ -189,7 +189,7 @@ class CommandQueue:
 
 
 class CommandConsumer:
-    """Single in-flight operation; retain every completion until its watermark is acknowledged."""
+    """Renderer side: one command in flight; acks are kept until the service watermark passes them."""
     def __init__(self, renderer_epoch=None):
         self.renderer_epoch = renderer_epoch or uuid.uuid4().hex
         self.server_epoch = None
@@ -234,7 +234,6 @@ class CommandConsumer:
 
 
 def load_field_packet(runtime: Path, reference: dict):
-    """Read exactly the immutable file named by the snapshot and validate identity."""
     import numpy as np
 
     if reference.get("schema_version") not in {1, 2}:

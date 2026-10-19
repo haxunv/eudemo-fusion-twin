@@ -51,8 +51,10 @@ rtx.index.compositeDepthMode = 3
 rtx.index.overrideSubdivisionMode = "kd_tree"
 rtx.index.overrideSubdivisionPartCount = 1
 persistent.rtx.modes.rt2.enabled = true
-fusion.render.interactiveWidth = 1920
-fusion.render.interactiveHeight = 1080
+# Kept equal to the output size: each viewport resize rebuilds the RTX Hydra engine,
+# and repeated rebuilds deadlocked Kit 110.1.3 in UsdContext scheduling.
+fusion.render.interactiveWidth = 2560
+fusion.render.interactiveHeight = 1440
 fusion.render.settleSeconds = 0.75
 rtx.rendermode = "RealTimePathTracing"
 rtx-transient.dlssg.enabled = false

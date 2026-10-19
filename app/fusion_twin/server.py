@@ -1,4 +1,4 @@
-"""Local web application and serialized state/compute coordinator."""
+"""HTTP service and the single serialized coordinator for state, compute and commands."""
 
 from __future__ import annotations
 
@@ -13,10 +13,11 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qsl, unquote, urlparse
 
 from .compute import FieldEngine, SCENARIOS, atomic_json
 from .field_cache import FieldCache
+from .imports import MAX_BODY_BYTES, SCENARIO_KEYS, SurfaceImport, parse_cases, summarize_case
 from .protocol import CommandQueue, ProtocolError, interaction_key
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,6 +39,7 @@ ENUMS = {
 }
 BOUNDS = {"power": (500, 2600), "heating": (20, 65), "flow": (0.4, 1.4), "inlet": (200, 400), "phase": (0, 1), "cutaway": (0, 180), "explode": (0, 1), "opacity": (0.1, 1)}
 BOOLEANS = {"fieldLines", "lineMotion", "neon", "orbit", "playing"}
+_KEEP = object()
 
 
 def validate_patch(patch: dict, component_ids: set[str]) -> dict:
@@ -96,6 +98,7 @@ class TwinApplication:
         self._renderer_snapshot = None
         self.commands = CommandQueue(saved.get("action_records", []), terminal_directory=self.runtime / "commands/completed")
         self.field_cache = FieldCache(self.runtime, saved.get("field_publications", []))
+        self.surface_import = None
         self.engine = (engine_factory or FieldEngine)(root)
         self.result = self.engine.compute(self.state, self.revision)
         self._publish()
@@ -105,7 +108,8 @@ class TwinApplication:
 
     def _publish(self):
         self.publication_pending = True
-        self.field_cache.record(self.result.get("field_ref"), self.revision)
+        for reference in (self.result.get("source_field_ref"), self.result.get("field_ref")):
+            self.field_cache.record(reference, self.revision)
         atomic_json(self.runtime / "state.json", {
             "server_epoch": self.commands.epoch, "revision": self.revision,
             "state": self.state, "result": self.result, "field_ref": self.result.get("field_ref"),
@@ -116,7 +120,7 @@ class TwinApplication:
         self.publication_pending = False
 
     def collect_fields(self):
-        # Never collect concurrently with the single field writer or its publication.
+        # Holding the compute lock keeps collection off any packet that is being written.
         if not self.compute_lock.acquire(blocking=False):
             return {"deleted": [], "bytes": 0}
         try:
@@ -156,7 +160,6 @@ class TwinApplication:
                             "read_error": read_error}
             else:
                 self._renderer_snapshot = (payload, modified)
-            # Preserve the successful file's timestamp and keep callers out of the cache.
             payload, modified = self._renderer_snapshot
             payload = copy.deepcopy(payload)
             age = time.time() - modified
@@ -180,24 +183,65 @@ class TwinApplication:
                     "field_ref": self.result.get("field_ref"), "renderer": renderer,
                     "actions": self.commands.saved()[-32:]}
 
-    def patch(self, patch):
-        clean = validate_patch(patch, self.component_ids)
+    def _merge(self, clean):
+        state = copy.deepcopy(self.state)
+        if "scenario" in clean and clean["scenario"] != state["scenario"]:
+            state.update({k: v for k, v in SCENARIOS[clean["scenario"]].items() if k != "hotspot"})
+        if "visible" in clean:
+            clean = {**clean, "visible": {**state["visible"], **clean["visible"]}}
+        if any(clean.get(key, state[key]) != state[key] for key in ("design", "equilibrium")):
+            state["selected"] = ""
+        state.update(clean)
+        return state
+
+    def _commit(self, clean, surface=_KEEP):
         with self.compute_lock:
             with self.lock:
-                state = copy.deepcopy(self.state)
+                state = self._merge(clean)
                 revision = self.revision + 1
-            if "scenario" in clean and clean["scenario"] != state["scenario"]:
-                state.update({k: v for k, v in SCENARIOS[clean["scenario"]].items() if k != "hotspot"})
-            if "visible" in clean:
-                clean["visible"] = {**state["visible"], **clean["visible"]}
-            if any(clean.get(key, state[key]) != state[key] for key in ("design", "equilibrium")):
-                state["selected"] = ""
-            state.update(clean)
+            if surface is _KEEP:
+                surface = self.surface_import
             result = self.engine.compute(state, revision)
+            if surface:
+                result = surface.apply(self.runtime, result, require_coverage=surface is not self.surface_import)
             with self.lock:
-                self.state, self.revision, self.result = state, revision, result
+                self.state, self.revision, self.result, self.surface_import = state, revision, result, surface
                 self._publish()
                 return self.snapshot()
+
+    def patch(self, patch):
+        return self._commit(validate_patch(patch, self.component_ids))
+
+    def import_scenarios(self, cases, apply=None):
+        """Compute each case on top of the current state; commit only the case named by apply."""
+        validated = []
+        for identifier, case in cases:
+            try:
+                validated.append((identifier, case, validate_patch(case, self.component_ids)))
+            except ValueError as exc:
+                raise ValueError(f"{identifier}: {exc}") from None
+        summaries = []
+        with self.compute_lock:
+            for identifier, case, clean in validated:
+                with self.lock:
+                    state = self._merge(clean)
+                    revision = self.revision
+                result = self.engine.compute(state, revision)
+                self.field_cache.record(result["field_ref"], revision)
+                summaries.append({"id": identifier, "inputs": {key: state[key] for key in SCENARIO_KEYS},
+                                  **summarize_case(result)})
+        response = {"cases": summaries, "applied": None}
+        if apply:
+            snapshot = self.patch(next(case for identifier, case in cases if identifier == apply))
+            response.update(applied=apply, revision=snapshot["revision"])
+        return response
+
+    def import_surface(self, surface):
+        snapshot = self._commit({"mode": surface.mode}, surface)
+        return {"revision": snapshot["revision"], "imported_surface": snapshot["result"]["imported_surface"]}
+
+    def clear_surface_import(self):
+        return {"revision": self._commit({}, surface=None)["revision"], "imported_surface": None}
 
     def action(self, action):
         if not isinstance(action, dict) or action.get("type") not in {"capture", "pick", "measure", "measure_start", "measure_clear", "reset_camera"}:
@@ -239,7 +283,7 @@ class TwinApplication:
                         raise ProtocolError("Volume field is still synchronizing", 409)
                     context["interaction_key"] = geometry_key
                 record = self.commands.submit(action, renderer, context)
-            # A retry also republishes work if a prior disk write failed before its HTTP response.
+            # Also republishes a retried command whose earlier disk write failed.
             self._publish()
         return {"accepted": True, "queued": record["status"] not in {"completed", "failed", "cancelled"}, "command_seq": record["seq"], **record}
 
@@ -270,7 +314,7 @@ class TwinApplication:
 
 
 class FusionHTTPServer(ThreadingHTTPServer):
-    # Python's default backlog of five resets burst connections on Windows.
+    # The default backlog of 5 resets burst connections on Windows.
     request_queue_size = 256
 
 
@@ -307,6 +351,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(self.app.snapshot())
         if path == "/api/manifest":
             return self.send_json(self.app.manifest)
+        if path == "/api/import/surface":
+            return self.send_json({"imported_surface": self.app.result.get("imported_surface")})
         if path == "/api/status":
             return self.send_json({"service": "ready", "version": "0.1.0", "project_root": str(self.app.root.resolve()),
                                    "pid": os.getpid(), "renderer": self.app.renderer(),
@@ -357,20 +403,37 @@ class Handler(BaseHTTPRequestHandler):
             pass
 
     def do_POST(self):
+        url = urlparse(self.path)
+        query = dict(parse_qsl(url.query))
+        content_type = self.headers.get("Content-Type", "application/json")
+        limit = MAX_BODY_BYTES if url.path.startswith("/api/import/") else 64000
         try:
             length = int(self.headers.get("Content-Length", 0))
-            if not 0 < length <= 64000:
-                return self.send_json({"error": "Invalid request size"}, 400)
-            body = json.loads(self.rfile.read(length))
-            if self.path == "/api/state":
-                return self.send_json(self.app.patch(body))
-            if self.path == "/api/action":
-                return self.send_json(self.app.action(body))
+            if not 0 < length <= limit:
+                return self.send_json({"error": f"Request body must be 1-{limit} bytes"}, 413 if length > limit else 400)
+            body = self.rfile.read(length)
+            if url.path == "/api/state":
+                return self.send_json(self.app.patch(json.loads(body)))
+            if url.path == "/api/action":
+                return self.send_json(self.app.action(json.loads(body)))
+            if url.path == "/api/import/scenarios":
+                return self.send_json(self.app.import_scenarios(*parse_cases(body, content_type, query)))
+            if url.path == "/api/import/surface":
+                return self.send_json(self.app.import_surface(SurfaceImport.parse(body, content_type, query)))
             return self.send_json({"error": "Unknown endpoint"}, 404)
         except ProtocolError as exc:
             return self.send_json({"error": str(exc)}, exc.status)
-        except (ValueError, TypeError) as exc:
+        except (ValueError, TypeError, KeyError, UnicodeDecodeError) as exc:
             return self.send_json({"error": str(exc)}, 400)
+        except Exception as exc:
+            print(f"Request failed: {type(exc).__name__}: {exc}", flush=True)
+            return self.send_json({"error": "Compute request failed; see local server log"}, 500)
+
+    def do_DELETE(self):
+        if urlparse(self.path).path != "/api/import/surface":
+            return self.send_json({"error": "Unknown endpoint"}, 404)
+        try:
+            return self.send_json(self.app.clear_surface_import())
         except Exception as exc:
             print(f"Request failed: {type(exc).__name__}: {exc}", flush=True)
             return self.send_json({"error": "Compute request failed; see local server log"}, 500)

@@ -1,4 +1,4 @@
-"""CAD-derived revolutions and closed angular mesh cuts, in metres and Z-up."""
+"""Mesh revolution and closed angular cuts for CAD parts (metres, Z-up)."""
 
 from __future__ import annotations
 
@@ -42,11 +42,7 @@ def merge_meshes(meshes):
 
 
 def revolve_from_endcap(points, triangles, angle_deg=20.0, max_step_deg=2.0):
-    """Revolve the source zero-angle cap, preserving its holes and part boundary.
-
-    Original cap triangulation supplies the RZ section. Only its boundary edges
-    create the lateral surface; artificial radial caps remain separate meshes.
-    """
+    """Revolve a part's zero-angle cap; returns body, cap_start and cap_end meshes."""
     points, triangles = weld_mesh(points, triangles)
     cap = triangles[np.all(np.abs(points[triangles, 1]) <= TOLERANCE, axis=1)]
     if not len(cap):
@@ -54,7 +50,7 @@ def revolve_from_endcap(points, triangles, angle_deg=20.0, max_step_deg=2.0):
     profile, cap = weld_mesh(points, cap)
     profile = np.column_stack((np.linalg.norm(profile[:, :2], axis=1),
                                np.zeros(len(profile)), profile[:, 2]))
-    # Start outward normal is -Y. Source tessellation winding is not assumed.
+    # Orient the start cap to face -Y; source winding is not consistent.
     normals = np.cross(profile[cap[:, 1]] - profile[cap[:, 0]],
                        profile[cap[:, 2]] - profile[cap[:, 0]])
     cap[normals[:, 1] > 0] = cap[normals[:, 1] > 0][:, ::-1]
@@ -72,7 +68,6 @@ def revolve_from_endcap(points, triangles, angle_deg=20.0, max_step_deg=2.0):
     n = len(profile)
     for step in range(steps):
         for a, b in boundary:
-            # Reverse the cap boundary edge on the adjoining side wall.
             faces.extend(((b + step*n, a + step*n, a + (step+1)*n),
                           (b + step*n, a + (step+1)*n, b + (step+1)*n)))
     return {"body": weld_mesh(rings.reshape(-1, 3), faces),
@@ -103,7 +98,7 @@ def _proper_intersection(a, b, c, d):
 
 
 def _triangulate_loops(points, loops):
-    """Ear clipping with visible bridges for nested planar contours."""
+    """Ear-clip nested planar contours, bridging holes into their outer loop."""
     polygons = [list(loop) for loop in loops if len(loop) >= 3]
     parents = []
     for i, loop in enumerate(polygons):
@@ -162,7 +157,7 @@ def _triangulate_loops(points, loops):
                 found = True
                 break
             if not found:
-                # Boundary vertices from triangle cuts can be exactly collinear.
+                # Cut contours can contain exactly collinear vertices; drop one and retry.
                 for k,b in enumerate(remaining):
                     a,c = remaining[k-1],remaining[(k+1)%len(remaining)]
                     if abs(_cross(points[a],points[b],points[c])) < 1e-11:
@@ -239,11 +234,7 @@ def clip_mesh_angular(points, triangles, start_deg, end_deg):
 
 
 def clip_visible_arc(points, triangles, end_deg):
-    """Keep [0,end] for a source part spanning less than 180 degrees.
-
-    The demo retains 180..360 degrees. Parts across the zero-angle seam can
-    become two disconnected solids; each is independently capped.
-    """
+    """Keep [0,end] degrees; parts straddling the 0-degree seam are split and capped separately."""
     if end_deg >= 360-1e-7:
         return np.asarray(points), np.asarray(triangles)
     if not 180 <= end_deg < 360:

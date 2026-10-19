@@ -3,6 +3,7 @@
 import asyncio
 import importlib
 import json
+import re
 import sys
 import tempfile
 import time
@@ -80,7 +81,11 @@ class BridgeTests(unittest.IsolatedAsyncioTestCase):
         bridge.runtime = Path(self.temporary.name)
         bridge.state = {}
         bridge.revision = -1
-        bridge.field_data = bridge.field_reference = None
+        bridge.field_data = None
+        bridge.line_points = None
+        bridge.apply_timing = bridge.render_reset = None
+        bridge.hall_walls, bridge.hall_hidden_walls = [], []
+        bridge.hall_camera_pose = bridge.hall_explode = None
         bridge.nvidia_workflow = None
         bridge.gpu_name = None
         bridge.applied_field_key = bridge.topology_key = bridge.equilibrium_key = bridge.color_key = None
@@ -220,6 +225,12 @@ class BridgeTests(unittest.IsolatedAsyncioTestCase):
         np.testing.assert_array_equal(markers.GetPointsAttr().Get(), moved)
         self.assertEqual(markers.ComputeVisibility(), "invisible")
         self.assertEqual(lines.ComputeVisibility(), "inherited")
+
+    def test_shipped_config_never_resizes_the_viewport(self):
+        text = (Path(__file__).resolve().parents[1] / "kit/apps/fusion_twin.kit").read_text(encoding="utf-8")
+        setting = lambda name: re.search(rf"^{re.escape(name)}\s*=\s*(\d+)", text, re.M).group(1)
+        self.assertEqual((setting("fusion.render.interactiveWidth"), setting("fusion.render.interactiveHeight")),
+                         (setting("renderer.resolution.width"), setting("renderer.resolution.height")))
 
     async def test_assembly_changes_resolution_without_switching_the_rt2_engine(self):
         bridge = self.bridge

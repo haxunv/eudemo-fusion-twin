@@ -1,4 +1,4 @@
-"""Reclaim only published field packets that no active snapshot can still reference."""
+"""Delete field packets that no snapshot, command or renderer can still reference."""
 
 from pathlib import Path
 
@@ -12,7 +12,6 @@ class FieldCache:
     def record(self, reference, snapshot_revision):
         if reference:
             key = reference["key"]
-            # Reusing a packet at a newer snapshot keeps it protected until that snapshot is consumed.
             self.publications.pop(key, None)
             self.publications[key] = {"key": key, "path": reference["path"], "snapshot_revision": snapshot_revision}
 
@@ -24,7 +23,7 @@ class FieldCache:
             return {"deleted": [], "bytes": 0}
         watermark = renderer.get("applied_revision", -1)
         protected = {current_key, renderer.get("applied_field_key"), renderer.get("applied_volume_field_key"),
-                     renderer.get("pending_volume_field_key"), renderer.get("volume_pending_field_key")}
+                     renderer.get("pending_volume_field_key")}
         protected.update(extra_protected)
         protected.update(list(self.publications)[-self.keep:])
         for key, item in self.publications.items():
@@ -41,7 +40,6 @@ class FieldCache:
                 size = path.stat().st_size if path.exists() else 0
                 path.unlink(missing_ok=True)
             except PermissionError:
-                # A Windows reader still owns the file; retry after a later acknowledged snapshot.
                 continue
             self.publications.pop(key)
             deleted.append(key)
